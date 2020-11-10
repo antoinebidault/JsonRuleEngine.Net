@@ -1,0 +1,11 @@
+{
+  "name": "jsonrule.net",
+  "version": "1.0.0",
+  "description": "A basic .net core json-rule interpreter using the json-rule-engine standard",
+  "main": "index.js",
+  "scripts": {
+    "test": "dotnet run test"
+  },
+  "author": "antoinebidault",
+  "license": "ISC"
+}

@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "urz2Qj5gxDkJwaDbouenv66fOmfEu0blWAvBhhlvA3B/1+hvYkvPh+d592BFTSobN8I3blG5lYvOFUfrk9WHJA==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\clement bidault\\source\\repos\\JsonRule.Net\\JsonRule.Net.csproj",
+  "expectedPackageFiles": [
+    "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder\\microsoft.netcore.platforms\\1.1.0\\microsoft.netcore.platforms.1.1.0.nupkg.sha512",
+    "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder\\netstandard.library\\2.0.3\\netstandard.library.2.0.3.nupkg.sha512"
+  ],
+  "logs": []
+}
