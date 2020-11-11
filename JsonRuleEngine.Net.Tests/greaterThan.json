@@ -1,0 +1,10 @@
+﻿{
+  "separator": "And",
+  "rules": [
+    {
+      "field": "Price",
+      "operator": "greaterThan",
+      "value": 50
+    }
+  ]
+}

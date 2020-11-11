@@ -1,4 +1,6 @@
 
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -63,17 +65,18 @@ namespace JsonRuleEngine.Net
 
                 if (rule.Operator == ConditionRuleOperator.@in)
                 {
+                    IEnumerable<string> array = ((JToken)rule.Value).Values<string>();
                     var contains = MethodContains.MakeGenericMethod(typeof(string));
                     var right = Expression.Call(
                         contains,
-                        Expression.Constant(value),
+                        Expression.Constant(array),
                         property);
                     left = bind(left, right);
                 }
                 else
                 {
                     object val = value is bool || value is string ?
-                        (object)value.ToString() : decimal.Parse(value.ToString());
+                        (object)value.ToString() : double.Parse(value.ToString());
                     var toCompare = Expression.Constant(val);
                     Expression right = null;
                     if (rule.Operator == ConditionRuleOperator.equal)

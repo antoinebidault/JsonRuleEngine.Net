@@ -1,5 +1,5 @@
 ﻿{
-  "condition": "And",
+  "separator": "And",
   "rules": [
     {
       "field": "Category",
@@ -10,17 +10,17 @@
       ]
     },
     {
-      "condition": "Or",
+      "separator": "Or",
       "rules": [
         {
           "field": "Name",
           "operator": "equal",
-          "value": "Assassin's Creed"
+          "value": "Assassin's creed"
         },
         {
           "field": "Name",
           "operator": "equal",
-          "value": "GTA 10"
+          "value": "Data"
         }
       ]
     },

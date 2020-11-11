@@ -1,0 +1,10 @@
+﻿{
+  "separator": "And",
+  "rules": [
+    {
+      "field": "Name",
+      "operator": "in",
+      "value": [ "GTA V", "Assassin's creed" ]
+    }
+  ]
+}
