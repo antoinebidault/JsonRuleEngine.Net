@@ -3,7 +3,9 @@ using System.Collections.Generic;
 
 namespace JsonRuleEngine.Net
 {
-
+    /// <summary>
+    /// Object used by the JsonRuleEngine for evaluating expressions
+    /// </summary>
     public class ConditionRuleSet
     {
         /// <summary>
@@ -27,7 +29,7 @@ namespace JsonRuleEngine.Net
         public object Value { get; set; }
 
         /// <summary>
-        /// 
+        /// List of sub rules
         /// </summary>
         public IEnumerable<ConditionRuleSet> Rules { get;  set; }
     }

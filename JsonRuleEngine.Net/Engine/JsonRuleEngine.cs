@@ -8,8 +8,96 @@ using System.Reflection;
 
 namespace JsonRuleEngine.Net
 {
+    /// <summary>
+    /// The JsonRuleEngine class that contains
+    /// </summary>
     public static class JsonRuleEngine
     {
+
+        /// <summary>
+        /// Transform the ConditionRuleSet object to an expression function 
+        /// that can be evaluated in LinqToSql queries or whatever
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="jsonRules"></param>
+        /// <returns>Expression function</returns>
+        public static Expression<Func<T, bool>> ParseExpression<T>(string jsonRules)
+        {
+            return ParseExpression<T>(Parse(jsonRules));
+        }
+
+        /// <summary>
+        /// Transform the ConditionRuleSet object to an expression function 
+        /// that can be evaluated in LinqToSql queries or whatever
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="rules"></param>
+        /// <returns></returns>
+        public static Expression<Func<T, bool>> ParseExpression<T>(ConditionRuleSet rules)
+        {
+            var itemExpression = Expression.Parameter(typeof(T));
+            var conditions = ParseTree<T>(rules, itemExpression);
+            if (conditions.CanReduce)
+            {
+                conditions = conditions.ReduceAndCheck();
+            }
+
+            Console.WriteLine(conditions.ToString());
+
+            var query = Expression.Lambda<Func<T, bool>>(conditions, itemExpression);
+            return query;
+        }
+
+        /// <summary>
+        /// Transform to predicate
+        /// </summary>
+        /// <returns>A predicate that return the true if the conditions are matched</returns>
+        public static Func<T, bool> ParsePredicate<T>(string jsonRules)
+        {
+            var query = ParseExpression<T>(jsonRules);
+            return query.Compile();
+        }
+
+        /// <summary>
+        /// Transform a ConditionRuleSet object to predicate
+        /// </summary>
+        /// <returns>A predicate that return the true if the conditions are matched</returns>
+        public static Func<T, bool> ParsePredicate<T>(ConditionRuleSet rules)
+        {
+            var query = ParseExpression<T>(rules);
+            return query.Compile();
+        }
+
+
+        /// <summary>
+        /// Test the conditions
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="obj">The object to test</param>
+        /// <param name="jsonRules">The json string conditionRuleSet object</param>
+        /// <returns>True if the conditions are matched</returns>
+        public static bool Evaluate<T>(T obj, string jsonRules)
+        {
+            var query = ParseExpression<T>(jsonRules);
+            return query.Compile().Invoke(obj);
+        }
+
+        /// <summary>
+        /// Test the conditions
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="obj">The object to test</param>
+        /// <param name="rules">The conditionRuleSet object</param>
+        /// <returns>True if the conditions are matched</returns>
+        public static bool Evaluate<T>(T obj, ConditionRuleSet rules)
+        {
+            var query = ParseExpression<T>(rules);
+            return query.Compile().Invoke(obj);
+        }
+
+
+
+
         private static readonly MethodInfo MethodContains = typeof(Enumerable).GetMethods(
                         BindingFlags.Static | BindingFlags.Public)
                         .Single(m => m.Name == nameof(Enumerable.Contains)
@@ -149,65 +237,20 @@ namespace JsonRuleEngine.Net
                               .ToArray();
         }
 
-        public static Expression<Func<T, bool>> ParseExpression<T>(string json)
-        {
-            return ParseExpression<T>(Parse(json));
-        }
-
-        public static Expression<Func<T, bool>> ParseExpression<T>(ConditionRuleSet doc)
-        {
-            var itemExpression = Expression.Parameter(typeof(T));
-            var conditions = ParseTree<T>(doc, itemExpression);
-            if (conditions.CanReduce)
-            {
-                conditions = conditions.ReduceAndCheck();
-            }
-
-            Console.WriteLine(conditions.ToString());
-
-            var query = Expression.Lambda<Func<T, bool>>(conditions, itemExpression);
-            return query;
-        }
-
         /// <summary>
-        /// Transform to predicate
+        /// Json parsing
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="doc"></param>
+        /// <param name="jsonRules"></param>
         /// <returns></returns>
-        public static Func<T, bool> ParsePredicate<T>(string json)
-        {
-            var query = ParseExpression<T>(json);
-            return query.Compile();
-        }
-
-        public static Func<T, bool> ParsePredicate<T>(ConditionRuleSet json)
-        {
-            var query = ParseExpression<T>(json);
-            return query.Compile();
-        }
-
-
-        public static bool Evaluate<T>(T obj, string json)
-        {
-            var query = ParseExpression<T>(json);
-            return query.Compile().Invoke(obj);
-        }
-
-        public static bool Evaluate<T>(T obj, ConditionRuleSet json)
-        {
-            var query = ParseExpression<T>(json);
-            return query.Compile().Invoke(obj);
-        }
-        private static ConditionRuleSet Parse(string json)
+        private static ConditionRuleSet Parse(string jsonRules)
         {
             try
             {
-                return Newtonsoft.Json.JsonConvert.DeserializeObject<ConditionRuleSet>(json);
+                return Newtonsoft.Json.JsonConvert.DeserializeObject<ConditionRuleSet>(jsonRules);
             }
             catch (Exception e)
             {
-                throw new JsonRuleEngineException(JsonRuleEngineExceptionCategory.InvalidJsonRules, "Invalid json provided");
+                throw new JsonRuleEngineException(JsonRuleEngineExceptionCategory.InvalidJsonRules, $"Invalid json provided : {e.Message}");
             }
         }
 
