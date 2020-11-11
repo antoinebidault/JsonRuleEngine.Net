@@ -14,18 +14,15 @@ namespace JsonRuleEngine.Net
 {
     public static class JsonRuleEngine
     {
-
-        private const string StringStr = "string";
-
-        private static readonly string BooleanStr = nameof(Boolean).ToLower();
-        private static readonly string Number = nameof(Number).ToLower();
-        // private static readonly string In = nameof(In).ToLower();
-        private static readonly string And = nameof(And).ToLower();
-
         private static readonly MethodInfo MethodContains = typeof(Enumerable).GetMethods(
                         BindingFlags.Static | BindingFlags.Public)
                         .Single(m => m.Name == nameof(Enumerable.Contains)
                             && m.GetParameters().Length == 2);
+
+        private static readonly MethodInfo MethodNotContains = typeof(Enumerable).GetMethods(
+                    BindingFlags.Static | BindingFlags.Public)
+                    .Single(m => m.Name == nameof(Enumerable.Except)
+                        && m.GetParameters().Length == 2);
 
         private delegate Expression Binder(Expression left, Expression right);
 
@@ -58,7 +55,6 @@ namespace JsonRuleEngine.Net
                 }
 
                 string field = rule.Field;
-
                 object value = rule.Value;
 
                 MemberExpression property = null;
@@ -71,12 +67,34 @@ namespace JsonRuleEngine.Net
                     throw new JsonRuleEngineException(JsonRuleEngineExceptionCategory.InvalidField, $"The provided field is invalid {field} : {e.Message} ");
                 }
 
-                if (rule.Operator == ConditionRuleOperator.@in)
+                // Contains methods
+                // Need a conversion to an array of string
+                if (rule.Operator == ConditionRuleOperator.@in || rule.Operator == ConditionRuleOperator.notIn)
                 {
-                    IEnumerable<string> array = ((JToken)rule.Value).Values<string>();
-                    var contains = MethodContains.MakeGenericMethod(typeof(string));
+                    IEnumerable<string> array = null;
+
+                    // Parsing the array
+                    try
+                    {
+                        array = ((JToken)rule.Value).Values<string>();
+                    }
+                    catch (Exception e)
+                    {
+                        throw new JsonRuleEngineException(JsonRuleEngineExceptionCategory.InvalidValue, $"The provided value is not an array {value.ToString()} : {e.Message} ");
+                    }
+
+                    MethodInfo method = null;
+                    if (rule.Operator == ConditionRuleOperator.@in)
+                    {
+                        method = MethodContains.MakeGenericMethod(typeof(string));
+                    }
+                    else
+                    {
+                        method = MethodNotContains.MakeGenericMethod(typeof(string));
+                    }
+
                     var right = Expression.Call(
-                        contains,
+                        method,
                         Expression.Constant(array),
                         property);
                     left = bind(left, right);
@@ -110,6 +128,16 @@ namespace JsonRuleEngine.Net
                     else if (rule.Operator == ConditionRuleOperator.lessThanInclusive)
                     {
                         right = Expression.LessThanOrEqual(property, toCompare);
+                    }
+                    else if (rule.Operator == ConditionRuleOperator.contains)
+                    {
+                        MethodInfo method = typeof(string).GetMethod("Contains", new[] { typeof(string) });
+                        right = Expression.Call(property, method, toCompare);
+                    }
+                    else if (rule.Operator == ConditionRuleOperator.doesNotContains)
+                    {
+                        MethodInfo method = typeof(string).GetMethod("Except", new[] { typeof(string) });
+                        right = Expression.Call(property, method, toCompare);
                     }
                     left = bind(left, right);
                 }
