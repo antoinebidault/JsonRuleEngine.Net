@@ -1,4 +1,5 @@
 # JsonRuleEngine.Net
+[![Build status](https://ci.appveyor.com/api/projects/status/r430k8vb29wjjsfd?svg=true)](https://ci.appveyor.com/project/antoinebidault/jsonruleengine-net)
 A json-rule-engine simple porting to Asp.Net Core
 (https://github.com/cachecontrol/json-rules-engine)[https://github.com/cachecontrol/json-rules-engine]
 
