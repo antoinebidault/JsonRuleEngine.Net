@@ -1,0 +1,10 @@
+﻿{
+  "separator": "toto",
+  "rules": [
+    {
+      "field": "Name",
+      "operator": "titi",
+      "value": "GTA V"
+    }
+  ]
+}

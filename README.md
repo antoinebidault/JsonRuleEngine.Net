@@ -31,6 +31,13 @@ YOu can store it into your favorite database system (SQL server, Postgresql, mon
 
 }
 
+
+# Simple use
+
+```CSharp
+var expression = JsonRuleEngine.ParseExpression<Game>(rules);
+var datas = FakeGameService.GetDatas();
+var list = datas.Where(expression).ToList();
 ```
 
 # Simple uses

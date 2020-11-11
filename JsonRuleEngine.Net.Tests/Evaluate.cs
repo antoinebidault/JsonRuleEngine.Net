@@ -6,7 +6,7 @@ using Xunit;
 
 namespace JsonRuleEngine.Net.Tests
 {
-    public class BaseTests
+    public partial class BaseTests
     {
         [Fact]
         public void Simple()
@@ -41,15 +41,32 @@ namespace JsonRuleEngine.Net.Tests
             Assert.True(list.Count > 0);
         }
 
+
+
+        [Fact]
+        public void Evaluate()
+        {
+            string rules = GetJsonTestFile("complex.json");
+
+            var items = FakeGameService.GetDatas();
+            bool result = JsonRuleEngine.Evaluate(items.First(), rules);
+            Assert.True(result);
+        }
+
         private static List<Game> Test(string jsonRuleFilePath)
         {
-            string rules = File.ReadAllText(jsonRuleFilePath);
+            string rules = GetJsonTestFile(jsonRuleFilePath);
 
             var expression = JsonRuleEngine.ParseExpression<Game>(rules);
 
             var datas = FakeGameService.GetDatas();
             var list = datas.Where(expression).ToList();
             return list;
+        }
+
+        private static string GetJsonTestFile(string jsonRuleFilePath)
+        {
+            return File.ReadAllText(Path.Combine("TestJsons/", jsonRuleFilePath));
         }
     }
 }

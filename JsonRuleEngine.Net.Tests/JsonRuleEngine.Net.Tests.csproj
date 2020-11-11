@@ -11,19 +11,27 @@
     <None Remove="greaterThan.json" />
     <None Remove="in.json" />
     <None Remove="simple.json" />
+    <None Remove="wrongField.json" />
+    <None Remove="wrongFormat.json" />
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="greaterThan.json">
+    <Content Include="TestJsons\greaterThan.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="in.json">
+    <Content Include="TestJsons\in.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="simple.json">
+    <Content Include="TestJsons\wrongField.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="complex.json">
+    <Content Include="TestJsons\wrongFormat.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestJsons\simple.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestJsons\complex.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

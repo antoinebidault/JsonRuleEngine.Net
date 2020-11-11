@@ -61,7 +61,15 @@ namespace JsonRuleEngine.Net
 
                 object value = rule.Value;
 
-                var property = Expression.Property(parm, field);
+                MemberExpression property = null;
+                try
+                {
+                    property = Expression.Property(parm, field);
+                }
+                catch (Exception e)
+                {
+                    throw new JsonRuleEngineException(JsonRuleEngineExceptionCategory.InvalidField, $"The provided field is invalid {field} : {e.Message} ");
+                }
 
                 if (rule.Operator == ConditionRuleOperator.@in)
                 {
@@ -119,7 +127,7 @@ namespace JsonRuleEngine.Net
 
         public static Expression<Func<T, bool>> ParseExpression<T>(string json)
         {
-            return ParseExpression<T>(Newtonsoft.Json.JsonConvert.DeserializeObject<ConditionRuleSet>(json));
+            return ParseExpression<T>(Parse(json));
         }
 
         public static Expression<Func<T, bool>> ParseExpression<T>(ConditionRuleSet doc)
@@ -154,5 +162,30 @@ namespace JsonRuleEngine.Net
             var query = ParseExpression<T>(json);
             return query.Compile();
         }
+
+
+        public static bool Evaluate<T>(T obj, string json)
+        {
+            var query = ParseExpression<T>(json);
+            return query.Compile().Invoke(obj);
+        }
+
+        public static bool Evaluate<T>(T obj, ConditionRuleSet json)
+        {
+            var query = ParseExpression<T>(json);
+            return query.Compile().Invoke(obj);
+        }
+        private static ConditionRuleSet Parse(string json)
+        {
+            try
+            {
+                return Newtonsoft.Json.JsonConvert.DeserializeObject<ConditionRuleSet>(json);
+            }
+            catch (Exception e)
+            {
+                throw new JsonRuleEngineException(JsonRuleEngineExceptionCategory.InvalidJsonRules, "Invalid json provided");
+            }
+        }
+
     }
 }
