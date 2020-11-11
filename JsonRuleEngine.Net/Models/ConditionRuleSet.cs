@@ -9,12 +9,12 @@ namespace JsonRuleEngine.Net
         /// <summary>
         /// Separator
         /// </summary>
-        public ConditionRuleSeparator? Separator { get; set; }
+        public ConditionRuleSeparator? Separator { get; set; } = null;
 
         /// <summary>
         /// Operator
         /// </summary>
-        public ConditionRuleOperator Operator { get; set; }
+        public ConditionRuleOperator Operator { get; set; } = ConditionRuleOperator.equal;
 
         /// <summary>
         /// The field name evaluated

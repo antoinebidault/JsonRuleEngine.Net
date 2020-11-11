@@ -4,6 +4,9 @@ using System.Text;
 
 namespace JsonRuleEngine.Net
 {
+    /// <summary>
+    /// Custom exception class with an enum for exception caracterisation
+    /// </summary>
     public class JsonRuleEngineException : Exception
     {
         public JsonRuleEngineException(JsonRuleEngineExceptionCategory type, string message):base(message)
