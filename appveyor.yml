@@ -18,5 +18,5 @@ build_script:
 test: off
 
 artifacts:
-  - path: HtmlToAmpConverter\**\bin\release\*.nupkg
+  - path: JsonRuleEngine.Net\**\bin\release\*.nupkg
     name: NuGet package
