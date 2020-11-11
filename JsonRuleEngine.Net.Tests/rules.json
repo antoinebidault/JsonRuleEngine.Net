@@ -1,40 +1,33 @@
 ﻿{
-  "condition": "and",
+  "condition": "And",
   "rules": [
     {
-      "label": "Category",
       "field": "Category",
       "operator": "in",
-      "type": "string",
       "value": [
-        "Clothing"
+        "Action",
+        "Adventure"
       ]
     },
     {
-      "condition": "or",
+      "condition": "Or",
       "rules": [
         {
-          "label": "TransactionType",
-          "field": "TransactionType",
+          "field": "Name",
           "operator": "equal",
-          "type": "boolean",
-          "value": "income"
+          "value": "Assassin's Creed"
         },
         {
-          "label": "PaymentMode",
-          "field": "PaymentMode",
+          "field": "Name",
           "operator": "equal",
-          "type": "string",
-          "value": "Cash"
+          "value": "GTA 10"
         }
       ]
     },
     {
-      "label": "Amount",
-      "field": "Amount",
-      "operator": "equal",
-      "type": "number",
-      "value": 10
+      "field": "Price",
+      "operator": "greaterThan",
+      "value": 5
     }
   ]
 }
