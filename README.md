@@ -74,11 +74,7 @@ install-package JsonRuleEngine.Net
 
 ## For evaluating a rule with a single object
 ```CSharp
-string ruleJson = "{  
-    \"field\": \"Name\",
-    \"operator\": \"equal\",
-    \"value\": \"Assassin's creed\" 
-}";
+string ruleJson = "{\"field\": \"Name\",\"operator\": \"equal\",\"value\": \"Assassin's creed\" }";
 
 Game objectToTest = new Game() { 
     Name = "Assassin's creed"
