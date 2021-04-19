@@ -3,6 +3,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Dynamic.Core;
+using System.Linq.Dynamic.Core.Parser;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
@@ -147,18 +149,49 @@ namespace JsonRuleEngine.Net
                 string field = rule.Field;
                 object value = rule.Value;
                 MemberExpression property = null;
+                bool moveNext = false;
 
                 try
                 {
                     foreach (var member in field.Split('.'))
                     {
+
                         if (property == null)
                         {
-                            property = Expression.Property(parm, member);
+                            property = Expression.PropertyOrField(parm, member);
                         }
                         else
                         {
-                            property = Expression.Property(property, member);
+                            property = Expression.PropertyOrField(property, member);
+                        }
+
+                        if (property.Type.IsArray())
+                        {
+                          
+                            var childType = property.Type.GetGenericArguments().First();
+                            var param = Expression.Parameter(childType);
+                           
+                            // Get the prop to filter
+                            var idProp = Expression.PropertyOrField(param, field.Split('.').Last());
+                            var newValue = GetValue(idProp.Type, value);
+                            Expression anyExp = null;
+                            var toCompare = Expression.Constant(newValue);
+                            if (rule.Operator == ConditionRuleOperator.contains)
+                            {
+                                anyExp = Expression.Equal(idProp, toCompare);
+                            }
+                            else
+                            {
+                                anyExp = Expression.NotEqual(idProp, toCompare);
+                            }
+                            var anyExpression = Expression.Lambda(anyExp, param);
+                            var anyMethod = typeof(Enumerable).GetMethods().Single(m => m.Name == "Any" && m.GetParameters().Length == 2);
+                            anyMethod = anyMethod.MakeGenericMethod(childType);
+                            var predicate = Expression.Call(anyMethod, property, anyExpression);
+
+                            left = bind(left, predicate);
+                            moveNext = true;
+                            break;
                         }
                     }
 
@@ -170,6 +203,11 @@ namespace JsonRuleEngine.Net
                 catch (Exception e)
                 {
                     throw new JsonRuleEngineException(JsonRuleEngineExceptionCategory.InvalidField, $"The provided field is invalid {field} : {e.Message} ");
+                }
+
+                if (moveNext)
+                {
+                    continue;
                 }
 
                 // Contains methods
@@ -198,17 +236,15 @@ namespace JsonRuleEngine.Net
                         method = MethodNotContains.MakeGenericMethod(typeof(string));
                     }
 
+                    var executed = Expression.Call(property, "ToString", Type.EmptyTypes);
                     var right = Expression.Call(
                         method,
                         Expression.Constant(array),
-                        property);
+                         executed);
                     left = bind(left, right);
                 }
                 else
                 {
-                    /*object val = value is bool || value is string ?
-                        (object)value.ToString() : double.Parse(value.ToString());*/
-
                     value = GetValue(property.Type, value);
 
                     var toCompare = Expression.Constant(value);
@@ -216,11 +252,11 @@ namespace JsonRuleEngine.Net
                     Expression right = null;
                     if (rule.Operator == ConditionRuleOperator.isNull)
                     {
-                        right = Expression.Equal(property, null);
+                        right = Expression.Equal(property, Expression.Constant(null));
                     }
                     else if (rule.Operator == ConditionRuleOperator.isNotNull)
                     {
-                        right = Expression.NotEqual(property, null);
+                        right = Expression.NotEqual(property, Expression.Constant(null));
                     }
                     else if (rule.Operator == ConditionRuleOperator.equal)
                     {
@@ -265,10 +301,9 @@ namespace JsonRuleEngine.Net
             return left;
         }
 
-        private static bool IsArray(Type type)
+        private static bool IsArray(this Type type)
         {
-            return type != typeof(string) && type.GetInterfaces().Any(x => x.IsGenericType
-           && (x.GetGenericTypeDefinition() == typeof(IEnumerable<>) || x.GetGenericTypeDefinition() == typeof(ICollection<>)));
+            return type != typeof(string) && typeof(IEnumerable).IsAssignableFrom(type);
         }
 
         private static object GetValue(Type type, object value)
@@ -291,7 +326,7 @@ namespace JsonRuleEngine.Net
                     return DateTime.Parse(value.ToString());
                 }
 
-           
+
                 if (type == typeof(Guid) || type == typeof(Guid?))
                 {
                     return Guid.Parse(value.ToString());
@@ -308,6 +343,9 @@ namespace JsonRuleEngine.Net
                 return null;
             }
         }
+
+
+
 
         private static bool IsNullable(this Type type)
         {

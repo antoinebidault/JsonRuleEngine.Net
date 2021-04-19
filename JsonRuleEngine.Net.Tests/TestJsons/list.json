@@ -2,9 +2,9 @@
   "separator": "And",
   "rules": [
     {
-      "field": "Reviews",
+      "field": "Reviews.Id",
       "operator": "contains",
-      "value": [1,2]
+      "value": 1
     }
   ]
 }

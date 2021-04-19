@@ -86,6 +86,15 @@ namespace JsonRuleEngine.Net.Tests
         }
 
 
+        [Fact]
+        public void List()
+        {
+            string rules = GetJsonTestFile("list.json");
+
+            var items = FakeGameService.GetDatas();
+            bool result = JsonRuleEngine.Evaluate(items.First(), rules);
+            Assert.True(result);
+        }
 
         [Fact]
         public void Empty()
