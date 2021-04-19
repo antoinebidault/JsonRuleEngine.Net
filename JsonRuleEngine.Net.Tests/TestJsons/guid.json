@@ -1,0 +1,10 @@
+﻿{
+  "separator": "And",
+  "rules": [
+    {
+      "field": "Id",
+      "operator": "equal",
+      "value": "8706328a-4495-44bb-9d60-998fc9bcc003"
+    }
+  ]
+}

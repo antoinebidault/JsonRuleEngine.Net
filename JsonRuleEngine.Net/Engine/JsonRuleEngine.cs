@@ -37,6 +37,14 @@ namespace JsonRuleEngine.Net
         {
             var itemExpression = Expression.Parameter(typeof(T));
             var conditions = ParseTree<T>(rules, itemExpression);
+
+            // If no conditions parsed
+            // Let's return a true predicate
+            if (conditions == null)
+            {
+                return (m) => true;
+            }
+
             if (conditions.CanReduce)
             {
                 conditions = conditions.ReduceAndCheck();
@@ -94,7 +102,6 @@ namespace JsonRuleEngine.Net
             var query = ParseExpression<T>(rules);
             return query.Compile().Invoke(obj);
         }
-
 
 
 
@@ -185,9 +192,13 @@ namespace JsonRuleEngine.Net
                 }
                 else
                 {
-                    object val = value is bool || value is string ?
-                        (object)value.ToString() : double.Parse(value.ToString());
-                    var toCompare = Expression.Constant(val);
+                    /*object val = value is bool || value is string ?
+                        (object)value.ToString() : double.Parse(value.ToString());*/
+
+                    value = GetValue(property.Type, value);
+
+                    var toCompare = Expression.Constant(value) ;
+                    
                     Expression right = null;
                     if (rule.Operator == ConditionRuleOperator.equal)
                     {
@@ -228,6 +239,22 @@ namespace JsonRuleEngine.Net
             }
 
             return left;
+        }
+
+        private static object GetValue(Type type, object value)
+        {
+            try
+            {
+                if (type == typeof(Guid) || type == typeof(Guid?))
+                {
+                    return Guid.Parse(value.ToString());
+                }
+               return Convert.ChangeType(value, type);
+            }
+            catch
+            {
+                return value;
+            }
         }
 
         private static string[] ToArray(object obj)

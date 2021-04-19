@@ -33,6 +33,7 @@ namespace JsonRuleEngine.Net.Tests
             Assert.True(list.Count > 0 && list.Count < total);
         }
 
+
         [Fact]
         public void Complex()
         {
@@ -41,6 +42,50 @@ namespace JsonRuleEngine.Net.Tests
             Assert.True(list.Count > 0);
         }
 
+
+        [Fact]
+        public void Guid()
+        {
+            string rules = GetJsonTestFile("guid.json");
+
+            var items = FakeGameService.GetDatas();
+            bool result = JsonRuleEngine.Evaluate(items.First(), rules);
+            Assert.False(result);
+        }
+
+
+        [Fact]
+        public void Bool()
+        {
+            string rules = GetJsonTestFile("bool.json");
+
+            var items = FakeGameService.GetDatas();
+            bool result = JsonRuleEngine.Evaluate(items.First(), rules);
+            Assert.True(result);
+        }
+
+        [Fact]
+        public void Date()
+        {
+            string rules = GetJsonTestFile("date.json");
+
+            var items = FakeGameService.GetDatas();
+            bool result = JsonRuleEngine.Evaluate(items.First(), rules);
+            Assert.True(result);
+        }
+
+
+
+
+        [Fact]
+        public void Empty()
+        {
+            string rules = GetJsonTestFile("empty.json");
+
+            var items = FakeGameService.GetDatas();
+            bool result = JsonRuleEngine.Evaluate(items.First(), rules);
+            Assert.True(result);
+        }
 
 
         [Fact]

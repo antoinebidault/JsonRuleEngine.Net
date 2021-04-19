@@ -1,0 +1,15 @@
+﻿{
+  "separator": "Or",
+  "rules": [
+    {
+      "field": "Date",
+      "operator": "greaterThanInclusive",
+      "value": "2021-01-01"
+    },
+    {
+      "field": "Date",
+      "operator": "lessThan",
+      "value": "2021-01-02"
+    }
+  ]
+}

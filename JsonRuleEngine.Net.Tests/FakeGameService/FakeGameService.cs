@@ -15,32 +15,39 @@ namespace JsonRuleEngine.Net.Tests
                 new Game()
                 {
                     Name= "Assassin's creed",
-                    Price = 45.3
+                    Price = 45.3,
+                    BoolValue = true,
+                    Date =new DateTime(2021,1,1)
                 },
                  new Game()
                 {
                     Name= "Destiny",
-                    Price = 23.3
+                    Price = 23.3,
+                    Date =new DateTime(2021,1,12)
                 },
                  new Game()
                 {
                     Name= "The forest",
-                    Price = 22
+                    Price = 22,
+                    Date =new DateTime(2021,1,11)
                 },
                  new Game()
                 {
                     Name= "Lowe",
-                    Price = 13
+                    Price = 13,
+                    Date =new DateTime(2021,1,2)
                 },
                  new Game()
                 {
                     Name= "GTA V",
-                    Price = 77
+                    Price = 77,
+                    Date =new DateTime(2022,1,1)
                 },
                  new Game()
                 {
                     Name= "GTA IV",
-                    Price = 24
+                    Price = 24,
+                    Date =new DateTime(2018,1,1)
                 }
             }.AsQueryable();
         }

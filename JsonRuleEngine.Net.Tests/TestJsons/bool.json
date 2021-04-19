@@ -1,0 +1,10 @@
+﻿{
+  "separator": "And",
+  "rules": [
+    {
+      "field": "BoolValue",
+      "operator": "equal",
+      "value": true
+    }
+  ]
+}

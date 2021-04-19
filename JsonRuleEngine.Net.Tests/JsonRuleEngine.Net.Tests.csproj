@@ -11,11 +11,27 @@
     <None Remove="greaterThan.json" />
     <None Remove="in.json" />
     <None Remove="simple.json" />
+    <None Remove="TestJsons\bool.json" />
+    <None Remove="TestJsons\date.json" />
+    <None Remove="TestJsons\empty.json" />
+    <None Remove="TestJsons\guid.json" />
     <None Remove="wrongField.json" />
     <None Remove="wrongFormat.json" />
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="TestJsons\bool.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestJsons\date.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestJsons\guid.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestJsons\empty.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="TestJsons\greaterThan.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
