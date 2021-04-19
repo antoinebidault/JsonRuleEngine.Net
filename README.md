@@ -7,6 +7,7 @@
 
 A simple C# rule engine parser and evaluator using a simple json format.
 This lib is inspired by the [json rules engine](https://github.com/cachecontrol/json-rules-engine).
+We plan to use it in production in the [Dastra](https://www.dastra.eu) filtering engine 
 
 # Purpose
 In some case you'll need to store some complex conditions object in database. The purpose of this library is to provide a simple way to store and transform to linq Expression tree nested conditional rules stored in json in database, filesystem... 
@@ -73,11 +74,7 @@ install-package JsonRuleEngine.Net
 
 ## For evaluating a rule with a single object
 ```CSharp
-string ruleJson = "{  
-    \"field\": \"Name\",
-    \"operator\": \"equal\",
-    \"value\": \"Assassin's creed\" 
-}";
+string ruleJson = "{\"field\": \"Name\",\"operator\": \"equal\",\"value\": \"Assassin's creed\" }";
 
 Game objectToTest = new Game() { 
     Name = "Assassin's creed"
