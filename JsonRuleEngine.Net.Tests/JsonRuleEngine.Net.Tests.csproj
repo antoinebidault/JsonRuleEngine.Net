@@ -15,11 +15,19 @@
     <None Remove="TestJsons\date.json" />
     <None Remove="TestJsons\empty.json" />
     <None Remove="TestJsons\guid.json" />
+    <None Remove="TestJsons\list.json" />
+    <None Remove="TestJsons\object.json" />
     <None Remove="wrongField.json" />
     <None Remove="wrongFormat.json" />
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="TestJsons\list.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestJsons\object.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="TestJsons\bool.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

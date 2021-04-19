@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Text;
 
 namespace JsonRuleEngine.Net
 {
@@ -104,7 +105,6 @@ namespace JsonRuleEngine.Net
         }
 
 
-
         private static readonly MethodInfo MethodContains = typeof(Enumerable).GetMethods(
                         BindingFlags.Static | BindingFlags.Public)
                         .Single(m => m.Name == nameof(Enumerable.Contains)
@@ -116,7 +116,6 @@ namespace JsonRuleEngine.Net
                         && m.GetParameters().Length == 2);
 
         private delegate Expression Binder(Expression left, Expression right);
-
 
         /// <summary>
         /// Parse the expression tree
@@ -147,11 +146,26 @@ namespace JsonRuleEngine.Net
 
                 string field = rule.Field;
                 object value = rule.Value;
-
                 MemberExpression property = null;
+
                 try
                 {
-                    property = Expression.Property(parm, field);
+                    foreach (var member in field.Split('.'))
+                    {
+                        if (property == null)
+                        {
+                            property = Expression.Property(parm, member);
+                        }
+                        else
+                        {
+                            property = Expression.Property(property, member);
+                        }
+                    }
+
+                    if (property.Type.IsNullable())
+                    {
+                        property = Expression.Property(property, "Value");
+                    }
                 }
                 catch (Exception e)
                 {
@@ -197,10 +211,18 @@ namespace JsonRuleEngine.Net
 
                     value = GetValue(property.Type, value);
 
-                    var toCompare = Expression.Constant(value) ;
-                    
+                    var toCompare = Expression.Constant(value);
+
                     Expression right = null;
-                    if (rule.Operator == ConditionRuleOperator.equal)
+                    if (rule.Operator == ConditionRuleOperator.isNull)
+                    {
+                        right = Expression.Equal(property, null);
+                    }
+                    else if (rule.Operator == ConditionRuleOperator.isNotNull)
+                    {
+                        right = Expression.NotEqual(property, null);
+                    }
+                    else if (rule.Operator == ConditionRuleOperator.equal)
                     {
                         right = Expression.Equal(property, toCompare);
                     }
@@ -234,27 +256,68 @@ namespace JsonRuleEngine.Net
                         MethodInfo method = typeof(string).GetMethod("Except", new[] { typeof(string) });
                         right = Expression.Call(property, method, toCompare);
                     }
+
                     left = bind(left, right);
+
+                    if (property.Type.IsNullable())
+                    {
+                        var notNull = Expression.NotEqual(property, null);
+                        left = bind(notNull,left);
+                    }
+
                 }
             }
 
             return left;
         }
 
+        private static bool IsArray(Type type)
+        {
+            return type != typeof(string) && type.GetInterfaces().Any(x => x.IsGenericType
+           && (x.GetGenericTypeDefinition() == typeof(IEnumerable<>) || x.GetGenericTypeDefinition() == typeof(ICollection<>)));
+        }
+
         private static object GetValue(Type type, object value)
         {
             try
             {
+                if (type == typeof(DateTime?))
+                {
+                    DateTime? output = null;
+                    if (value != null || value.ToString() != "")
+                    {
+                        output = DateTime.Parse(value.ToString());
+                    }
+
+                    return output;
+                }
+
+                if (type == typeof(DateTime))
+                {
+                    return DateTime.Parse(value.ToString());
+                }
+
+           
                 if (type == typeof(Guid) || type == typeof(Guid?))
                 {
                     return Guid.Parse(value.ToString());
                 }
-               return Convert.ChangeType(value, type);
+
+                return Convert.ChangeType(value, type);
             }
             catch
             {
-                return value;
+                if (type.IsValueType)
+                {
+                    return Activator.CreateInstance(type);
+                }
+                return null;
             }
+        }
+
+        private static bool IsNullable(this Type type)
+        {
+            return Nullable.GetUnderlyingType(type) != null;
         }
 
         private static string[] ToArray(object obj)

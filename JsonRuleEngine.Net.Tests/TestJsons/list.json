@@ -1,0 +1,10 @@
+﻿{
+  "separator": "And",
+  "rules": [
+    {
+      "field": "Reviews",
+      "operator": "contains",
+      "value": [1,2]
+    }
+  ]
+}

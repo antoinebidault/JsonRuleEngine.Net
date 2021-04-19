@@ -16,8 +16,22 @@ namespace JsonRuleEngine.Net.Tests
                 {
                     Name= "Assassin's creed",
                     Price = 45.3,
+                    Category = "Adventure",
                     BoolValue = true,
-                    Date =new DateTime(2021,1,1)
+                    Date =new DateTime(2021,1,1),
+                    Reviews = new List<Review>()
+                    {
+                       new Review()
+                       {
+                           Id = 1,
+                           Text ="It's cool"
+                       },
+                       new Review()
+                       {
+                           Id = 2,
+                           Text ="It's very cool"
+                       }
+                    }
                 },
                  new Game()
                 {
@@ -41,13 +55,31 @@ namespace JsonRuleEngine.Net.Tests
                 {
                     Name= "GTA V",
                     Price = 77,
-                    Date =new DateTime(2022,1,1)
+                    Date =new DateTime(2022,1,1),
+                    Editor = new Editor()
+                    {
+                        Id = 2,
+                        Name= "test"
+                    },
+                    Reviews = new List<Review>()
+                    {
+                       new Review()
+                       {
+                           Id = 2,
+                           Text ="It's cool"
+                       }
+                    }
                 },
                  new Game()
                 {
                     Name= "GTA IV",
                     Price = 24,
-                    Date =new DateTime(2018,1,1)
+                    Date =new DateTime(2018,1,1),
+                    Editor = new Editor()
+                    {
+                        Id = 1,
+                        Name= "test"
+                    }
                 }
             }.AsQueryable();
         }
