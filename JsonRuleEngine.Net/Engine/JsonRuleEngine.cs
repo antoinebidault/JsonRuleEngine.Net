@@ -130,7 +130,7 @@ namespace JsonRuleEngine.Net
         {
             IEnumerable<ConditionRuleSet> rules = condition.Rules;
 
-            Binder binder = condition.Separator == ConditionRuleSeparator.And ? (Binder)Expression.And : Expression.Or;
+            Binder binder = condition.Separator == ConditionRuleSeparator.Or ? (Binder)Expression.Or : Expression.And;
 
             Expression bind(Expression lef, Expression right) => lef == null ? right : binder(lef, right);
 
@@ -258,12 +258,6 @@ namespace JsonRuleEngine.Net
                     }
 
                     left = bind(left, right);
-
-                    if (property.Type.IsNullable())
-                    {
-                        var notNull = Expression.NotEqual(property, null);
-                        left = bind(notNull,left);
-                    }
 
                 }
             }
