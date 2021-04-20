@@ -19,6 +19,11 @@ namespace JsonRuleEngine.Net.Tests
                     Category = "Adventure",
                     BoolValue = true,
                     Date =new DateTime(2021,1,1),
+                    Editor = new Editor()
+                    {
+                        Id = 1,
+                        Name= "Ubisoft"
+                    },
                     Reviews = new List<Review>()
                     {
                        new Review()

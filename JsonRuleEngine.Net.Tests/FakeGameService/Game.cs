@@ -11,7 +11,7 @@ namespace JsonRuleEngine.Net.Tests
         public string Name { get; set; }
         public double Price { get; set; }
         public string Category { get; set; } = "Action";
-        public Editor Editor { get; set; }
-        public IEnumerable<Review> Reviews { get; set; }
+        public Editor Editor { get; set; } = new Editor();
+        public IEnumerable<Review> Reviews { get; set; } = new List<Review>();
     }
 }

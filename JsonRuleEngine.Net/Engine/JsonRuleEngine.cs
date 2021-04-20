@@ -9,11 +9,55 @@ using System.Text;
 
 namespace JsonRuleEngine.Net
 {
+
     /// <summary>
     /// The JsonRuleEngine class that contains
     /// </summary>
     public static class JsonRuleEngine
     {
+        /// <summary>
+        /// Validate expression against a list of white listed field
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="jsonRules"></param>
+        /// <param name="fieldWhiteList"></param>
+        /// <returns></returns>
+        public static ValidateExpressionResult ValidateExpressionFields(string jsonRules, IEnumerable<string> fieldWhiteList)
+        {
+            var data = Parse(jsonRules);
+            if (data == null)
+            {
+                return ValidateExpressionResult.Valid;
+            }
+
+            return ValidateExpressionRecursive(data, fieldWhiteList);
+        }
+
+        private static ValidateExpressionResult ValidateExpressionRecursive(ConditionRuleSet rule, IEnumerable<string> fieldWhiteList)
+        {
+            if (!string.IsNullOrEmpty(rule.Field) && !fieldWhiteList.Contains(rule.Field))
+            {
+                return new ValidateExpressionResult()
+                {
+                    InvalidField = rule.Field
+                };
+            }
+
+            if (rule.Rules != null)
+            {
+                foreach (var subRule in rule.Rules)
+                {
+                    var evaluate = ValidateExpressionRecursive(subRule, fieldWhiteList);
+                    if (!evaluate.Success)
+                    {
+                        return evaluate;
+                    }
+                }
+            }
+
+            return ValidateExpressionResult.Valid;
+        }
+
 
         /// <summary>
         /// Transform the ConditionRuleSet object to an expression function 
@@ -320,15 +364,13 @@ namespace JsonRuleEngine.Net
                      idProp);
             }
 
-        
+
 
             var anyExpression = Expression.Lambda(anyExp, param);
             var anyMethod = typeof(Enumerable).GetMethods().Single(m => m.Name == "Any" && m.GetParameters().Length == 2);
             anyMethod = anyMethod.MakeGenericMethod(childType);
             var predicate = Expression.Call(anyMethod, property, anyExpression);
             return predicate;
-
-
         }
 
         private static bool IsArray(this Type type)

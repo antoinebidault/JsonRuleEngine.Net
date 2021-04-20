@@ -2,6 +2,16 @@
   "separator": "And",
   "rules": [
     {
+      "field": "Editor.Name",
+      "operator": "equal",
+      "value": "Ubisoft"
+    },
+    {
+      "field": "Reviews.Id",
+      "operator": "in",
+      "value": [1,2]
+    },
+    {
       "field": "Category",
       "operator": "in",
       "value": [
