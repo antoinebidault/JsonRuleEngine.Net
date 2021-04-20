@@ -121,7 +121,7 @@ namespace JsonRuleEngine.Net.Tests
             string rules = GetJsonTestFile("isNull.json");
 
             var items = FakeGameService.GetDatas();
-            bool result = JsonRuleEngine.Evaluate(new Game() { Category = null }, rules);
+            bool result = JsonRuleEngine.Evaluate(new Game() { Category = null, Date = null }, rules);
             Assert.True(result);
         }
 
@@ -131,7 +131,7 @@ namespace JsonRuleEngine.Net.Tests
             string rules = GetJsonTestFile("isNotNull.json");
 
             var items = FakeGameService.GetDatas();
-            bool result = JsonRuleEngine.Evaluate(new Game() { Category = "Titi" }, rules);
+            bool result = JsonRuleEngine.Evaluate(new Game() { Category = "Titi", Date = DateTime.UtcNow }, rules);
             Assert.True(result);
         }
 

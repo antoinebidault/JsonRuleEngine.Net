@@ -200,11 +200,11 @@ namespace JsonRuleEngine.Net
 
                         if (property == null)
                         {
-                            property = Expression.PropertyOrField(parm, member);
+                            property = Expression.Property(parm, member);
                         }
                         else
                         {
-                            property = Expression.PropertyOrField(property, member);
+                            property = Expression.Property(property, member);
                         }
 
                         if (property.Type.IsArray())
@@ -217,10 +217,7 @@ namespace JsonRuleEngine.Net
                         }
                     }
 
-                    if (property.Type.IsNullable())
-                    {
-                        property = Expression.Property(property, "Value");
-                    }
+                
                 }
                 catch (Exception e)
                 {
@@ -267,18 +264,27 @@ namespace JsonRuleEngine.Net
                 }
                 else
                 {
-                    value = GetValue(property.Type, value);
+                    
+                    // It's a bit tricky behaviour
+                    // If it's a nullable prop, scope to the .Value of the prop just if not a isNull operator
+                    if (property.Type.IsNullable() && 
+                        (rule.Operator != ConditionRuleOperator.isNotNull && 
+                        rule.Operator != ConditionRuleOperator.isNull))
+                    {
+                        property = Expression.Property(property, "Value");
+                    }
 
+                    value = GetValue(property.Type, value);
                     var toCompare = Expression.Constant(value);
 
                     Expression right = null;
                     if (rule.Operator == ConditionRuleOperator.isNull)
                     {
-                        right = Expression.Equal(property, Expression.Constant(null));
+                        right = Expression.Equal(property, Expression.Default(property.Type));
                     }
                     else if (rule.Operator == ConditionRuleOperator.isNotNull)
                     {
-                        right = Expression.NotEqual(property, Expression.Constant(null));
+                        right = Expression.NotEqual(property, Expression.Default(property.Type));
                     }
                     else if (rule.Operator == ConditionRuleOperator.equal)
                     {

@@ -1,5 +1,5 @@
 ﻿{
-  "separator": "Or",
+  "separator": "And",
   "rules": [
     {
       "field": "Date",

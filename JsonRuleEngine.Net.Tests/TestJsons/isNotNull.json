@@ -4,6 +4,10 @@
     {
       "field": "Category",
       "operator": "isNotNull"
+    },
+    {
+      "field": "Date",
+      "operator": "isNotNull"
     }
   ]
 }
