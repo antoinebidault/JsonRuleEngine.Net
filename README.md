@@ -3,6 +3,8 @@
 [![Build status](https://ci.appveyor.com/api/projects/status/r430k8vb29wjjsfd?svg=true)](https://ci.appveyor.com/project/antoinebidault/jsonruleengine-net)
 ![Nuget](https://img.shields.io/nuget/v/JsonRuleEngine.Net)
 
+![Logo](/JsonRuleEngine.Net/JsonRuleEngine.Net.png)
+
 # JsonRuleEngine.Net
 
 A simple C# rule engine parser and evaluator using a simple json format.
@@ -137,6 +139,8 @@ bool result = JsonRuleEngine.Evaluate(objectToTest, ruleJson);
 Assert.True(result)
 ```
 
+Limitations : for nested list it works only with one level subproperty in the object's array.
+
 
 ## For filtering a list using an expression
 The expression parsed will work with LinqToSql query with EntityFramework Core.
@@ -159,6 +163,6 @@ var list = datas.Where(expression).ToList();
 |--|--|--|
 |separator|enum (Or, And) **optional**| The type of condition rules  |
 |field|string **optional**| The name of the field used for filtering (Camel sensitive). If the rules properties contains no element **this field must be set**  |
-|operator|enum (equal,notEqual,  lessThan,lessThanInclusive,greaterThan, greaterThanInclusive,in,notIn, contains,  doesNotContains) **default:equal**| The type of method used for comparing values |
+|operator|enum (equal,notEqual,  lessThan, lessThanInclusive,greaterThan, greaterThanInclusive,in,notIn, contains,  doesNotContains, isNull, isNotNull) **default:equal**| The type of method used for comparing values |
 |value|object **optional, default:null**| The string value, the number or the object used for egality comparison. In case, the in operator is used, this **must be a list of string** |
 |rules| List of ConditionRuleSet **optional, default: null** | The nested rules contained in the group  |
