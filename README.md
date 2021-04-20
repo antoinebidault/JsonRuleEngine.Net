@@ -85,6 +85,59 @@ bool result = JsonRuleEngine.Evaluate(objectToTest, ruleJson);
 return result; // this must display "True"
 ```
 
+## Support of navigation properties
+If you have complex models with nested list or class, you are able to apply filters on them using the dot (.) separator.
+
+Example of model with a nested list and object :
+```CSharp
+public class Game {
+    public Guid Id { get; set; }
+    public Author Author { get; set; }
+    public IEnumerable<Review> Reviews { get; set; }
+}
+
+public class Author {
+    public Guid Id { get; set; }
+    public string Name { get; set; }
+}
+
+public class Reviews {
+    public Guid Id { get; set; }
+    public int Score { get; set; }
+}
+```
+
+If you want all the game with author named "John Doe" and one review with a score of 3 or 5
+```CSharp
+string ruleJson = "{ \"rules\": [
+    {\"field\": \"Author.Name\",\"operator\": \"equal\",\"value\": \"John Doe\" },
+    {\"field\": \"Reviews.Score\",\"operator\": \"in\",\"value\": [3,5] }
+]";
+
+Game objectToTest = new Game() { 
+    Name = "Assassin's creed",
+    Author = new Author(){
+        Name = "John Doe"
+    },
+    Reviews = new [] {
+        new Review() {
+            Score = 3
+        },
+        new Review() {
+            Score = 4
+        },
+        new Review() {
+            Score = 1
+        }
+    }
+};
+
+bool result = JsonRuleEngine.Evaluate(objectToTest, ruleJson);
+
+Assert.True(result)
+```
+
+
 ## For filtering a list using an expression
 The expression parsed will work with LinqToSql query with EntityFramework Core.
 ```CSharp
