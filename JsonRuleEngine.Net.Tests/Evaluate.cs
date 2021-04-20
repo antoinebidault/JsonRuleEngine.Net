@@ -87,9 +87,9 @@ namespace JsonRuleEngine.Net.Tests
 
 
         [Fact]
-        public void List()
+        public void ListContains()
         {
-            string rules = GetJsonTestFile("list.json");
+            string rules = GetJsonTestFile("listContains.json");
 
             var items = FakeGameService.GetDatas();
             bool result = JsonRuleEngine.Evaluate(items.First(), rules);
@@ -97,12 +97,41 @@ namespace JsonRuleEngine.Net.Tests
         }
 
         [Fact]
+        public void ListIn()
+        {
+            string rules = GetJsonTestFile("listIn.json");
+
+            var items = FakeGameService.GetDatas();
+            bool result = JsonRuleEngine.Evaluate(items.First(), rules);
+            Assert.True(result);
+        }
+        [Fact]
         public void Empty()
         {
             string rules = GetJsonTestFile("empty.json");
 
             var items = FakeGameService.GetDatas();
             bool result = JsonRuleEngine.Evaluate(items.First(), rules);
+            Assert.True(result);
+        }
+
+        [Fact]
+        public void IsNull()
+        {
+            string rules = GetJsonTestFile("isNull.json");
+
+            var items = FakeGameService.GetDatas();
+            bool result = JsonRuleEngine.Evaluate(new Game() { Category = null }, rules);
+            Assert.True(result);
+        }
+
+        [Fact]
+        public void IsNotNull()
+        {
+            string rules = GetJsonTestFile("isNotNull.json");
+
+            var items = FakeGameService.GetDatas();
+            bool result = JsonRuleEngine.Evaluate(new Game() { Category = "Titi" }, rules);
             Assert.True(result);
         }
 

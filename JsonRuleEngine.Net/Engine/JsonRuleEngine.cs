@@ -165,27 +165,7 @@ namespace JsonRuleEngine.Net
 
                         if (property.Type.IsArray())
                         {
-                          
-                            var childType = property.Type.GetGenericArguments().First();
-                            var param = Expression.Parameter(childType);
-                           
-                            // Get the prop to filter
-                            var idProp = Expression.PropertyOrField(param, field.Split('.').Last());
-                            var newValue = GetValue(idProp.Type, value);
-                            Expression anyExp = null;
-                            var toCompare = Expression.Constant(newValue);
-                            if (rule.Operator == ConditionRuleOperator.contains)
-                            {
-                                anyExp = Expression.Equal(idProp, toCompare);
-                            }
-                            else
-                            {
-                                anyExp = Expression.NotEqual(idProp, toCompare);
-                            }
-                            var anyExpression = Expression.Lambda(anyExp, param);
-                            var anyMethod = typeof(Enumerable).GetMethods().Single(m => m.Name == "Any" && m.GetParameters().Length == 2);
-                            anyMethod = anyMethod.MakeGenericMethod(childType);
-                            var predicate = Expression.Call(anyMethod, property, anyExpression);
+                            MethodCallExpression predicate = HandleTableRule(rule, field, value, property);
 
                             left = bind(left, predicate);
                             moveNext = true;
@@ -212,34 +192,34 @@ namespace JsonRuleEngine.Net
                 // Need a conversion to an array of string
                 if (rule.Operator == ConditionRuleOperator.@in || rule.Operator == ConditionRuleOperator.notIn)
                 {
-                    IEnumerable<string> array = null;
 
                     // Parsing the array
                     try
                     {
-                        array = ((JToken)rule.Value).Values<string>();
+                        var listType = typeof(IEnumerable<>).MakeGenericType(property.Type);
+                        var array = ((JArray)rule.Value).ToObject(listType);
+                        MethodInfo method = null;
+                        if (rule.Operator == ConditionRuleOperator.@in)
+                        {
+                            method = MethodContains.MakeGenericMethod(property.Type);
+                        }
+                        else
+                        {
+                            method = MethodNotContains.MakeGenericMethod(property.Type);
+                        }
+
+                        // var executed = Expression.Call(property, "ToString", Type.EmptyTypes);
+                        var right = Expression.Call(
+                            method,
+                            Expression.Constant(array),
+                             property);
+                        left = bind(left, right);
                     }
                     catch (Exception e)
                     {
                         throw new JsonRuleEngineException(JsonRuleEngineExceptionCategory.InvalidValue, $"The provided value is not an array {value.ToString()} : {e.Message} ");
                     }
 
-                    MethodInfo method = null;
-                    if (rule.Operator == ConditionRuleOperator.@in)
-                    {
-                        method = MethodContains.MakeGenericMethod(typeof(string));
-                    }
-                    else
-                    {
-                        method = MethodNotContains.MakeGenericMethod(typeof(string));
-                    }
-
-                    var executed = Expression.Call(property, "ToString", Type.EmptyTypes);
-                    var right = Expression.Call(
-                        method,
-                        Expression.Constant(array),
-                         executed);
-                    left = bind(left, right);
                 }
                 else
                 {
@@ -297,6 +277,58 @@ namespace JsonRuleEngine.Net
             }
 
             return left;
+        }
+
+        private static MethodCallExpression HandleTableRule(ConditionRuleSet rule, string field, object value, MemberExpression property)
+        {
+            var childType = property.Type.GetGenericArguments().First();
+            var param = Expression.Parameter(childType);
+
+            // Get the prop to filter
+            var idProp = Expression.PropertyOrField(param, field.Split('.').Last());
+            var newValue = GetValue(idProp.Type, value);
+            Expression anyExp = null;
+            var toCompare = Expression.Constant(newValue);
+            if (rule.Operator == ConditionRuleOperator.contains || rule.Operator == ConditionRuleOperator.doesNotContains)
+            {
+                if (rule.Operator == ConditionRuleOperator.contains)
+                {
+                    anyExp = Expression.Equal(idProp, toCompare);
+                }
+                else
+                {
+                    anyExp = Expression.NotEqual(idProp, toCompare);
+                }
+            }
+            else
+            {
+                var listType = typeof(IEnumerable<>).MakeGenericType(idProp.Type);
+                var array = ((JArray)rule.Value).ToObject(listType);
+                MethodInfo method = null;
+                if (rule.Operator == ConditionRuleOperator.@in)
+                {
+                    method = MethodContains.MakeGenericMethod(idProp.Type);
+                }
+                else
+                {
+                    method = MethodNotContains.MakeGenericMethod(idProp.Type);
+                }
+
+                anyExp = Expression.Call(
+                    method,
+                    Expression.Constant(array),
+                     idProp);
+            }
+
+        
+
+            var anyExpression = Expression.Lambda(anyExp, param);
+            var anyMethod = typeof(Enumerable).GetMethods().Single(m => m.Name == "Any" && m.GetParameters().Length == 2);
+            anyMethod = anyMethod.MakeGenericMethod(childType);
+            var predicate = Expression.Call(anyMethod, property, anyExpression);
+            return predicate;
+
+
         }
 
         private static bool IsArray(this Type type)
