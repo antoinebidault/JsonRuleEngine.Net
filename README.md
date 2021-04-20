@@ -109,10 +109,10 @@ public class Reviews {
 
 If you want all the game with author named "John Doe" and one review with a score of 3 or 5
 ```CSharp
-string ruleJson = "{ \"rules\": [
-    {\"field\": \"Author.Name\",\"operator\": \"equal\",\"value\": \"John Doe\" },
-    {\"field\": \"Reviews.Score\",\"operator\": \"in\",\"value\": [3,5] }
-]";
+string ruleJson = "{ \"rules\": [ " +
+   " {\"field\": \"Author.Name\",\"operator\": \"equal\",\"value\": \"John Doe\" }, " +
+   " {\"field\": \"Reviews.Score\",\"operator\": \"in\",\"value\": [3,5] } " +
+" ]";
 
 Game objectToTest = new Game() { 
     Name = "Assassin's creed",
