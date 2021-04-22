@@ -19,6 +19,7 @@
     <None Remove="TestJsons\isNull.json" />
     <None Remove="TestJsons\listContains.json" />
     <None Remove="TestJsons\listIn.json" />
+    <None Remove="TestJsons\listNotIn.json" />
     <None Remove="TestJsons\object.json" />
     <None Remove="wrongField.json" />
     <None Remove="wrongFormat.json" />
@@ -29,6 +30,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="TestJsons\isNull.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestJsons\listNotIn.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="TestJsons\listIn.json">

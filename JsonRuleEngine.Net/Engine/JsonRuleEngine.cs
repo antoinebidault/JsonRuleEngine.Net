@@ -210,14 +210,13 @@ namespace JsonRuleEngine.Net
                         if (property.Type.IsArray())
                         {
                             MethodCallExpression predicate = HandleTableRule(rule, field, value, property);
-
                             left = bind(left, predicate);
                             moveNext = true;
                             break;
                         }
                     }
 
-                
+
                 }
                 catch (Exception e)
                 {
@@ -240,20 +239,20 @@ namespace JsonRuleEngine.Net
                         var listType = typeof(IEnumerable<>).MakeGenericType(property.Type);
                         var array = ((JArray)rule.Value).ToObject(listType);
                         MethodInfo method = null;
-                        if (rule.Operator == ConditionRuleOperator.@in)
-                        {
-                            method = MethodContains.MakeGenericMethod(property.Type);
-                        }
-                        else
-                        {
-                            method = MethodNotContains.MakeGenericMethod(property.Type);
-                        }
+                        method = MethodContains.MakeGenericMethod(property.Type);
+
 
                         // var executed = Expression.Call(property, "ToString", Type.EmptyTypes);
-                        var right = Expression.Call(
+                        Expression right = Expression.Call(
                             method,
                             Expression.Constant(array),
                              property);
+
+                        if (rule.Operator == ConditionRuleOperator.notIn)
+                        {
+                            right = Expression.Not(right);
+                        }
+
                         left = bind(left, right);
                     }
                     catch (Exception e)
@@ -264,11 +263,11 @@ namespace JsonRuleEngine.Net
                 }
                 else
                 {
-                    
+
                     // It's a bit tricky behaviour
                     // If it's a nullable prop, scope to the .Value of the prop just if not a isNull operator
-                    if (property.Type.IsNullable() && 
-                        (rule.Operator != ConditionRuleOperator.isNotNull && 
+                    if (property.Type.IsNullable() &&
+                        (rule.Operator != ConditionRuleOperator.isNotNull &&
                         rule.Operator != ConditionRuleOperator.isNull))
                     {
                         property = Expression.Property(property, "Value");
@@ -355,19 +354,17 @@ namespace JsonRuleEngine.Net
                 var listType = typeof(IEnumerable<>).MakeGenericType(idProp.Type);
                 var array = ((JArray)rule.Value).ToObject(listType);
                 MethodInfo method = null;
-                if (rule.Operator == ConditionRuleOperator.@in)
-                {
-                    method = MethodContains.MakeGenericMethod(idProp.Type);
-                }
-                else
-                {
-                    method = MethodNotContains.MakeGenericMethod(idProp.Type);
-                }
-
+                method = MethodContains.MakeGenericMethod(idProp.Type);
+                
                 anyExp = Expression.Call(
                     method,
                     Expression.Constant(array),
                      idProp);
+
+                if (rule.Operator == ConditionRuleOperator.notIn)
+                {
+                    anyExp = Expression.Not(anyExp);
+                }
             }
 
 

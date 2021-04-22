@@ -106,6 +106,15 @@ namespace JsonRuleEngine.Net.Tests
             Assert.True(result);
         }
         [Fact]
+        public void ListNotIn()
+        {
+            string rules = GetJsonTestFile("listNotIn.json");
+
+            var items = FakeGameService.GetDatas();
+            bool result = JsonRuleEngine.Evaluate(items.First(), rules);
+            Assert.False(result);
+        }
+        [Fact]
         public void Empty()
         {
             string rules = GetJsonTestFile("empty.json");
@@ -129,7 +138,6 @@ namespace JsonRuleEngine.Net.Tests
         public void IsNotNull()
         {
             string rules = GetJsonTestFile("isNotNull.json");
-
             var items = FakeGameService.GetDatas();
             bool result = JsonRuleEngine.Evaluate(new Game() { Category = "Titi", Date = DateTime.UtcNow }, rules);
             Assert.True(result);
