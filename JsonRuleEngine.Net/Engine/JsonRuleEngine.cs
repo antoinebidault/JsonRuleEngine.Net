@@ -367,8 +367,6 @@ namespace JsonRuleEngine.Net
                 }
             }
 
-
-
             var anyExpression = Expression.Lambda(anyExp, param);
             var anyMethod = typeof(Enumerable).GetMethods().Single(m => m.Name == "Any" && m.GetParameters().Length == 2);
             anyMethod = anyMethod.MakeGenericMethod(childType);
