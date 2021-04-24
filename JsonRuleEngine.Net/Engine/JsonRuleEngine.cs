@@ -181,23 +181,25 @@ namespace JsonRuleEngine.Net
             Expression left = null;
             foreach (var rule in rules)
             {
+                Expression right = null;
                 if (rule.Separator.HasValue)
                 {
-                    var right = ParseTree<T>(rule, parm);
+                    right = ParseTree<T>(rule, parm);
                     left = bind(left, right);
                     continue;
                 }
 
-                string field = rule.Field;
-                object value = rule.Value;
                 MemberExpression property = null;
                 bool moveNext = false;
 
                 try
                 {
-                    foreach (var member in field.Split('.'))
+                    string field = rule.Field;
+                    var fields = field.Split('.');
+                    int i = 0;
+                    foreach (var member in fields)
                     {
-
+                        i = i + member.Length + 1;
                         if (property == null)
                         {
                             property = Expression.Property(parm, member);
@@ -209,7 +211,20 @@ namespace JsonRuleEngine.Net
 
                         if (property.Type.IsArray())
                         {
-                            MethodCallExpression predicate = HandleTableRule(rule, field, value, property);
+                            string subField = "";
+                            try
+                            {
+                                subField = field.Substring(i, field.Length - i);
+                                if (string.IsNullOrEmpty(subField))
+                                {
+                                    throw new Exception("");
+                                }
+                            }
+                            catch
+                            {
+                                throw new JsonRuleEngineException(JsonRuleEngineExceptionCategory.InvalidField, $"The array {field} does not have a subfield. e.g. {field}.Id");
+                            }
+                            MethodCallExpression predicate = HandleTableRule(rule, subField, rule.Value, property);
                             left = bind(left, predicate);
                             moveNext = true;
                             break;
@@ -220,7 +235,7 @@ namespace JsonRuleEngine.Net
                 }
                 catch (Exception e)
                 {
-                    throw new JsonRuleEngineException(JsonRuleEngineExceptionCategory.InvalidField, $"The provided field is invalid {field} : {e.Message} ");
+                    throw new JsonRuleEngineException(JsonRuleEngineExceptionCategory.InvalidField, $"The provided field is invalid {rule.Field} : {e.Message} ");
                 }
 
                 if (moveNext)
@@ -228,202 +243,188 @@ namespace JsonRuleEngine.Net
                     continue;
                 }
 
-                // Contains methods
-                // Need a conversion to an array of string
-                if (rule.Operator == ConditionRuleOperator.@in || rule.Operator == ConditionRuleOperator.notIn)
-                {
-
-                    // Parsing the array
-                    try
-                    {
-                        var listType = typeof(IEnumerable<>).MakeGenericType(property.Type);
-                        var array = ((JArray)rule.Value).ToObject(listType);
-                        MethodInfo method = null;
-                        method = MethodContains.MakeGenericMethod(property.Type);
-
-
-                        // var executed = Expression.Call(property, "ToString", Type.EmptyTypes);
-                        Expression right = Expression.Call(
-                            method,
-                            Expression.Constant(array),
-                             property);
-
-                        if (rule.Operator == ConditionRuleOperator.notIn)
-                        {
-                            right = Expression.Not(right);
-                        }
-
-                        left = bind(left, right);
-                    }
-                    catch (Exception e)
-                    {
-                        throw new JsonRuleEngineException(JsonRuleEngineExceptionCategory.InvalidValue, $"The provided value is not an array {value.ToString()} : {e.Message} ");
-                    }
-
-                }
-                else
-                {
-
-                    // It's a bit tricky behaviour
-                    // If it's a nullable prop, scope to the .Value of the prop just if not a isNull operator
-                    if (property.Type.IsNullable() &&
-                        (rule.Operator != ConditionRuleOperator.isNotNull &&
-                        rule.Operator != ConditionRuleOperator.isNull))
-                    {
-                        property = Expression.Property(property, "Value");
-                    }
-
-                    value = GetValue(property.Type, value);
-                    var toCompare = Expression.Constant(value);
-
-                    Expression right = null;
-                    if (rule.Operator == ConditionRuleOperator.isNull)
-                    {
-                        right = Expression.Equal(property, Expression.Default(property.Type));
-                    }
-                    else if (rule.Operator == ConditionRuleOperator.isNotNull)
-                    {
-                        right = Expression.NotEqual(property, Expression.Default(property.Type));
-                    }
-                    else if (rule.Operator == ConditionRuleOperator.equal)
-                    {
-                        right = Expression.Equal(property, toCompare);
-                    }
-                    else if (rule.Operator == ConditionRuleOperator.notEqual)
-                    {
-                        right = Expression.NotEqual(property, toCompare);
-                    }
-                    else if (rule.Operator == ConditionRuleOperator.greaterThan)
-                    {
-                        right = Expression.GreaterThan(property, toCompare);
-                    }
-                    else if (rule.Operator == ConditionRuleOperator.greaterThanInclusive)
-                    {
-                        right = Expression.GreaterThanOrEqual(property, toCompare);
-                    }
-                    else if (rule.Operator == ConditionRuleOperator.lessThan)
-                    {
-                        right = Expression.LessThan(property, toCompare);
-                    }
-                    else if (rule.Operator == ConditionRuleOperator.lessThanInclusive)
-                    {
-                        right = Expression.LessThanOrEqual(property, toCompare);
-                    }
-                    else if (rule.Operator == ConditionRuleOperator.contains)
-                    {
-                        MethodInfo method = typeof(string).GetMethod("Contains", new[] { typeof(string) });
-                        right = Expression.Call(property, method, toCompare);
-                    }
-                    else if (rule.Operator == ConditionRuleOperator.doesNotContains)
-                    {
-                        MethodInfo method = typeof(string).GetMethod("Except", new[] { typeof(string) });
-                        right = Expression.Call(property, method, toCompare);
-                    }
-
-                    left = bind(left, right);
-
-                }
+                right = CreateOperationExpression(property, rule.Operator, rule.Value);
+                left = bind(left, right);
             }
 
             return left;
         }
 
+
+        /// <summary>
+        /// Apply the con
+        /// </summary>
+        /// <returns></returns>
+        private static Expression CreateOperationExpression(MemberExpression property, ConditionRuleOperator op, object value)
+        {
+            Expression expression = null;
+
+            // Contains methods
+            // Need a conversion to an array of string
+            if (op == ConditionRuleOperator.@in || op == ConditionRuleOperator.notIn)
+            {
+
+                // Parsing the array
+                try
+                {
+                    var listType = typeof(IEnumerable<>).MakeGenericType(property.Type);
+                    var array = ((JArray)value).ToObject(listType);
+                    MethodInfo method = null;
+                    method = MethodContains.MakeGenericMethod(property.Type);
+
+
+                    // var executed = Expression.Call(property, "ToString", Type.EmptyTypes);
+                    expression = Expression.Call(
+                        method,
+                        Expression.Constant(array),
+                         property);
+
+                    if (op == ConditionRuleOperator.notIn)
+                    {
+                        expression = Expression.Not(expression);
+                    }
+
+                    return expression;
+                }
+                catch (Exception e)
+                {
+                    throw new JsonRuleEngineException(JsonRuleEngineExceptionCategory.InvalidValue, $"The provided value is not an array {value.ToString()} : {e.Message} ");
+                }
+
+            }
+
+            // It's a bit tricky behaviour
+            // If it's a nullable prop, scope to the .Value of the prop just if not a isNull operator
+            if (property.Type.IsNullable() &&
+                (op != ConditionRuleOperator.isNotNull &&
+                op != ConditionRuleOperator.isNull))
+            {
+                property = Expression.Property(property, "Value");
+            }
+
+            value = property.Type.GetValue(value);
+            var toCompare = Expression.Constant(value);
+
+            if (op == ConditionRuleOperator.isNull)
+            {
+                expression = Expression.Equal(property, Expression.Default(property.Type));
+            }
+            else if (op == ConditionRuleOperator.isNotNull)
+            {
+                expression = Expression.NotEqual(property, Expression.Default(property.Type));
+            }
+            else if (op == ConditionRuleOperator.equal)
+            {
+                expression = Expression.Equal(property, toCompare);
+            }
+            else if (op == ConditionRuleOperator.notEqual)
+            {
+                expression = Expression.NotEqual(property, toCompare);
+            }
+            else if (op == ConditionRuleOperator.greaterThan)
+            {
+                expression = Expression.GreaterThan(property, toCompare);
+            }
+            else if (op == ConditionRuleOperator.greaterThanInclusive)
+            {
+                expression = Expression.GreaterThanOrEqual(property, toCompare);
+            }
+            else if (op == ConditionRuleOperator.lessThan)
+            {
+                expression = Expression.LessThan(property, toCompare);
+            }
+            else if (op == ConditionRuleOperator.lessThanInclusive)
+            {
+                expression = Expression.LessThanOrEqual(property, toCompare);
+            }
+            else if (op == ConditionRuleOperator.contains)
+            {
+                MethodInfo method = typeof(string).GetMethod("Contains", new[] { typeof(string) });
+                expression = Expression.Call(property, method, toCompare);
+            }
+            else if (op == ConditionRuleOperator.doesNotContains)
+            {
+                MethodInfo method = typeof(string).GetMethod("Except", new[] { typeof(string) });
+                expression = Expression.Call(property, method, toCompare);
+            }
+            return expression;
+        }
+
         private static MethodCallExpression HandleTableRule(ConditionRuleSet rule, string field, object value, MemberExpression property)
         {
+            // Get the type of T in the IEnumerable<T> or ICollection<T> list
             var childType = property.Type.GetGenericArguments().First();
-            var param = Expression.Parameter(childType);
 
-            // Get the prop to filter
-            var idProp = Expression.PropertyOrField(param, field.Split('.').Last());
-            var newValue = GetValue(idProp.Type, value);
+            // Set it as the param of the any expression
+            var param = Expression.Parameter(childType);
+            var anyExpression = Expression.Lambda(GetExpression(rule, param, field, value), param);
+
+
+            var anyMethod = typeof(Enumerable).GetMethods().Single(m => m.Name == "Any" && m.GetParameters().Length == 2);
+            anyMethod = anyMethod.MakeGenericMethod(childType);
+
+            var predicate = Expression.Call(anyMethod, property, anyExpression);
+
+            return predicate;
+        }
+
+
+        private static Expression GetExpression(ConditionRuleSet rule, ParameterExpression param, string field, object value)
+        {
+            MemberExpression property = null;
+
+            foreach (var member in field.Split('.'))
+            {
+                if (property == null)
+                {
+                    property = Expression.Property(param, member);
+                }
+                else
+                {
+                    property = Expression.Property(property, member);
+                }
+            }
+
+            return CreateOperationExpression(property, rule.Operator, value);
+
+            /*
+            var newValue = property.Type.GetValue(value);
             Expression anyExp = null;
             var toCompare = Expression.Constant(newValue);
+
+
             if (rule.Operator == ConditionRuleOperator.contains || rule.Operator == ConditionRuleOperator.doesNotContains)
             {
                 if (rule.Operator == ConditionRuleOperator.contains)
                 {
-                    anyExp = Expression.Equal(idProp, toCompare);
+                    anyExp = Expression.Equal(property, toCompare);
                 }
                 else
                 {
-                    anyExp = Expression.NotEqual(idProp, toCompare);
+                    anyExp = Expression.NotEqual(property, toCompare);
                 }
             }
             else
             {
-                var listType = typeof(IEnumerable<>).MakeGenericType(idProp.Type);
+                var listType = typeof(IEnumerable<>).MakeGenericType(property.Type);
                 var array = ((JArray)rule.Value).ToObject(listType);
                 MethodInfo method = null;
-                method = MethodContains.MakeGenericMethod(idProp.Type);
-                
+                method = MethodContains.MakeGenericMethod(property.Type);
+
                 anyExp = Expression.Call(
                     method,
                     Expression.Constant(array),
-                     idProp);
+                     property);
 
                 if (rule.Operator == ConditionRuleOperator.notIn)
                 {
                     anyExp = Expression.Not(anyExp);
                 }
             }
-
-            var anyExpression = Expression.Lambda(anyExp, param);
-            var anyMethod = typeof(Enumerable).GetMethods().Single(m => m.Name == "Any" && m.GetParameters().Length == 2);
-            anyMethod = anyMethod.MakeGenericMethod(childType);
-            var predicate = Expression.Call(anyMethod, property, anyExpression);
-            return predicate;
-        }
-
-        private static bool IsArray(this Type type)
-        {
-            return type != typeof(string) && typeof(IEnumerable).IsAssignableFrom(type);
-        }
-
-        private static object GetValue(Type type, object value)
-        {
-            try
-            {
-                if (type == typeof(DateTime?))
-                {
-                    DateTime? output = null;
-                    if (value != null || value.ToString() != "")
-                    {
-                        output = DateTime.Parse(value.ToString());
-                    }
-
-                    return output;
-                }
-
-                if (type == typeof(DateTime))
-                {
-                    return DateTime.Parse(value.ToString());
-                }
-
-
-                if (type == typeof(Guid) || type == typeof(Guid?))
-                {
-                    return Guid.Parse(value.ToString());
-                }
-
-                return Convert.ChangeType(value, type);
-            }
-            catch
-            {
-                if (type.IsValueType)
-                {
-                    return Activator.CreateInstance(type);
-                }
-                return null;
-            }
+            return anyExp;*/
         }
 
 
-
-
-        private static bool IsNullable(this Type type)
-        {
-            return Nullable.GetUnderlyingType(type) != null;
-        }
 
         private static string[] ToArray(object obj)
         {

@@ -29,7 +29,11 @@ namespace JsonRuleEngine.Net.Tests
                        new Review()
                        {
                            Id = 1,
-                           Text ="It's cool"
+                           Text ="It's cool",
+                           Author = new Author()
+                           {
+                               Name = "Johnny"
+                           },
                        },
                        new Review()
                        {
@@ -71,6 +75,10 @@ namespace JsonRuleEngine.Net.Tests
                        new Review()
                        {
                            Id = 2,
+                           Author = new Author()
+                           {
+                               Name = "Johnny"
+                           },
                            Text ="It's cool"
                        }
                     }

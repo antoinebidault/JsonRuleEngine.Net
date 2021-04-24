@@ -1,10 +1,20 @@
 ﻿{
-  "separator": "And",
+  "separator": "Or",
   "rules": [
     {
       "field": "Reviews.Id",
+      "operator": "greaterThan",
+      "value": 1
+    },
+    {
+      "field": "Reviews.Id",
       "operator": "in",
-      "value": [1,2,3]
+      "value": [ 1, 2, 3 ]
+    },
+    {
+      "field": "Reviews.Author.Name",
+      "operator": "in",
+      "value": [ "Johnny" ]
     }
   ]
 }
