@@ -3,6 +3,7 @@ version: 1.0.{build}
 
 build_script:
   - dotnet restore -v quiet
+  - ps: dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura
   - ps: dotnet build /p:configuration=Release /p:Version=$($env:appveyor_build_version)
 
 test: off
