@@ -1,0 +1,722 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CoverageSession>
+  <Summary numSequencePoints="279" visitedSequencePoints="219" numBranchPoints="92" visitedBranchPoints="76" sequenceCoverage="78.49" branchCoverage="82.6" maxCyclomaticComplexity="110" minCyclomaticComplexity="110" visitedClasses="5" numClasses="5" visitedMethods="24" numMethods="29" />
+  <Modules>
+    <Module hash="9B9D88BE-2F08-44AD-ACE1-C40C6A3EBE61">
+      <ModulePath>JsonRuleEngine.Net.dll</ModulePath>
+      <ModuleTime>2021-04-24T09:42:55</ModuleTime>
+      <ModuleName>JsonRuleEngine.Net</ModuleName>
+      <Files>
+        <File uid="1" fullPath="C:\Users\clement bidault\source\repos\JsonRule.Net\JsonRuleEngine.Net\Engine\JsonRuleEngine.cs" />
+        <File uid="2" fullPath="C:\Users\clement bidault\source\repos\JsonRule.Net\JsonRuleEngine.Net\Extensions\Type.cs" />
+        <File uid="3" fullPath="C:\Users\clement bidault\source\repos\JsonRule.Net\JsonRuleEngine.Net\Models\ConditionRuleSet.cs" />
+        <File uid="4" fullPath="C:\Users\clement bidault\source\repos\JsonRule.Net\JsonRuleEngine.Net\Models\JsonRuleEngineException.cs" />
+        <File uid="5" fullPath="C:\Users\clement bidault\source\repos\JsonRule.Net\JsonRuleEngine.Net\Models\ValidateExpressionResult.cs" />
+      </Files>
+      <Classes>
+        <Class>
+          <Summary numSequencePoints="233" visitedSequencePoints="179" numBranchPoints="76" visitedBranchPoints="64" sequenceCoverage="76.82" branchCoverage="84.21" maxCyclomaticComplexity="32" minCyclomaticComplexity="1" visitedClasses="1" numClasses="1" visitedMethods="12" numMethods="16" />
+          <FullName>JsonRuleEngine.Net.JsonRuleEngine</FullName>
+          <Methods>
+            <Method cyclomaticComplexity="2" nPathComplexity="0" sequenceCoverage="71.42" branchCoverage="50" isConstructor="False" isGetter="False" isSetter="False" isStatic="True">
+              <Summary numSequencePoints="7" visitedSequencePoints="5" numBranchPoints="2" visitedBranchPoints="1" sequenceCoverage="71.42" branchCoverage="50" maxCyclomaticComplexity="2" minCyclomaticComplexity="2" visitedClasses="0" numClasses="0" visitedMethods="1" numMethods="1" />
+              <MetadataToken />
+              <Name>JsonRuleEngine.Net.ValidateExpressionResult JsonRuleEngine.Net.JsonRuleEngine::ValidateExpressionFields(System.String,System.Collections.Generic.IEnumerable`1&lt;System.String&gt;)</Name>
+              <FileRef uid="1" />
+              <SequencePoints>
+                <SequencePoint vc="1" uspid="26" ordinal="0" sl="26" sc="1" el="26" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="1" uspid="27" ordinal="1" sl="27" sc="1" el="27" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="1" uspid="28" ordinal="2" sl="28" sc="1" el="28" ec="2" bec="2" bev="1" fileid="1" />
+                <SequencePoint vc="0" uspid="29" ordinal="3" sl="29" sc="1" el="29" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="0" uspid="30" ordinal="4" sl="30" sc="1" el="30" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="1" uspid="33" ordinal="5" sl="33" sc="1" el="33" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="1" uspid="34" ordinal="6" sl="34" sc="1" el="34" ec="2" bec="0" bev="0" fileid="1" />
+              </SequencePoints>
+              <BranchPoints>
+                <BranchPoint vc="0" uspid="28" ordinal="0" path="0" offset="14" offsetend="16" sl="28" fileid="1" />
+                <BranchPoint vc="1" uspid="28" ordinal="1" path="1" offset="14" offsetend="25" sl="28" fileid="1" />
+              </BranchPoints>
+              <MethodPoint vc="5" uspid="0" p8:type="SequencePoint" ordinal="0" offset="0" sc="0" sl="26" ec="1" el="34" bec="0" bev="0" fileid="1" xmlns:p8="xsi" />
+            </Method>
+            <Method cyclomaticComplexity="10" nPathComplexity="0" sequenceCoverage="63.15" branchCoverage="80" isConstructor="False" isGetter="False" isSetter="False" isStatic="True">
+              <Summary numSequencePoints="19" visitedSequencePoints="12" numBranchPoints="10" visitedBranchPoints="8" sequenceCoverage="63.15" branchCoverage="80" maxCyclomaticComplexity="10" minCyclomaticComplexity="10" visitedClasses="0" numClasses="0" visitedMethods="1" numMethods="1" />
+              <MetadataToken />
+              <Name>JsonRuleEngine.Net.ValidateExpressionResult JsonRuleEngine.Net.JsonRuleEngine::ValidateExpressionRecursive(JsonRuleEngine.Net.ConditionRuleSet,System.Collections.Generic.IEnumerable`1&lt;System.String&gt;)</Name>
+              <FileRef uid="1" />
+              <SequencePoints>
+                <SequencePoint vc="9" uspid="37" ordinal="0" sl="37" sc="1" el="37" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="9" uspid="38" ordinal="1" sl="38" sc="1" el="38" ec="2" bec="4" bev="3" fileid="1" />
+                <SequencePoint vc="0" uspid="39" ordinal="2" sl="39" sc="1" el="39" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="0" uspid="40" ordinal="3" sl="40" sc="1" el="40" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="0" uspid="41" ordinal="4" sl="41" sc="1" el="41" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="0" uspid="42" ordinal="5" sl="42" sc="1" el="42" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="0" uspid="43" ordinal="6" sl="43" sc="1" el="43" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="9" uspid="46" ordinal="7" sl="46" sc="1" el="46" ec="2" bec="2" bev="2" fileid="1" />
+                <SequencePoint vc="2" uspid="47" ordinal="8" sl="47" sc="1" el="47" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="22" uspid="48" ordinal="9" sl="48" sc="1" el="48" ec="2" bec="2" bev="2" fileid="1" />
+                <SequencePoint vc="8" uspid="49" ordinal="10" sl="49" sc="1" el="49" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="8" uspid="50" ordinal="11" sl="50" sc="1" el="50" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="8" uspid="51" ordinal="12" sl="51" sc="1" el="51" ec="2" bec="2" bev="1" fileid="1" />
+                <SequencePoint vc="0" uspid="52" ordinal="13" sl="52" sc="1" el="52" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="0" uspid="53" ordinal="14" sl="53" sc="1" el="53" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="8" uspid="55" ordinal="15" sl="55" sc="1" el="55" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="2" uspid="56" ordinal="16" sl="56" sc="1" el="56" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="9" uspid="58" ordinal="17" sl="58" sc="1" el="58" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="9" uspid="59" ordinal="18" sl="59" sc="1" el="59" ec="2" bec="0" bev="0" fileid="1" />
+              </SequencePoints>
+              <BranchPoints>
+                <BranchPoint vc="7" uspid="38" ordinal="0" path="0" offset="12" offsetend="14" sl="38" fileid="1" />
+                <BranchPoint vc="2" uspid="38" ordinal="1" path="1" offset="12" offsetend="31" sl="38" fileid="1" />
+                <BranchPoint vc="0" uspid="38" ordinal="2" path="0" offset="34" offsetend="36" sl="38" fileid="1" />
+                <BranchPoint vc="9" uspid="38" ordinal="3" path="1" offset="34" offsetend="58" sl="38" fileid="1" />
+                <BranchPoint vc="2" uspid="46" ordinal="4" path="0" offset="69" offsetend="71" sl="46" fileid="1" />
+                <BranchPoint vc="8" uspid="48" ordinal="9" path="1" offset="135" offsetend="87" sl="48" fileid="1" />
+                <BranchPoint vc="0" uspid="51" ordinal="6" path="0" offset="120" offsetend="122" sl="51" fileid="1" />
+                <BranchPoint vc="8" uspid="51" ordinal="7" path="1" offset="120" offsetend="128" sl="51" fileid="1" />
+                <BranchPoint vc="2" uspid="48" ordinal="8" path="0" offset="135" offsetend="137" sl="48" fileid="1" />
+                <BranchPoint vc="9" uspid="46" ordinal="5" path="1" offset="69" offsetend="151" sl="46" fileid="1" />
+              </BranchPoints>
+              <MethodPoint vc="12" uspid="0" p8:type="SequencePoint" ordinal="1" offset="1" sc="0" sl="37" ec="1" el="59" bec="0" bev="0" fileid="1" xmlns:p8="xsi" />
+            </Method>
+            <Method cyclomaticComplexity="1" nPathComplexity="0" sequenceCoverage="100" branchCoverage="100" isConstructor="False" isGetter="False" isSetter="False" isStatic="True">
+              <Summary numSequencePoints="3" visitedSequencePoints="3" numBranchPoints="0" visitedBranchPoints="0" sequenceCoverage="100" branchCoverage="100" maxCyclomaticComplexity="1" minCyclomaticComplexity="1" visitedClasses="0" numClasses="0" visitedMethods="1" numMethods="1" />
+              <MetadataToken />
+              <Name>System.Linq.Expressions.Expression`1&lt;System.Func`2&lt;T,System.Boolean&gt;&gt; JsonRuleEngine.Net.JsonRuleEngine::ParseExpression(System.String)</Name>
+              <FileRef uid="1" />
+              <SequencePoints>
+                <SequencePoint vc="17" uspid="70" ordinal="0" sl="70" sc="1" el="70" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="17" uspid="71" ordinal="1" sl="71" sc="1" el="71" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="15" uspid="72" ordinal="2" sl="72" sc="1" el="72" ec="2" bec="0" bev="0" fileid="1" />
+              </SequencePoints>
+              <BranchPoints />
+              <MethodPoint vc="3" uspid="0" p8:type="SequencePoint" ordinal="2" offset="2" sc="0" sl="70" ec="1" el="72" bec="0" bev="0" fileid="1" xmlns:p8="xsi" />
+            </Method>
+            <Method cyclomaticComplexity="4" nPathComplexity="0" sequenceCoverage="78.57" branchCoverage="75" isConstructor="False" isGetter="False" isSetter="False" isStatic="True">
+              <Summary numSequencePoints="14" visitedSequencePoints="11" numBranchPoints="4" visitedBranchPoints="3" sequenceCoverage="78.57" branchCoverage="75" maxCyclomaticComplexity="4" minCyclomaticComplexity="4" visitedClasses="0" numClasses="0" visitedMethods="1" numMethods="1" />
+              <MetadataToken />
+              <Name>System.Linq.Expressions.Expression`1&lt;System.Func`2&lt;T,System.Boolean&gt;&gt; JsonRuleEngine.Net.JsonRuleEngine::ParseExpression(JsonRuleEngine.Net.ConditionRuleSet)</Name>
+              <FileRef uid="1" />
+              <SequencePoints>
+                <SequencePoint vc="16" uspid="82" ordinal="0" sl="82" sc="1" el="82" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="16" uspid="83" ordinal="1" sl="83" sc="1" el="83" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="16" uspid="84" ordinal="2" sl="84" sc="1" el="84" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="15" uspid="88" ordinal="3" sl="88" sc="1" el="88" ec="2" bec="2" bev="2" fileid="1" />
+                <SequencePoint vc="1" uspid="89" ordinal="4" sl="89" sc="1" el="89" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="1" uspid="90" ordinal="5" sl="90" sc="1" el="90" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="14" uspid="93" ordinal="6" sl="93" sc="1" el="93" ec="2" bec="2" bev="1" fileid="1" />
+                <SequencePoint vc="0" uspid="94" ordinal="7" sl="94" sc="1" el="94" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="0" uspid="95" ordinal="8" sl="95" sc="1" el="95" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="0" uspid="96" ordinal="9" sl="96" sc="1" el="96" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="14" uspid="98" ordinal="10" sl="98" sc="1" el="98" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="14" uspid="100" ordinal="11" sl="100" sc="1" el="100" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="14" uspid="101" ordinal="12" sl="101" sc="1" el="101" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="15" uspid="102" ordinal="13" sl="102" sc="1" el="102" ec="2" bec="0" bev="0" fileid="1" />
+              </SequencePoints>
+              <BranchPoints>
+                <BranchPoint vc="1" uspid="88" ordinal="0" path="0" offset="31" offsetend="33" sl="88" fileid="1" />
+                <BranchPoint vc="14" uspid="88" ordinal="1" path="1" offset="31" offsetend="97" sl="88" fileid="1" />
+                <BranchPoint vc="0" uspid="93" ordinal="2" path="0" offset="107" offsetend="109" sl="93" fileid="1" />
+                <BranchPoint vc="14" uspid="93" ordinal="3" path="1" offset="107" offsetend="118" sl="93" fileid="1" />
+              </BranchPoints>
+              <MethodPoint vc="11" uspid="0" p8:type="SequencePoint" ordinal="3" offset="3" sc="0" sl="82" ec="1" el="102" bec="0" bev="0" fileid="1" xmlns:p8="xsi" />
+            </Method>
+            <Method cyclomaticComplexity="1" nPathComplexity="0" sequenceCoverage="0" branchCoverage="100" isConstructor="False" isGetter="False" isSetter="False" isStatic="True">
+              <Summary numSequencePoints="4" visitedSequencePoints="0" numBranchPoints="0" visitedBranchPoints="0" sequenceCoverage="0" branchCoverage="100" maxCyclomaticComplexity="1" minCyclomaticComplexity="1" visitedClasses="0" numClasses="0" visitedMethods="0" numMethods="1" />
+              <MetadataToken />
+              <Name>System.Func`2&lt;T,System.Boolean&gt; JsonRuleEngine.Net.JsonRuleEngine::ParsePredicate(System.String)</Name>
+              <FileRef uid="1" />
+              <SequencePoints>
+                <SequencePoint vc="0" uspid="109" ordinal="0" sl="109" sc="1" el="109" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="0" uspid="110" ordinal="1" sl="110" sc="1" el="110" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="0" uspid="111" ordinal="2" sl="111" sc="1" el="111" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="0" uspid="112" ordinal="3" sl="112" sc="1" el="112" ec="2" bec="0" bev="0" fileid="1" />
+              </SequencePoints>
+              <BranchPoints />
+              <MethodPoint vc="0" uspid="0" p8:type="SequencePoint" ordinal="4" offset="4" sc="0" sl="109" ec="1" el="112" bec="0" bev="0" fileid="1" xmlns:p8="xsi" />
+            </Method>
+            <Method cyclomaticComplexity="1" nPathComplexity="0" sequenceCoverage="0" branchCoverage="100" isConstructor="False" isGetter="False" isSetter="False" isStatic="True">
+              <Summary numSequencePoints="4" visitedSequencePoints="0" numBranchPoints="0" visitedBranchPoints="0" sequenceCoverage="0" branchCoverage="100" maxCyclomaticComplexity="1" minCyclomaticComplexity="1" visitedClasses="0" numClasses="0" visitedMethods="0" numMethods="1" />
+              <MetadataToken />
+              <Name>System.Func`2&lt;T,System.Boolean&gt; JsonRuleEngine.Net.JsonRuleEngine::ParsePredicate(JsonRuleEngine.Net.ConditionRuleSet)</Name>
+              <FileRef uid="1" />
+              <SequencePoints>
+                <SequencePoint vc="0" uspid="119" ordinal="0" sl="119" sc="1" el="119" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="0" uspid="120" ordinal="1" sl="120" sc="1" el="120" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="0" uspid="121" ordinal="2" sl="121" sc="1" el="121" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="0" uspid="122" ordinal="3" sl="122" sc="1" el="122" ec="2" bec="0" bev="0" fileid="1" />
+              </SequencePoints>
+              <BranchPoints />
+              <MethodPoint vc="0" uspid="0" p8:type="SequencePoint" ordinal="5" offset="5" sc="0" sl="119" ec="1" el="122" bec="0" bev="0" fileid="1" xmlns:p8="xsi" />
+            </Method>
+            <Method cyclomaticComplexity="1" nPathComplexity="0" sequenceCoverage="100" branchCoverage="100" isConstructor="False" isGetter="False" isSetter="False" isStatic="True">
+              <Summary numSequencePoints="4" visitedSequencePoints="4" numBranchPoints="0" visitedBranchPoints="0" sequenceCoverage="100" branchCoverage="100" maxCyclomaticComplexity="1" minCyclomaticComplexity="1" visitedClasses="0" numClasses="0" visitedMethods="1" numMethods="1" />
+              <MetadataToken />
+              <Name>System.Boolean JsonRuleEngine.Net.JsonRuleEngine::Evaluate(T,System.String)</Name>
+              <FileRef uid="1" />
+              <SequencePoints>
+                <SequencePoint vc="11" uspid="133" ordinal="0" sl="133" sc="1" el="133" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="11" uspid="134" ordinal="1" sl="134" sc="1" el="134" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="11" uspid="135" ordinal="2" sl="135" sc="1" el="135" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="11" uspid="136" ordinal="3" sl="136" sc="1" el="136" ec="2" bec="0" bev="0" fileid="1" />
+              </SequencePoints>
+              <BranchPoints />
+              <MethodPoint vc="4" uspid="0" p8:type="SequencePoint" ordinal="6" offset="6" sc="0" sl="133" ec="1" el="136" bec="0" bev="0" fileid="1" xmlns:p8="xsi" />
+            </Method>
+            <Method cyclomaticComplexity="1" nPathComplexity="0" sequenceCoverage="0" branchCoverage="100" isConstructor="False" isGetter="False" isSetter="False" isStatic="True">
+              <Summary numSequencePoints="4" visitedSequencePoints="0" numBranchPoints="0" visitedBranchPoints="0" sequenceCoverage="0" branchCoverage="100" maxCyclomaticComplexity="1" minCyclomaticComplexity="1" visitedClasses="0" numClasses="0" visitedMethods="0" numMethods="1" />
+              <MetadataToken />
+              <Name>System.Boolean JsonRuleEngine.Net.JsonRuleEngine::Evaluate(T,JsonRuleEngine.Net.ConditionRuleSet)</Name>
+              <FileRef uid="1" />
+              <SequencePoints>
+                <SequencePoint vc="0" uspid="146" ordinal="0" sl="146" sc="1" el="146" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="0" uspid="147" ordinal="1" sl="147" sc="1" el="147" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="0" uspid="148" ordinal="2" sl="148" sc="1" el="148" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="0" uspid="149" ordinal="3" sl="149" sc="1" el="149" ec="2" bec="0" bev="0" fileid="1" />
+              </SequencePoints>
+              <BranchPoints />
+              <MethodPoint vc="0" uspid="0" p8:type="SequencePoint" ordinal="7" offset="7" sc="0" sl="146" ec="1" el="149" bec="0" bev="0" fileid="1" xmlns:p8="xsi" />
+            </Method>
+            <Method cyclomaticComplexity="16" nPathComplexity="0" sequenceCoverage="91.22" branchCoverage="93.75" isConstructor="False" isGetter="False" isSetter="False" isStatic="True">
+              <Summary numSequencePoints="57" visitedSequencePoints="52" numBranchPoints="16" visitedBranchPoints="15" sequenceCoverage="91.22" branchCoverage="93.75" maxCyclomaticComplexity="16" minCyclomaticComplexity="16" visitedClasses="0" numClasses="0" visitedMethods="1" numMethods="1" />
+              <MetadataToken />
+              <Name>System.Linq.Expressions.Expression JsonRuleEngine.Net.JsonRuleEngine::ParseTree(JsonRuleEngine.Net.ConditionRuleSet,System.Linq.Expressions.ParameterExpression)</Name>
+              <FileRef uid="1" />
+              <SequencePoints>
+                <SequencePoint vc="18" uspid="174" ordinal="0" sl="174" sc="1" el="174" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="18" uspid="175" ordinal="1" sl="175" sc="1" el="175" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="18" uspid="177" ordinal="2" sl="177" sc="1" el="177" ec="2" bec="2" bev="2" fileid="1" />
+                <SequencePoint vc="18" uspid="181" ordinal="3" sl="181" sc="1" el="181" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="121" uspid="182" ordinal="4" sl="182" sc="1" el="182" ec="2" bec="2" bev="2" fileid="1" />
+                <SequencePoint vc="34" uspid="183" ordinal="5" sl="183" sc="1" el="183" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="34" uspid="184" ordinal="6" sl="184" sc="1" el="184" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="34" uspid="185" ordinal="7" sl="185" sc="1" el="185" ec="2" bec="2" bev="2" fileid="1" />
+                <SequencePoint vc="2" uspid="186" ordinal="8" sl="186" sc="1" el="186" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="2" uspid="187" ordinal="9" sl="187" sc="1" el="187" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="2" uspid="188" ordinal="10" sl="188" sc="1" el="188" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="2" uspid="189" ordinal="11" sl="189" sc="1" el="189" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="32" uspid="192" ordinal="12" sl="192" sc="1" el="192" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="32" uspid="193" ordinal="13" sl="193" sc="1" el="193" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="32" uspid="196" ordinal="14" sl="196" sc="1" el="196" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="32" uspid="197" ordinal="15" sl="197" sc="1" el="197" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="32" uspid="198" ordinal="16" sl="198" sc="1" el="198" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="32" uspid="199" ordinal="17" sl="199" sc="1" el="199" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="158" uspid="200" ordinal="18" sl="200" sc="1" el="200" ec="2" bec="2" bev="2" fileid="1" />
+                <SequencePoint vc="35" uspid="201" ordinal="19" sl="201" sc="1" el="201" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="35" uspid="202" ordinal="20" sl="202" sc="1" el="202" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="35" uspid="203" ordinal="21" sl="203" sc="1" el="203" ec="2" bec="2" bev="2" fileid="1" />
+                <SequencePoint vc="32" uspid="204" ordinal="22" sl="204" sc="1" el="204" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="32" uspid="205" ordinal="23" sl="205" sc="1" el="205" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="31" uspid="206" ordinal="24" sl="206" sc="1" el="206" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="3" uspid="208" ordinal="25" sl="208" sc="1" el="208" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="3" uspid="209" ordinal="26" sl="209" sc="1" el="209" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="3" uspid="210" ordinal="27" sl="210" sc="1" el="210" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="34" uspid="212" ordinal="28" sl="212" sc="1" el="212" ec="2" bec="2" bev="2" fileid="1" />
+                <SequencePoint vc="7" uspid="213" ordinal="29" sl="213" sc="1" el="213" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="7" uspid="214" ordinal="30" sl="214" sc="1" el="214" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="7" uspid="216" ordinal="31" sl="216" sc="1" el="216" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="7" uspid="217" ordinal="32" sl="217" sc="1" el="217" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="7" uspid="218" ordinal="33" sl="218" sc="1" el="218" ec="2" bec="2" bev="1" fileid="1" />
+                <SequencePoint vc="0" uspid="219" ordinal="34" sl="219" sc="1" el="219" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="0" uspid="220" ordinal="35" sl="220" sc="1" el="220" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="7" uspid="222" ordinal="36" sl="222" sc="1" el="222" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="0" uspid="223" ordinal="37" sl="223" sc="1" el="223" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="0" uspid="224" ordinal="38" sl="224" sc="1" el="224" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="0" uspid="225" ordinal="39" sl="225" sc="1" el="225" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="7" uspid="227" ordinal="40" sl="227" sc="1" el="227" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="7" uspid="228" ordinal="41" sl="228" sc="1" el="228" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="7" uspid="229" ordinal="42" sl="229" sc="1" el="229" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="7" uspid="230" ordinal="43" sl="230" sc="1" el="230" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="27" uspid="232" ordinal="44" sl="232" sc="1" el="232" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="31" uspid="235" ordinal="45" sl="235" sc="1" el="235" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="1" uspid="236" ordinal="46" sl="236" sc="1" el="236" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="1" uspid="237" ordinal="47" sl="237" sc="1" el="237" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="1" uspid="238" ordinal="48" sl="238" sc="1" el="238" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="31" uspid="241" ordinal="49" sl="241" sc="1" el="241" ec="2" bec="2" bev="2" fileid="1" />
+                <SequencePoint vc="7" uspid="242" ordinal="50" sl="242" sc="1" el="242" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="7" uspid="243" ordinal="51" sl="243" sc="1" el="243" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="24" uspid="246" ordinal="52" sl="246" sc="1" el="246" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="24" uspid="247" ordinal="53" sl="247" sc="1" el="247" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="24" uspid="248" ordinal="54" sl="248" sc="1" el="248" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="17" uspid="250" ordinal="55" sl="250" sc="1" el="250" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="17" uspid="251" ordinal="56" sl="251" sc="1" el="251" ec="2" bec="0" bev="0" fileid="1" />
+              </SequencePoints>
+              <BranchPoints>
+                <BranchPoint vc="15" uspid="177" ordinal="0" path="0" offset="39" offsetend="41" sl="177" fileid="1" />
+                <BranchPoint vc="3" uspid="177" ordinal="1" path="1" offset="39" offsetend="55" sl="177" fileid="1" />
+                <BranchPoint vc="34" uspid="182" ordinal="15" path="1" offset="570" offsetend="89" sl="182" fileid="1" />
+                <BranchPoint vc="2" uspid="185" ordinal="2" path="0" offset="121" offsetend="123" sl="185" fileid="1" />
+                <BranchPoint vc="32" uspid="185" ordinal="3" path="1" offset="121" offsetend="150" sl="185" fileid="1" />
+                <BranchPoint vc="35" uspid="200" ordinal="11" path="1" offset="444" offsetend="202" sl="200" fileid="1" />
+                <BranchPoint vc="32" uspid="203" ordinal="4" path="0" offset="233" offsetend="235" sl="203" fileid="1" />
+                <BranchPoint vc="3" uspid="203" ordinal="5" path="1" offset="233" offsetend="249" sl="203" fileid="1" />
+                <BranchPoint vc="7" uspid="212" ordinal="6" path="0" offset="278" offsetend="283" sl="212" fileid="1" />
+                <BranchPoint vc="0" uspid="218" ordinal="8" path="0" offset="324" offsetend="326" sl="218" fileid="1" />
+                <BranchPoint vc="7" uspid="218" ordinal="9" path="1" offset="324" offsetend="338" sl="218" fileid="1" />
+                <BranchPoint vc="27" uspid="212" ordinal="7" path="1" offset="278" offsetend="431" sl="212" fileid="1" />
+                <BranchPoint vc="31" uspid="200" ordinal="10" path="0" offset="444" offsetend="449" sl="200" fileid="1" />
+                <BranchPoint vc="7" uspid="241" ordinal="12" path="0" offset="523" offsetend="525" sl="241" fileid="1" />
+                <BranchPoint vc="24" uspid="241" ordinal="13" path="1" offset="523" offsetend="528" sl="241" fileid="1" />
+                <BranchPoint vc="17" uspid="182" ordinal="14" path="0" offset="570" offsetend="575" sl="182" fileid="1" />
+              </BranchPoints>
+              <MethodPoint vc="52" uspid="0" p8:type="SequencePoint" ordinal="8" offset="8" sc="0" sl="174" ec="1" el="251" bec="0" bev="0" fileid="1" xmlns:p8="xsi" />
+            </Method>
+            <Method cyclomaticComplexity="32" nPathComplexity="0" sequenceCoverage="72.6" branchCoverage="78.12" isConstructor="False" isGetter="False" isSetter="False" isStatic="True">
+              <Summary numSequencePoints="73" visitedSequencePoints="53" numBranchPoints="32" visitedBranchPoints="25" sequenceCoverage="72.6" branchCoverage="78.12" maxCyclomaticComplexity="32" minCyclomaticComplexity="32" visitedClasses="0" numClasses="0" visitedMethods="1" numMethods="1" />
+              <MetadataToken />
+              <Name>System.Linq.Expressions.Expression JsonRuleEngine.Net.JsonRuleEngine::CreateOperationExpression(System.Linq.Expressions.MemberExpression,JsonRuleEngine.Net.ConditionRuleOperator,System.Object)</Name>
+              <FileRef uid="1" />
+              <SequencePoints>
+                <SequencePoint vc="31" uspid="259" ordinal="0" sl="259" sc="1" el="259" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="31" uspid="260" ordinal="1" sl="260" sc="1" el="260" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="31" uspid="264" ordinal="2" sl="264" sc="1" el="264" ec="2" bec="4" bev="4" fileid="1" />
+                <SequencePoint vc="10" uspid="265" ordinal="3" sl="265" sc="1" el="265" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="10" uspid="269" ordinal="4" sl="269" sc="1" el="269" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="10" uspid="270" ordinal="5" sl="270" sc="1" el="270" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="10" uspid="271" ordinal="6" sl="271" sc="1" el="271" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="10" uspid="272" ordinal="7" sl="272" sc="1" el="272" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="10" uspid="273" ordinal="8" sl="273" sc="1" el="273" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="10" uspid="277" ordinal="9" sl="277" sc="1" el="277" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="10" uspid="278" ordinal="10" sl="278" sc="1" el="278" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="10" uspid="279" ordinal="11" sl="279" sc="1" el="279" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="10" uspid="280" ordinal="12" sl="280" sc="1" el="280" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="10" uspid="282" ordinal="13" sl="282" sc="1" el="282" ec="2" bec="2" bev="2" fileid="1" />
+                <SequencePoint vc="1" uspid="283" ordinal="14" sl="283" sc="1" el="283" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="1" uspid="284" ordinal="15" sl="284" sc="1" el="284" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="1" uspid="285" ordinal="16" sl="285" sc="1" el="285" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="10" uspid="287" ordinal="17" sl="287" sc="1" el="287" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="0" uspid="289" ordinal="18" sl="289" sc="1" el="289" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="0" uspid="290" ordinal="19" sl="290" sc="1" el="290" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="0" uspid="291" ordinal="20" sl="291" sc="1" el="291" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="21" uspid="298" ordinal="21" sl="298" sc="1" el="298" ec="2" bec="6" bev="6" fileid="1" />
+                <SequencePoint vc="21" uspid="299" ordinal="22" sl="299" sc="1" el="299" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="21" uspid="300" ordinal="23" sl="300" sc="1" el="300" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="2" uspid="301" ordinal="24" sl="301" sc="1" el="301" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="2" uspid="302" ordinal="25" sl="302" sc="1" el="302" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="2" uspid="303" ordinal="26" sl="303" sc="1" el="303" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="21" uspid="305" ordinal="27" sl="305" sc="1" el="305" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="21" uspid="306" ordinal="28" sl="306" sc="1" el="306" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="21" uspid="308" ordinal="29" sl="308" sc="1" el="308" ec="2" bec="2" bev="2" fileid="1" />
+                <SequencePoint vc="2" uspid="309" ordinal="30" sl="309" sc="1" el="309" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="2" uspid="310" ordinal="31" sl="310" sc="1" el="310" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="2" uspid="311" ordinal="32" sl="311" sc="1" el="311" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="19" uspid="312" ordinal="33" sl="312" sc="1" el="312" ec="2" bec="2" bev="2" fileid="1" />
+                <SequencePoint vc="2" uspid="313" ordinal="34" sl="313" sc="1" el="313" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="2" uspid="314" ordinal="35" sl="314" sc="1" el="314" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="2" uspid="315" ordinal="36" sl="315" sc="1" el="315" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="17" uspid="316" ordinal="37" sl="316" sc="1" el="316" ec="2" bec="2" bev="2" fileid="1" />
+                <SequencePoint vc="11" uspid="317" ordinal="38" sl="317" sc="1" el="317" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="11" uspid="318" ordinal="39" sl="318" sc="1" el="318" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="11" uspid="319" ordinal="40" sl="319" sc="1" el="319" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="6" uspid="320" ordinal="41" sl="320" sc="1" el="320" ec="2" bec="2" bev="1" fileid="1" />
+                <SequencePoint vc="0" uspid="321" ordinal="42" sl="321" sc="1" el="321" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="0" uspid="322" ordinal="43" sl="322" sc="1" el="322" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="0" uspid="323" ordinal="44" sl="323" sc="1" el="323" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="6" uspid="324" ordinal="45" sl="324" sc="1" el="324" ec="2" bec="2" bev="2" fileid="1" />
+                <SequencePoint vc="4" uspid="325" ordinal="46" sl="325" sc="1" el="325" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="4" uspid="326" ordinal="47" sl="326" sc="1" el="326" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="4" uspid="327" ordinal="48" sl="327" sc="1" el="327" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="2" uspid="328" ordinal="49" sl="328" sc="1" el="328" ec="2" bec="2" bev="2" fileid="1" />
+                <SequencePoint vc="1" uspid="329" ordinal="50" sl="329" sc="1" el="329" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="1" uspid="330" ordinal="51" sl="330" sc="1" el="330" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="1" uspid="331" ordinal="52" sl="331" sc="1" el="331" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="1" uspid="332" ordinal="53" sl="332" sc="1" el="332" ec="2" bec="2" bev="1" fileid="1" />
+                <SequencePoint vc="1" uspid="333" ordinal="54" sl="333" sc="1" el="333" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="1" uspid="334" ordinal="55" sl="334" sc="1" el="334" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="1" uspid="335" ordinal="56" sl="335" sc="1" el="335" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="0" uspid="336" ordinal="57" sl="336" sc="1" el="336" ec="2" bec="2" bev="0" fileid="1" />
+                <SequencePoint vc="0" uspid="337" ordinal="58" sl="337" sc="1" el="337" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="0" uspid="338" ordinal="59" sl="338" sc="1" el="338" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="0" uspid="339" ordinal="60" sl="339" sc="1" el="339" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="0" uspid="340" ordinal="61" sl="340" sc="1" el="340" ec="2" bec="2" bev="0" fileid="1" />
+                <SequencePoint vc="0" uspid="341" ordinal="62" sl="341" sc="1" el="341" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="0" uspid="342" ordinal="63" sl="342" sc="1" el="342" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="0" uspid="343" ordinal="64" sl="343" sc="1" el="343" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="0" uspid="344" ordinal="65" sl="344" sc="1" el="344" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="0" uspid="345" ordinal="66" sl="345" sc="1" el="345" ec="2" bec="2" bev="1" fileid="1" />
+                <SequencePoint vc="0" uspid="346" ordinal="67" sl="346" sc="1" el="346" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="0" uspid="347" ordinal="68" sl="347" sc="1" el="347" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="0" uspid="348" ordinal="69" sl="348" sc="1" el="348" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="0" uspid="349" ordinal="70" sl="349" sc="1" el="349" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="21" uspid="350" ordinal="71" sl="350" sc="1" el="350" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="31" uspid="351" ordinal="72" sl="351" sc="1" el="351" ec="2" bec="0" bev="0" fileid="1" />
+              </SequencePoints>
+              <BranchPoints>
+                <BranchPoint vc="22" uspid="264" ordinal="0" path="0" offset="5" offsetend="7" sl="264" fileid="1" />
+                <BranchPoint vc="9" uspid="264" ordinal="1" path="1" offset="5" offsetend="13" sl="264" fileid="1" />
+                <BranchPoint vc="10" uspid="264" ordinal="2" path="0" offset="16" offsetend="21" sl="264" fileid="1" />
+                <BranchPoint vc="1" uspid="282" ordinal="4" path="0" offset="122" offsetend="124" sl="282" fileid="1" />
+                <BranchPoint vc="10" uspid="282" ordinal="5" path="1" offset="122" offsetend="133" sl="282" fileid="1" />
+                <BranchPoint vc="21" uspid="264" ordinal="3" path="1" offset="16" offsetend="205" sl="264" fileid="1" />
+                <BranchPoint vc="4" uspid="298" ordinal="6" path="0" offset="216" offsetend="218" sl="298" fileid="1" />
+                <BranchPoint vc="3" uspid="298" ordinal="8" path="0" offset="221" offsetend="223" sl="298" fileid="1" />
+                <BranchPoint vc="1" uspid="298" ordinal="9" path="1" offset="221" offsetend="233" sl="298" fileid="1" />
+                <BranchPoint vc="17" uspid="298" ordinal="7" path="1" offset="216" offsetend="236" sl="298" fileid="1" />
+                <BranchPoint vc="2" uspid="298" ordinal="10" path="0" offset="241" offsetend="243" sl="298" fileid="1" />
+                <BranchPoint vc="21" uspid="298" ordinal="11" path="1" offset="241" offsetend="258" sl="298" fileid="1" />
+                <BranchPoint vc="2" uspid="308" ordinal="12" path="0" offset="288" offsetend="290" sl="308" fileid="1" />
+                <BranchPoint vc="19" uspid="308" ordinal="13" path="1" offset="288" offsetend="315" sl="308" fileid="1" />
+                <BranchPoint vc="2" uspid="312" ordinal="14" path="0" offset="324" offsetend="326" sl="312" fileid="1" />
+                <BranchPoint vc="17" uspid="312" ordinal="15" path="1" offset="324" offsetend="351" sl="312" fileid="1" />
+                <BranchPoint vc="11" uspid="316" ordinal="16" path="0" offset="359" offsetend="361" sl="316" fileid="1" />
+                <BranchPoint vc="6" uspid="316" ordinal="17" path="1" offset="359" offsetend="376" sl="316" fileid="1" />
+                <BranchPoint vc="0" uspid="320" ordinal="18" path="0" offset="384" offsetend="386" sl="320" fileid="1" />
+                <BranchPoint vc="6" uspid="320" ordinal="19" path="1" offset="384" offsetend="401" sl="320" fileid="1" />
+                <BranchPoint vc="4" uspid="324" ordinal="20" path="0" offset="409" offsetend="411" sl="324" fileid="1" />
+                <BranchPoint vc="2" uspid="324" ordinal="21" path="1" offset="409" offsetend="426" sl="324" fileid="1" />
+                <BranchPoint vc="1" uspid="328" ordinal="22" path="0" offset="434" offsetend="436" sl="328" fileid="1" />
+                <BranchPoint vc="1" uspid="328" ordinal="23" path="1" offset="434" offsetend="451" sl="328" fileid="1" />
+                <BranchPoint vc="1" uspid="332" ordinal="24" path="0" offset="459" offsetend="461" sl="332" fileid="1" />
+                <BranchPoint vc="0" uspid="332" ordinal="25" path="1" offset="459" offsetend="476" sl="332" fileid="1" />
+                <BranchPoint vc="0" uspid="336" ordinal="26" path="0" offset="484" offsetend="486" sl="336" fileid="1" />
+                <BranchPoint vc="0" uspid="336" ordinal="27" path="1" offset="484" offsetend="501" sl="336" fileid="1" />
+                <BranchPoint vc="0" uspid="340" ordinal="28" path="0" offset="509" offsetend="511" sl="340" fileid="1" />
+                <BranchPoint vc="0" uspid="340" ordinal="29" path="1" offset="509" offsetend="575" sl="340" fileid="1" />
+                <BranchPoint vc="0" uspid="345" ordinal="30" path="0" offset="584" offsetend="586" sl="345" fileid="1" />
+                <BranchPoint vc="21" uspid="345" ordinal="31" path="1" offset="584" offsetend="648" sl="345" fileid="1" />
+              </BranchPoints>
+              <MethodPoint vc="53" uspid="0" p8:type="SequencePoint" ordinal="9" offset="9" sc="0" sl="259" ec="1" el="351" bec="0" bev="0" fileid="1" xmlns:p8="xsi" />
+            </Method>
+            <Method cyclomaticComplexity="2" nPathComplexity="0" sequenceCoverage="100" branchCoverage="100" isConstructor="False" isGetter="False" isSetter="False" isStatic="True">
+              <Summary numSequencePoints="9" visitedSequencePoints="9" numBranchPoints="2" visitedBranchPoints="2" sequenceCoverage="100" branchCoverage="100" maxCyclomaticComplexity="2" minCyclomaticComplexity="2" visitedClasses="0" numClasses="0" visitedMethods="1" numMethods="1" />
+              <MetadataToken />
+              <Name>System.Linq.Expressions.MethodCallExpression JsonRuleEngine.Net.JsonRuleEngine::HandleTableRule(JsonRuleEngine.Net.ConditionRuleSet,System.String,System.Object,System.Linq.Expressions.MemberExpression)</Name>
+              <FileRef uid="1" />
+              <SequencePoints>
+                <SequencePoint vc="7" uspid="354" ordinal="0" sl="354" sc="1" el="354" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="7" uspid="356" ordinal="1" sl="356" sc="1" el="356" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="7" uspid="359" ordinal="2" sl="359" sc="1" el="359" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="7" uspid="360" ordinal="3" sl="360" sc="1" el="360" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="1309" uspid="363" ordinal="4" sl="363" sc="1" el="363" ec="2" bec="2" bev="2" fileid="1" />
+                <SequencePoint vc="7" uspid="364" ordinal="5" sl="364" sc="1" el="364" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="7" uspid="366" ordinal="6" sl="366" sc="1" el="366" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="7" uspid="368" ordinal="7" sl="368" sc="1" el="368" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="7" uspid="369" ordinal="8" sl="369" sc="1" el="369" ec="2" bec="0" bev="0" fileid="1" />
+              </SequencePoints>
+              <BranchPoints>
+                <BranchPoint vc="14" uspid="363" ordinal="0" path="0" offset="16" offsetend="18" sl="363" fileid="1" />
+                <BranchPoint vc="1288" uspid="363" ordinal="1" path="1" offset="16" offsetend="31" sl="363" fileid="1" />
+              </BranchPoints>
+              <MethodPoint vc="9" uspid="0" p8:type="SequencePoint" ordinal="10" offset="10" sc="0" sl="354" ec="1" el="369" bec="0" bev="0" fileid="1" xmlns:p8="xsi" />
+            </Method>
+            <Method cyclomaticComplexity="4" nPathComplexity="0" sequenceCoverage="100" branchCoverage="100" isConstructor="False" isGetter="False" isSetter="False" isStatic="True">
+              <Summary numSequencePoints="14" visitedSequencePoints="14" numBranchPoints="4" visitedBranchPoints="4" sequenceCoverage="100" branchCoverage="100" maxCyclomaticComplexity="4" minCyclomaticComplexity="4" visitedClasses="0" numClasses="0" visitedMethods="1" numMethods="1" />
+              <MetadataToken />
+              <Name>System.Linq.Expressions.Expression JsonRuleEngine.Net.JsonRuleEngine::GetExpression(JsonRuleEngine.Net.ConditionRuleSet,System.Linq.Expressions.ParameterExpression,System.String,System.Object)</Name>
+              <FileRef uid="1" />
+              <SequencePoints>
+                <SequencePoint vc="7" uspid="373" ordinal="0" sl="373" sc="1" el="373" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="7" uspid="374" ordinal="1" sl="374" sc="1" el="374" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="37" uspid="376" ordinal="2" sl="376" sc="1" el="376" ec="2" bec="2" bev="2" fileid="1" />
+                <SequencePoint vc="8" uspid="377" ordinal="3" sl="377" sc="1" el="377" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="8" uspid="378" ordinal="4" sl="378" sc="1" el="378" ec="2" bec="2" bev="2" fileid="1" />
+                <SequencePoint vc="7" uspid="379" ordinal="5" sl="379" sc="1" el="379" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="7" uspid="380" ordinal="6" sl="380" sc="1" el="380" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="7" uspid="381" ordinal="7" sl="381" sc="1" el="381" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="1" uspid="383" ordinal="8" sl="383" sc="1" el="383" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="1" uspid="384" ordinal="9" sl="384" sc="1" el="384" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="1" uspid="385" ordinal="10" sl="385" sc="1" el="385" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="8" uspid="386" ordinal="11" sl="386" sc="1" el="386" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="7" uspid="388" ordinal="12" sl="388" sc="1" el="388" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="7" uspid="425" ordinal="13" sl="425" sc="1" el="425" ec="2" bec="0" bev="0" fileid="1" />
+              </SequencePoints>
+              <BranchPoints>
+                <BranchPoint vc="8" uspid="376" ordinal="3" path="1" offset="72" offsetend="26" sl="376" fileid="1" />
+                <BranchPoint vc="7" uspid="378" ordinal="0" path="0" offset="39" offsetend="41" sl="378" fileid="1" />
+                <BranchPoint vc="1" uspid="378" ordinal="1" path="1" offset="39" offsetend="53" sl="378" fileid="1" />
+                <BranchPoint vc="7" uspid="376" ordinal="2" path="0" offset="72" offsetend="74" sl="376" fileid="1" />
+              </BranchPoints>
+              <MethodPoint vc="14" uspid="0" p8:type="SequencePoint" ordinal="11" offset="11" sc="0" sl="373" ec="1" el="425" bec="0" bev="0" fileid="1" xmlns:p8="xsi" />
+            </Method>
+            <Method cyclomaticComplexity="1" nPathComplexity="0" sequenceCoverage="0" branchCoverage="100" isConstructor="False" isGetter="False" isSetter="False" isStatic="True">
+              <Summary numSequencePoints="5" visitedSequencePoints="0" numBranchPoints="0" visitedBranchPoints="0" sequenceCoverage="0" branchCoverage="100" maxCyclomaticComplexity="1" minCyclomaticComplexity="1" visitedClasses="0" numClasses="0" visitedMethods="0" numMethods="1" />
+              <MetadataToken />
+              <Name>System.String[] JsonRuleEngine.Net.JsonRuleEngine::ToArray(System.Object)</Name>
+              <FileRef uid="1" />
+              <SequencePoints>
+                <SequencePoint vc="0" uspid="430" ordinal="0" sl="430" sc="1" el="430" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="0" uspid="431" ordinal="1" sl="431" sc="1" el="431" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="0" uspid="432" ordinal="2" sl="432" sc="1" el="432" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="0" uspid="433" ordinal="3" sl="433" sc="1" el="433" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="0" uspid="434" ordinal="4" sl="434" sc="1" el="434" ec="2" bec="0" bev="0" fileid="1" />
+              </SequencePoints>
+              <BranchPoints />
+              <MethodPoint vc="0" uspid="0" p8:type="SequencePoint" ordinal="12" offset="12" sc="0" sl="430" ec="1" el="434" bec="0" bev="0" fileid="1" xmlns:p8="xsi" />
+            </Method>
+            <Method cyclomaticComplexity="1" nPathComplexity="0" sequenceCoverage="100" branchCoverage="100" isConstructor="False" isGetter="False" isSetter="False" isStatic="True">
+              <Summary numSequencePoints="7" visitedSequencePoints="7" numBranchPoints="0" visitedBranchPoints="0" sequenceCoverage="100" branchCoverage="100" maxCyclomaticComplexity="1" minCyclomaticComplexity="1" visitedClasses="0" numClasses="0" visitedMethods="1" numMethods="1" />
+              <MetadataToken />
+              <Name>JsonRuleEngine.Net.ConditionRuleSet JsonRuleEngine.Net.JsonRuleEngine::Parse(System.String)</Name>
+              <FileRef uid="1" />
+              <SequencePoints>
+                <SequencePoint vc="18" uspid="442" ordinal="0" sl="442" sc="1" el="442" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="18" uspid="444" ordinal="1" sl="444" sc="1" el="444" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="18" uspid="445" ordinal="2" sl="445" sc="1" el="445" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="1" uspid="447" ordinal="3" sl="447" sc="1" el="447" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="1" uspid="448" ordinal="4" sl="448" sc="1" el="448" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="1" uspid="449" ordinal="5" sl="449" sc="1" el="449" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="17" uspid="451" ordinal="6" sl="451" sc="1" el="451" ec="2" bec="0" bev="0" fileid="1" />
+              </SequencePoints>
+              <BranchPoints />
+              <MethodPoint vc="7" uspid="0" p8:type="SequencePoint" ordinal="13" offset="13" sc="0" sl="442" ec="1" el="451" bec="0" bev="0" fileid="1" xmlns:p8="xsi" />
+            </Method>
+            <Method cyclomaticComplexity="2" nPathComplexity="0" sequenceCoverage="100" branchCoverage="100" isConstructor="False" isGetter="False" isSetter="False" isStatic="True">
+              <Summary numSequencePoints="1" visitedSequencePoints="1" numBranchPoints="2" visitedBranchPoints="2" sequenceCoverage="100" branchCoverage="100" maxCyclomaticComplexity="2" minCyclomaticComplexity="2" visitedClasses="0" numClasses="0" visitedMethods="1" numMethods="1" />
+              <MetadataToken />
+              <Name>System.Linq.Expressions.Expression JsonRuleEngine.Net.JsonRuleEngine::&lt;ParseTree&gt;g__bind|11_0(System.Linq.Expressions.Expression,System.Linq.Expressions.Expression,JsonRuleEngine.Net.JsonRuleEngine/&lt;&gt;c__DisplayClass11_0`1&lt;T&gt;&amp;)</Name>
+              <FileRef uid="1" />
+              <SequencePoints>
+                <SequencePoint vc="33" uspid="179" ordinal="0" sl="179" sc="1" el="179" ec="2" bec="2" bev="2" fileid="1" />
+              </SequencePoints>
+              <BranchPoints>
+                <BranchPoint vc="17" uspid="179" ordinal="0" path="0" offset="1" offsetend="3" sl="179" fileid="1" />
+                <BranchPoint vc="16" uspid="179" ordinal="1" path="1" offset="1" offsetend="18" sl="179" fileid="1" />
+              </BranchPoints>
+              <MethodPoint vc="1" uspid="0" p8:type="SequencePoint" ordinal="14" offset="14" sc="0" sl="179" ec="1" el="179" bec="0" bev="0" fileid="1" xmlns:p8="xsi" />
+            </Method>
+            <Method cyclomaticComplexity="4" nPathComplexity="0" sequenceCoverage="100" branchCoverage="100" isConstructor="True" isGetter="False" isSetter="False" isStatic="True">
+              <Summary numSequencePoints="8" visitedSequencePoints="8" numBranchPoints="4" visitedBranchPoints="4" sequenceCoverage="100" branchCoverage="100" maxCyclomaticComplexity="4" minCyclomaticComplexity="4" visitedClasses="0" numClasses="0" visitedMethods="1" numMethods="1" />
+              <MetadataToken />
+              <Name>System.Void JsonRuleEngine.Net.JsonRuleEngine::.cctor()</Name>
+              <FileRef uid="1" />
+              <SequencePoints>
+                <SequencePoint vc="1" uspid="152" ordinal="0" sl="152" sc="1" el="152" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="1" uspid="153" ordinal="1" sl="153" sc="1" el="153" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="183" uspid="154" ordinal="2" sl="154" sc="1" el="154" ec="2" bec="2" bev="2" fileid="1" />
+                <SequencePoint vc="183" uspid="155" ordinal="3" sl="155" sc="1" el="155" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="1" uspid="157" ordinal="4" sl="157" sc="1" el="157" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="1" uspid="158" ordinal="5" sl="158" sc="1" el="158" ec="2" bec="0" bev="0" fileid="1" />
+                <SequencePoint vc="183" uspid="159" ordinal="6" sl="159" sc="1" el="159" ec="2" bec="2" bev="2" fileid="1" />
+                <SequencePoint vc="183" uspid="160" ordinal="7" sl="160" sc="1" el="160" ec="2" bec="0" bev="0" fileid="1" />
+              </SequencePoints>
+              <BranchPoints>
+                <BranchPoint vc="2" uspid="154" ordinal="0" path="0" offset="16" offsetend="18" sl="154" fileid="1" />
+                <BranchPoint vc="180" uspid="154" ordinal="1" path="1" offset="16" offsetend="31" sl="154" fileid="1" />
+                <BranchPoint vc="2" uspid="159" ordinal="0" path="0" offset="16" offsetend="18" sl="159" fileid="1" />
+                <BranchPoint vc="180" uspid="159" ordinal="1" path="1" offset="16" offsetend="31" sl="159" fileid="1" />
+              </BranchPoints>
+              <MethodPoint vc="8" uspid="0" p8:type="SequencePoint" ordinal="15" offset="15" sc="0" sl="152" ec="1" el="160" bec="0" bev="0" fileid="1" xmlns:p8="xsi" />
+            </Method>
+          </Methods>
+        </Class>
+        <Class>
+          <Summary numSequencePoints="30" visitedSequencePoints="25" numBranchPoints="16" visitedBranchPoints="12" sequenceCoverage="83.33" branchCoverage="75" maxCyclomaticComplexity="14" minCyclomaticComplexity="1" visitedClasses="1" numClasses="1" visitedMethods="3" numMethods="3" />
+          <FullName>JsonRuleEngine.Net.TypeExtensions</FullName>
+          <Methods>
+            <Method cyclomaticComplexity="1" nPathComplexity="0" sequenceCoverage="100" branchCoverage="100" isConstructor="False" isGetter="False" isSetter="False" isStatic="True">
+              <Summary numSequencePoints="3" visitedSequencePoints="3" numBranchPoints="0" visitedBranchPoints="0" sequenceCoverage="100" branchCoverage="100" maxCyclomaticComplexity="1" minCyclomaticComplexity="1" visitedClasses="0" numClasses="0" visitedMethods="1" numMethods="1" />
+              <MetadataToken />
+              <Name>System.Boolean JsonRuleEngine.Net.TypeExtensions::IsNullable(System.Type)</Name>
+              <FileRef uid="2" />
+              <SequencePoints>
+                <SequencePoint vc="21" uspid="11" ordinal="0" sl="11" sc="1" el="11" ec="2" bec="0" bev="0" fileid="2" />
+                <SequencePoint vc="21" uspid="12" ordinal="1" sl="12" sc="1" el="12" ec="2" bec="0" bev="0" fileid="2" />
+                <SequencePoint vc="21" uspid="13" ordinal="2" sl="13" sc="1" el="13" ec="2" bec="0" bev="0" fileid="2" />
+              </SequencePoints>
+              <BranchPoints />
+              <MethodPoint vc="3" uspid="0" p8:type="SequencePoint" ordinal="0" offset="0" sc="0" sl="11" ec="1" el="13" bec="0" bev="0" fileid="2" xmlns:p8="xsi" />
+            </Method>
+            <Method cyclomaticComplexity="2" nPathComplexity="0" sequenceCoverage="100" branchCoverage="100" isConstructor="False" isGetter="False" isSetter="False" isStatic="True">
+              <Summary numSequencePoints="3" visitedSequencePoints="3" numBranchPoints="2" visitedBranchPoints="2" sequenceCoverage="100" branchCoverage="100" maxCyclomaticComplexity="2" minCyclomaticComplexity="2" visitedClasses="0" numClasses="0" visitedMethods="1" numMethods="1" />
+              <MetadataToken />
+              <Name>System.Boolean JsonRuleEngine.Net.TypeExtensions::IsArray(System.Type)</Name>
+              <FileRef uid="2" />
+              <SequencePoints>
+                <SequencePoint vc="34" uspid="16" ordinal="0" sl="16" sc="1" el="16" ec="2" bec="0" bev="0" fileid="2" />
+                <SequencePoint vc="34" uspid="17" ordinal="1" sl="17" sc="1" el="17" ec="2" bec="2" bev="2" fileid="2" />
+                <SequencePoint vc="34" uspid="18" ordinal="2" sl="18" sc="1" el="18" ec="2" bec="0" bev="0" fileid="2" />
+              </SequencePoints>
+              <BranchPoints>
+                <BranchPoint vc="22" uspid="17" ordinal="0" path="0" offset="17" offsetend="19" sl="17" fileid="2" />
+                <BranchPoint vc="12" uspid="17" ordinal="1" path="1" offset="17" offsetend="37" sl="17" fileid="2" />
+              </BranchPoints>
+              <MethodPoint vc="3" uspid="0" p8:type="SequencePoint" ordinal="1" offset="1" sc="0" sl="16" ec="1" el="18" bec="0" bev="0" fileid="2" xmlns:p8="xsi" />
+            </Method>
+            <Method cyclomaticComplexity="14" nPathComplexity="0" sequenceCoverage="79.16" branchCoverage="71.42" isConstructor="False" isGetter="False" isSetter="False" isStatic="True">
+              <Summary numSequencePoints="24" visitedSequencePoints="19" numBranchPoints="14" visitedBranchPoints="10" sequenceCoverage="79.16" branchCoverage="71.42" maxCyclomaticComplexity="14" minCyclomaticComplexity="14" visitedClasses="0" numClasses="0" visitedMethods="1" numMethods="1" />
+              <MetadataToken />
+              <Name>System.Object JsonRuleEngine.Net.TypeExtensions::GetValue(System.Type,System.Object)</Name>
+              <FileRef uid="2" />
+              <SequencePoints>
+                <SequencePoint vc="21" uspid="21" ordinal="0" sl="21" sc="1" el="21" ec="2" bec="0" bev="0" fileid="2" />
+                <SequencePoint vc="21" uspid="23" ordinal="1" sl="23" sc="1" el="23" ec="2" bec="0" bev="0" fileid="2" />
+                <SequencePoint vc="21" uspid="24" ordinal="2" sl="24" sc="1" el="24" ec="2" bec="2" bev="2" fileid="2" />
+                <SequencePoint vc="2" uspid="25" ordinal="3" sl="25" sc="1" el="25" ec="2" bec="0" bev="0" fileid="2" />
+                <SequencePoint vc="2" uspid="26" ordinal="4" sl="26" sc="1" el="26" ec="2" bec="0" bev="0" fileid="2" />
+                <SequencePoint vc="2" uspid="27" ordinal="5" sl="27" sc="1" el="27" ec="2" bec="4" bev="1" fileid="2" />
+                <SequencePoint vc="0" uspid="28" ordinal="6" sl="28" sc="1" el="28" ec="2" bec="0" bev="0" fileid="2" />
+                <SequencePoint vc="0" uspid="29" ordinal="7" sl="29" sc="1" el="29" ec="2" bec="0" bev="0" fileid="2" />
+                <SequencePoint vc="0" uspid="30" ordinal="8" sl="30" sc="1" el="30" ec="2" bec="0" bev="0" fileid="2" />
+                <SequencePoint vc="0" uspid="32" ordinal="9" sl="32" sc="1" el="32" ec="2" bec="0" bev="0" fileid="2" />
+                <SequencePoint vc="19" uspid="35" ordinal="10" sl="35" sc="1" el="35" ec="2" bec="2" bev="2" fileid="2" />
+                <SequencePoint vc="2" uspid="36" ordinal="11" sl="36" sc="1" el="36" ec="2" bec="0" bev="0" fileid="2" />
+                <SequencePoint vc="2" uspid="37" ordinal="12" sl="37" sc="1" el="37" ec="2" bec="0" bev="0" fileid="2" />
+                <SequencePoint vc="17" uspid="41" ordinal="13" sl="41" sc="1" el="41" ec="2" bec="4" bev="4" fileid="2" />
+                <SequencePoint vc="1" uspid="42" ordinal="14" sl="42" sc="1" el="42" ec="2" bec="0" bev="0" fileid="2" />
+                <SequencePoint vc="1" uspid="43" ordinal="15" sl="43" sc="1" el="43" ec="2" bec="0" bev="0" fileid="2" />
+                <SequencePoint vc="16" uspid="46" ordinal="16" sl="46" sc="1" el="46" ec="2" bec="0" bev="0" fileid="2" />
+                <SequencePoint vc="2" uspid="48" ordinal="17" sl="48" sc="1" el="48" ec="2" bec="0" bev="0" fileid="2" />
+                <SequencePoint vc="2" uspid="49" ordinal="18" sl="49" sc="1" el="49" ec="2" bec="0" bev="0" fileid="2" />
+                <SequencePoint vc="2" uspid="50" ordinal="19" sl="50" sc="1" el="50" ec="2" bec="2" bev="1" fileid="2" />
+                <SequencePoint vc="2" uspid="51" ordinal="20" sl="51" sc="1" el="51" ec="2" bec="0" bev="0" fileid="2" />
+                <SequencePoint vc="2" uspid="52" ordinal="21" sl="52" sc="1" el="52" ec="2" bec="0" bev="0" fileid="2" />
+                <SequencePoint vc="0" uspid="54" ordinal="22" sl="54" sc="1" el="54" ec="2" bec="0" bev="0" fileid="2" />
+                <SequencePoint vc="21" uspid="56" ordinal="23" sl="56" sc="1" el="56" ec="2" bec="0" bev="0" fileid="2" />
+              </SequencePoints>
+              <BranchPoints>
+                <BranchPoint vc="2" uspid="24" ordinal="0" path="0" offset="20" offsetend="22" sl="24" fileid="2" />
+                <BranchPoint vc="2" uspid="27" ordinal="2" path="0" offset="32" offsetend="34" sl="27" fileid="2" />
+                <BranchPoint vc="0" uspid="27" ordinal="3" path="1" offset="32" offsetend="52" sl="27" fileid="2" />
+                <BranchPoint vc="0" uspid="27" ordinal="4" path="0" offset="55" offsetend="57" sl="27" fileid="2" />
+                <BranchPoint vc="0" uspid="27" ordinal="5" path="1" offset="55" offsetend="77" sl="27" fileid="2" />
+                <BranchPoint vc="19" uspid="24" ordinal="1" path="1" offset="20" offsetend="89" sl="24" fileid="2" />
+                <BranchPoint vc="2" uspid="35" ordinal="6" path="0" offset="109" offsetend="111" sl="35" fileid="2" />
+                <BranchPoint vc="17" uspid="35" ordinal="7" path="1" offset="109" offsetend="131" sl="35" fileid="2" />
+                <BranchPoint vc="16" uspid="41" ordinal="8" path="0" offset="147" offsetend="149" sl="41" fileid="2" />
+                <BranchPoint vc="1" uspid="41" ordinal="9" path="1" offset="147" offsetend="167" sl="41" fileid="2" />
+                <BranchPoint vc="1" uspid="41" ordinal="10" path="0" offset="172" offsetend="174" sl="41" fileid="2" />
+                <BranchPoint vc="16" uspid="41" ordinal="11" path="1" offset="172" offsetend="194" sl="41" fileid="2" />
+                <BranchPoint vc="2" uspid="50" ordinal="12" path="0" offset="216" offsetend="218" sl="50" fileid="2" />
+                <BranchPoint vc="0" uspid="50" ordinal="13" path="1" offset="216" offsetend="228" sl="50" fileid="2" />
+              </BranchPoints>
+              <MethodPoint vc="19" uspid="0" p8:type="SequencePoint" ordinal="2" offset="2" sc="0" sl="21" ec="1" el="56" bec="0" bev="0" fileid="2" xmlns:p8="xsi" />
+            </Method>
+          </Methods>
+        </Class>
+        <Class>
+          <Summary numSequencePoints="5" visitedSequencePoints="5" numBranchPoints="0" visitedBranchPoints="0" sequenceCoverage="100" branchCoverage="100" maxCyclomaticComplexity="1" minCyclomaticComplexity="1" visitedClasses="1" numClasses="1" visitedMethods="5" numMethods="5" />
+          <FullName>JsonRuleEngine.Net.ConditionRuleSet</FullName>
+          <Methods>
+            <Method cyclomaticComplexity="1" nPathComplexity="0" sequenceCoverage="100" branchCoverage="100" isConstructor="False" isGetter="True" isSetter="False" isStatic="True">
+              <Summary numSequencePoints="1" visitedSequencePoints="1" numBranchPoints="0" visitedBranchPoints="0" sequenceCoverage="100" branchCoverage="100" maxCyclomaticComplexity="1" minCyclomaticComplexity="1" visitedClasses="0" numClasses="0" visitedMethods="1" numMethods="1" />
+              <MetadataToken />
+              <Name>System.Nullable`1&lt;JsonRuleEngine.Net.ConditionRuleSeparator&gt; JsonRuleEngine.Net.ConditionRuleSet::get_Separator()</Name>
+              <FileRef uid="3" />
+              <SequencePoints>
+                <SequencePoint vc="131" uspid="14" ordinal="0" sl="14" sc="1" el="14" ec="2" bec="0" bev="0" fileid="3" />
+              </SequencePoints>
+              <BranchPoints />
+              <MethodPoint vc="1" uspid="0" p8:type="SequencePoint" ordinal="0" offset="0" sc="0" sl="14" ec="1" el="14" bec="0" bev="0" fileid="3" xmlns:p8="xsi" />
+            </Method>
+            <Method cyclomaticComplexity="1" nPathComplexity="0" sequenceCoverage="100" branchCoverage="100" isConstructor="False" isGetter="True" isSetter="False" isStatic="True">
+              <Summary numSequencePoints="1" visitedSequencePoints="1" numBranchPoints="0" visitedBranchPoints="0" sequenceCoverage="100" branchCoverage="100" maxCyclomaticComplexity="1" minCyclomaticComplexity="1" visitedClasses="0" numClasses="0" visitedMethods="1" numMethods="1" />
+              <MetadataToken />
+              <Name>JsonRuleEngine.Net.ConditionRuleOperator JsonRuleEngine.Net.ConditionRuleSet::get_Operator()</Name>
+              <FileRef uid="3" />
+              <SequencePoints>
+                <SequencePoint vc="130" uspid="19" ordinal="0" sl="19" sc="1" el="19" ec="2" bec="0" bev="0" fileid="3" />
+              </SequencePoints>
+              <BranchPoints />
+              <MethodPoint vc="1" uspid="0" p8:type="SequencePoint" ordinal="1" offset="1" sc="0" sl="19" ec="1" el="19" bec="0" bev="0" fileid="3" xmlns:p8="xsi" />
+            </Method>
+            <Method cyclomaticComplexity="1" nPathComplexity="0" sequenceCoverage="100" branchCoverage="100" isConstructor="False" isGetter="True" isSetter="False" isStatic="True">
+              <Summary numSequencePoints="1" visitedSequencePoints="1" numBranchPoints="0" visitedBranchPoints="0" sequenceCoverage="100" branchCoverage="100" maxCyclomaticComplexity="1" minCyclomaticComplexity="1" visitedClasses="0" numClasses="0" visitedMethods="1" numMethods="1" />
+              <MetadataToken />
+              <Name>System.String JsonRuleEngine.Net.ConditionRuleSet::get_Field()</Name>
+              <FileRef uid="3" />
+              <SequencePoints>
+                <SequencePoint vc="88" uspid="24" ordinal="0" sl="24" sc="1" el="24" ec="2" bec="0" bev="0" fileid="3" />
+              </SequencePoints>
+              <BranchPoints />
+              <MethodPoint vc="1" uspid="0" p8:type="SequencePoint" ordinal="2" offset="2" sc="0" sl="24" ec="1" el="24" bec="0" bev="0" fileid="3" xmlns:p8="xsi" />
+            </Method>
+            <Method cyclomaticComplexity="1" nPathComplexity="0" sequenceCoverage="100" branchCoverage="100" isConstructor="False" isGetter="True" isSetter="False" isStatic="True">
+              <Summary numSequencePoints="1" visitedSequencePoints="1" numBranchPoints="0" visitedBranchPoints="0" sequenceCoverage="100" branchCoverage="100" maxCyclomaticComplexity="1" minCyclomaticComplexity="1" visitedClasses="0" numClasses="0" visitedMethods="1" numMethods="1" />
+              <MetadataToken />
+              <Name>System.Object JsonRuleEngine.Net.ConditionRuleSet::get_Value()</Name>
+              <FileRef uid="3" />
+              <SequencePoints>
+                <SequencePoint vc="79" uspid="29" ordinal="0" sl="29" sc="1" el="29" ec="2" bec="0" bev="0" fileid="3" />
+              </SequencePoints>
+              <BranchPoints />
+              <MethodPoint vc="1" uspid="0" p8:type="SequencePoint" ordinal="3" offset="3" sc="0" sl="29" ec="1" el="29" bec="0" bev="0" fileid="3" xmlns:p8="xsi" />
+            </Method>
+            <Method cyclomaticComplexity="1" nPathComplexity="0" sequenceCoverage="100" branchCoverage="100" isConstructor="False" isGetter="True" isSetter="False" isStatic="True">
+              <Summary numSequencePoints="1" visitedSequencePoints="1" numBranchPoints="0" visitedBranchPoints="0" sequenceCoverage="100" branchCoverage="100" maxCyclomaticComplexity="1" minCyclomaticComplexity="1" visitedClasses="0" numClasses="0" visitedMethods="1" numMethods="1" />
+              <MetadataToken />
+              <Name>System.Collections.Generic.IEnumerable`1&lt;JsonRuleEngine.Net.ConditionRuleSet&gt; JsonRuleEngine.Net.ConditionRuleSet::get_Rules()</Name>
+              <FileRef uid="3" />
+              <SequencePoints>
+                <SequencePoint vc="69" uspid="34" ordinal="0" sl="34" sc="1" el="34" ec="2" bec="0" bev="0" fileid="3" />
+              </SequencePoints>
+              <BranchPoints />
+              <MethodPoint vc="1" uspid="0" p8:type="SequencePoint" ordinal="4" offset="4" sc="0" sl="34" ec="1" el="34" bec="0" bev="0" fileid="3" xmlns:p8="xsi" />
+            </Method>
+          </Methods>
+        </Class>
+        <Class>
+          <Summary numSequencePoints="5" visitedSequencePoints="5" numBranchPoints="0" visitedBranchPoints="0" sequenceCoverage="100" branchCoverage="100" maxCyclomaticComplexity="1" minCyclomaticComplexity="1" visitedClasses="1" numClasses="1" visitedMethods="2" numMethods="2" />
+          <FullName>JsonRuleEngine.Net.JsonRuleEngineException</FullName>
+          <Methods>
+            <Method cyclomaticComplexity="1" nPathComplexity="0" sequenceCoverage="100" branchCoverage="100" isConstructor="False" isGetter="True" isSetter="False" isStatic="True">
+              <Summary numSequencePoints="1" visitedSequencePoints="1" numBranchPoints="0" visitedBranchPoints="0" sequenceCoverage="100" branchCoverage="100" maxCyclomaticComplexity="1" minCyclomaticComplexity="1" visitedClasses="0" numClasses="0" visitedMethods="1" numMethods="1" />
+              <MetadataToken />
+              <Name>JsonRuleEngine.Net.JsonRuleEngineExceptionCategory JsonRuleEngine.Net.JsonRuleEngineException::get_Type()</Name>
+              <FileRef uid="4" />
+              <SequencePoints>
+                <SequencePoint vc="4" uspid="22" ordinal="0" sl="22" sc="1" el="22" ec="2" bec="0" bev="0" fileid="4" />
+              </SequencePoints>
+              <BranchPoints />
+              <MethodPoint vc="1" uspid="0" p8:type="SequencePoint" ordinal="0" offset="0" sc="0" sl="22" ec="1" el="22" bec="0" bev="0" fileid="4" xmlns:p8="xsi" />
+            </Method>
+            <Method cyclomaticComplexity="1" nPathComplexity="0" sequenceCoverage="100" branchCoverage="100" isConstructor="True" isGetter="False" isSetter="False" isStatic="True">
+              <Summary numSequencePoints="4" visitedSequencePoints="4" numBranchPoints="0" visitedBranchPoints="0" sequenceCoverage="100" branchCoverage="100" maxCyclomaticComplexity="1" minCyclomaticComplexity="1" visitedClasses="0" numClasses="0" visitedMethods="1" numMethods="1" />
+              <MetadataToken />
+              <Name>System.Void JsonRuleEngine.Net.JsonRuleEngineException::.ctor(JsonRuleEngine.Net.JsonRuleEngineExceptionCategory,System.String)</Name>
+              <FileRef uid="4" />
+              <SequencePoints>
+                <SequencePoint vc="2" uspid="14" ordinal="0" sl="14" sc="1" el="14" ec="2" bec="0" bev="0" fileid="4" />
+                <SequencePoint vc="2" uspid="15" ordinal="1" sl="15" sc="1" el="15" ec="2" bec="0" bev="0" fileid="4" />
+                <SequencePoint vc="2" uspid="16" ordinal="2" sl="16" sc="1" el="16" ec="2" bec="0" bev="0" fileid="4" />
+                <SequencePoint vc="2" uspid="17" ordinal="3" sl="17" sc="1" el="17" ec="2" bec="0" bev="0" fileid="4" />
+              </SequencePoints>
+              <BranchPoints />
+              <MethodPoint vc="4" uspid="0" p8:type="SequencePoint" ordinal="1" offset="1" sc="0" sl="14" ec="1" el="17" bec="0" bev="0" fileid="4" xmlns:p8="xsi" />
+            </Method>
+          </Methods>
+        </Class>
+        <Class>
+          <Summary numSequencePoints="6" visitedSequencePoints="5" numBranchPoints="0" visitedBranchPoints="0" sequenceCoverage="83.33" branchCoverage="100" maxCyclomaticComplexity="1" minCyclomaticComplexity="1" visitedClasses="1" numClasses="1" visitedMethods="2" numMethods="3" />
+          <FullName>JsonRuleEngine.Net.ValidateExpressionResult</FullName>
+          <Methods>
+            <Method cyclomaticComplexity="1" nPathComplexity="0" sequenceCoverage="0" branchCoverage="100" isConstructor="False" isGetter="True" isSetter="False" isStatic="True">
+              <Summary numSequencePoints="1" visitedSequencePoints="0" numBranchPoints="0" visitedBranchPoints="0" sequenceCoverage="0" branchCoverage="100" maxCyclomaticComplexity="1" minCyclomaticComplexity="1" visitedClasses="0" numClasses="0" visitedMethods="0" numMethods="1" />
+              <MetadataToken />
+              <Name>System.String JsonRuleEngine.Net.ValidateExpressionResult::get_InvalidField()</Name>
+              <FileRef uid="5" />
+              <SequencePoints>
+                <SequencePoint vc="0" uspid="8" ordinal="0" sl="8" sc="1" el="8" ec="2" bec="0" bev="0" fileid="5" />
+              </SequencePoints>
+              <BranchPoints />
+              <MethodPoint vc="0" uspid="0" p8:type="SequencePoint" ordinal="0" offset="0" sc="0" sl="8" ec="1" el="8" bec="0" bev="0" fileid="5" xmlns:p8="xsi" />
+            </Method>
+            <Method cyclomaticComplexity="1" nPathComplexity="0" sequenceCoverage="100" branchCoverage="100" isConstructor="False" isGetter="True" isSetter="False" isStatic="True">
+              <Summary numSequencePoints="1" visitedSequencePoints="1" numBranchPoints="0" visitedBranchPoints="0" sequenceCoverage="100" branchCoverage="100" maxCyclomaticComplexity="1" minCyclomaticComplexity="1" visitedClasses="0" numClasses="0" visitedMethods="1" numMethods="1" />
+              <MetadataToken />
+              <Name>System.Boolean JsonRuleEngine.Net.ValidateExpressionResult::get_Success()</Name>
+              <FileRef uid="5" />
+              <SequencePoints>
+                <SequencePoint vc="10" uspid="9" ordinal="0" sl="9" sc="1" el="9" ec="2" bec="0" bev="0" fileid="5" />
+              </SequencePoints>
+              <BranchPoints />
+              <MethodPoint vc="1" uspid="0" p8:type="SequencePoint" ordinal="1" offset="1" sc="0" sl="9" ec="1" el="9" bec="0" bev="0" fileid="5" xmlns:p8="xsi" />
+            </Method>
+            <Method cyclomaticComplexity="1" nPathComplexity="0" sequenceCoverage="100" branchCoverage="100" isConstructor="True" isGetter="False" isSetter="False" isStatic="True">
+              <Summary numSequencePoints="4" visitedSequencePoints="4" numBranchPoints="0" visitedBranchPoints="0" sequenceCoverage="100" branchCoverage="100" maxCyclomaticComplexity="1" minCyclomaticComplexity="1" visitedClasses="0" numClasses="0" visitedMethods="1" numMethods="1" />
+              <MetadataToken />
+              <Name>System.Void JsonRuleEngine.Net.ValidateExpressionResult::.cctor()</Name>
+              <FileRef uid="5" />
+              <SequencePoints>
+                <SequencePoint vc="1" uspid="11" ordinal="0" sl="11" sc="1" el="11" ec="2" bec="0" bev="0" fileid="5" />
+                <SequencePoint vc="1" uspid="12" ordinal="1" sl="12" sc="1" el="12" ec="2" bec="0" bev="0" fileid="5" />
+                <SequencePoint vc="1" uspid="13" ordinal="2" sl="13" sc="1" el="13" ec="2" bec="0" bev="0" fileid="5" />
+                <SequencePoint vc="1" uspid="14" ordinal="3" sl="14" sc="1" el="14" ec="2" bec="0" bev="0" fileid="5" />
+              </SequencePoints>
+              <BranchPoints />
+              <MethodPoint vc="4" uspid="0" p8:type="SequencePoint" ordinal="2" offset="2" sc="0" sl="11" ec="1" el="14" bec="0" bev="0" fileid="5" xmlns:p8="xsi" />
+            </Method>
+          </Methods>
+        </Class>
+      </Classes>
+    </Module>
+  </Modules>
+</CoverageSession>

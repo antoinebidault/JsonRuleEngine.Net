@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<coverage line-rate="0.7848999999999999" branch-rate="0.826" version="1.9" timestamp="1619299790" lines-covered="219" lines-valid="279" branches-covered="76" branches-valid="92">
+<coverage line-rate="0.7848999999999999" branch-rate="0.826" version="1.9" timestamp="1619300566" lines-covered="219" lines-valid="279" branches-covered="76" branches-valid="92">
   <sources>
     <source>C:\Users\clement bidault\source\repos\JsonRule.Net\JsonRuleEngine.Net\</source>
   </sources>
