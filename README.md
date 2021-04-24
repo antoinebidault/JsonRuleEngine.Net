@@ -7,12 +7,12 @@
 
 # JsonRuleEngine.Net
 
-A simple C# rule engine parser and evaluator using a simple json format.
+A simple C# Asp.Net Core rule engine parser and evaluator using a simple json format.
 This lib is inspired by the [json rules engine](https://github.com/cachecontrol/json-rules-engine).
-We plan to use it in production in the [Dastra](https://www.dastra.eu) filtering engine 
+We are currently plan using it in production in the [Dastra](https://www.dastra.eu) filtering engine.
 
 # Purpose
-In some case you'll need to store some complex conditions object in database. The purpose of this library is to provide a simple way to store and transform to linq Expression tree nested conditional rules stored in json in database, filesystem... 
+In some case you'll need to store some complex conditions objects in database. The purpose of this library is to provide a simple way to store and transform to linq Expression tree nested conditional rules stored in a simple json format. in database, filesystem... You'll be able to evaluate it as a Linq Expression and use it for applying filters in Entity Framework.
 
 # Json format of queries
 Here is a basic JSON sample that represents rules
@@ -56,7 +56,7 @@ You can post it to a simple controller using the ConditionRuleSet class
 ```CSharp
 [HttpPost]
 public IActionResult PostRules([FromBody] ConditionRuleSet rules) {
-    // Save it in DB or whatever
+    // Then, save it in DB or whatever
     if (ModelState.IsValid) {
 	    _db.Add(rules);
 	    _db.SaveChanges();
@@ -76,6 +76,7 @@ install-package JsonRuleEngine.Net
 
 ## For evaluating a rule with a single object
 ```CSharp
+// Simple json rule definition
 string ruleJson = "{\"field\": \"Name\",\"operator\": \"equal\",\"value\": \"Assassin's creed\" }";
 
 Game objectToTest = new Game() { 
@@ -88,7 +89,7 @@ return result; // this must display "True"
 ```
 
 ## Support of navigation properties
-If you have complex models with nested list or class, you are able to apply filters on them using the dot (.) separator.
+If you have complex models with nested list or object, you are able to apply filters on them using the dot (.) separator on field.
 
 Example of model with a nested list and object :
 ```CSharp
@@ -139,25 +140,34 @@ bool result = JsonRuleEngine.Evaluate(objectToTest, ruleJson);
 Assert.True(result)
 ```
 
-Limitations : for nested list it works only with one level subproperty in the object's array.
-
+Limitations : for nested list it works only with one level.
 
 ## For filtering a list using an expression
 The expression parsed will work with LinqToSql query with EntityFramework Core.
 ```CSharp
-string ruleJson = "{}"
+string ruleJson = ""{\"field\": \"Name\",\"operator\": \"notEqual\",\"value\": \"test\" }"
 var expression = JsonRuleEngine.ParseExpression<Game>(ruleJson);
 var datas = new List<Game>() {
     new Game() {
-        Name = "test"
+        Name = "Assassin's Creed"
     }
 };
 
-// Works with LinqToSql queries
+// Works with EF Core LinqToSql queries
 var list = datas.Where(expression).ToList();
+
+Assert.Equal(list.Count(), 1);
 ```
 
-# The nested rules object
+## Entity Framework Core support
+```CSharp
+string ruleJson = ""{\"field\": \"Name\",\"operator\": \"notEqual\",\"value\": \"test\" }"
+var expression = JsonRuleEngine.ParseExpression<Game>(ruleJson);
+
+var list = _db.Games.Where(expression).ToList();
+```
+
+# The nested rules object / classname : ConditionRuleSet
 ## ConditionRuleSet
 |Field name| Type| Description |
 |--|--|--|
