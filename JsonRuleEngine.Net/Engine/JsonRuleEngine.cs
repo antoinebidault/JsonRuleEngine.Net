@@ -102,27 +102,6 @@ namespace JsonRuleEngine.Net
         }
 
         /// <summary>
-        /// Transform to predicate
-        /// </summary>
-        /// <returns>A predicate that return the true if the conditions are matched</returns>
-        public static Func<T, bool> ParsePredicate<T>(string jsonRules)
-        {
-            var query = ParseExpression<T>(jsonRules);
-            return query.Compile();
-        }
-
-        /// <summary>
-        /// Transform a ConditionRuleSet object to predicate
-        /// </summary>
-        /// <returns>A predicate that return the true if the conditions are matched</returns>
-        public static Func<T, bool> ParsePredicate<T>(ConditionRuleSet rules)
-        {
-            var query = ParseExpression<T>(rules);
-            return query.Compile();
-        }
-
-
-        /// <summary>
         /// Test the conditions
         /// </summary>
         /// <typeparam name="T"></typeparam>
