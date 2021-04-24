@@ -154,6 +154,16 @@ namespace JsonRuleEngine.Net.Tests
             Assert.True(result);
         }
 
+        [Fact]
+        public void EvaluateWithClass()
+        {
+            string rules = GetJsonTestFile("complex.json");
+
+            var items = FakeGameService.GetDatas();
+            bool result = JsonRuleEngine.Evaluate(items.First(), new ConditionRuleSet() { Field = "Name", Operator = ConditionRuleOperator.isNotNull });
+            Assert.True(result);
+        }
+
         private static List<Game> Test(string jsonRuleFilePath)
         {
             string rules = GetJsonTestFile(jsonRuleFilePath);
