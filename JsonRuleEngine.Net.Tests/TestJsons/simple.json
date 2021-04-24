@@ -1,10 +1,6 @@
 ﻿{
   "separator": "And",
-  "rules": [
-    {
-      "field": "Name",
-      "operator": "equal",
-      "value": "GTA V"
-    }
-  ]
+  "field": "Name",
+  "operator": "equal",
+  "value": "GTA V"
 }

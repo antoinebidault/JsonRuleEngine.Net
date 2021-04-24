@@ -179,75 +179,85 @@ namespace JsonRuleEngine.Net
             Expression bind(Expression lef, Expression right) => lef == null ? right : binder(lef, right);
 
             Expression left = null;
-            foreach (var rule in rules)
+
+            // If multiple rules inner
+            if (condition.Rules != null && condition.Rules.Any())
             {
-                Expression right = null;
-                if (rule.Separator.HasValue)
+                foreach (var rule in condition.Rules)
                 {
-                    right = ParseTree<T>(rule, parm);
-                    left = bind(left, right);
-                    continue;
+                    left = bind(left, CreateRuleExpression<T>(rule, parm));
                 }
-
-                MemberExpression property = null;
-                bool moveNext = false;
-
-                try
-                {
-                    string field = rule.Field;
-                    var fields = field.Split('.');
-                    int i = 0;
-                    foreach (var member in fields)
-                    {
-                        i = i + member.Length + 1;
-                        if (property == null)
-                        {
-                            property = Expression.Property(parm, member);
-                        }
-                        else
-                        {
-                            property = Expression.Property(property, member);
-                        }
-
-                        if (property.Type.IsArray())
-                        {
-                            string subField = "";
-                            try
-                            {
-                                subField = field.Substring(i, field.Length - i);
-                                if (string.IsNullOrEmpty(subField))
-                                {
-                                    throw new Exception("");
-                                }
-                            }
-                            catch
-                            {
-                                throw new JsonRuleEngineException(JsonRuleEngineExceptionCategory.InvalidField, $"The array {field} does not have a subfield. e.g. {field}.Id");
-                            }
-                            MethodCallExpression predicate = HandleTableRule(rule, subField, rule.Value, property);
-                            left = bind(left, predicate);
-                            moveNext = true;
-                            break;
-                        }
-                    }
-
-
-                }
-                catch (Exception e)
-                {
-                    throw new JsonRuleEngineException(JsonRuleEngineExceptionCategory.InvalidField, $"The provided field is invalid {rule.Field} : {e.Message} ");
-                }
-
-                if (moveNext)
-                {
-                    continue;
-                }
-
-                right = CreateOperationExpression(property, rule.Operator, rule.Value);
-                left = bind(left, right);
+            }
+            else
+            {
+                left = bind(left, CreateRuleExpression<T>(condition, parm));
             }
 
             return left;
+        }
+
+        private static Expression CreateRuleExpression<T>(ConditionRuleSet rule, ParameterExpression parm)
+        {
+            Expression right = null;
+            if (rule.Separator.HasValue && rule.Rules != null && rule.Rules.Any())
+            {
+                right = ParseTree<T>(rule, parm);
+                return right;
+            }
+
+            // If the field is empty, then return true
+            if (string.IsNullOrEmpty(rule.Field))
+            {
+                return right;
+            }
+
+            MemberExpression property = null;
+
+            try
+            {
+                string field = rule.Field;
+                var fields = field.Split('.');
+                int i = 0;
+                foreach (var member in fields)
+                {
+                    i = i + member.Length + 1;
+                    if (property == null)
+                    {
+                        property = Expression.Property(parm, member);
+                    }
+                    else
+                    {
+                        property = Expression.Property(property, member);
+                    }
+
+                    if (property.Type.IsArray())
+                    {
+                        string subField = "";
+                        try
+                        {
+                            subField = field.Substring(i, field.Length - i);
+                            if (string.IsNullOrEmpty(subField))
+                            {
+                                throw new Exception("");
+                            }
+                        }
+                        catch
+                        {
+                            throw new JsonRuleEngineException(JsonRuleEngineExceptionCategory.InvalidField, $"The array {field} does not have a subfield. e.g. {field}.Id");
+                        }
+                        right = HandleTableRule(rule, subField, rule.Value, property);
+                        return right;
+                    }
+                }
+
+
+            }
+            catch (Exception e)
+            {
+                throw new JsonRuleEngineException(JsonRuleEngineExceptionCategory.InvalidField, $"The provided field is invalid {rule.Field} : {e.Message} ");
+            }
+
+            return CreateOperationExpression(property, rule.Operator, rule.Value);
         }
 
 
@@ -386,42 +396,6 @@ namespace JsonRuleEngine.Net
             }
 
             return CreateOperationExpression(property, rule.Operator, value);
-
-            /*
-            var newValue = property.Type.GetValue(value);
-            Expression anyExp = null;
-            var toCompare = Expression.Constant(newValue);
-
-
-            if (rule.Operator == ConditionRuleOperator.contains || rule.Operator == ConditionRuleOperator.doesNotContains)
-            {
-                if (rule.Operator == ConditionRuleOperator.contains)
-                {
-                    anyExp = Expression.Equal(property, toCompare);
-                }
-                else
-                {
-                    anyExp = Expression.NotEqual(property, toCompare);
-                }
-            }
-            else
-            {
-                var listType = typeof(IEnumerable<>).MakeGenericType(property.Type);
-                var array = ((JArray)rule.Value).ToObject(listType);
-                MethodInfo method = null;
-                method = MethodContains.MakeGenericMethod(property.Type);
-
-                anyExp = Expression.Call(
-                    method,
-                    Expression.Constant(array),
-                     property);
-
-                if (rule.Operator == ConditionRuleOperator.notIn)
-                {
-                    anyExp = Expression.Not(anyExp);
-                }
-            }
-            return anyExp;*/
         }
 
 
