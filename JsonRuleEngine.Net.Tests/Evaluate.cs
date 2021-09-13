@@ -35,6 +35,17 @@ namespace JsonRuleEngine.Net.Tests
 
 
         [Fact]
+        public void Enum()
+        {
+            List<Game> list = Test("enum.json");
+            var expectedCount = FakeGameService.GetDatas()
+                .Count(m => m.Type == GameType.CityBuilder || m.Type == GameType.RPG);
+            Assert.True(list.Count == expectedCount, $"{list.Count}/{expectedCount}");
+        }
+
+
+
+        [Fact]
         public void Complex()
         {
             List<Game> list = Test("complex.json");

@@ -1,0 +1,15 @@
+﻿{
+  "separator": "Or",
+  "rules": [
+    {
+      "field": "Type",
+      "operator": "equal",
+      "value": "CityBuilder"
+    },
+    {
+      "field": "Type",
+      "operator": "equal",
+      "value": "1"
+    }
+  ]
+}

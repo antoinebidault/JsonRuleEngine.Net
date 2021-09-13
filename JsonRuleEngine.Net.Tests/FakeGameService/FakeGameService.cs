@@ -19,6 +19,7 @@ namespace JsonRuleEngine.Net.Tests
                     Category = "Adventure",
                     BoolValue = true,
                     Date =new DateTime(2021,1,1),
+                    Type = GameType.RPG,
                     Editor = new Editor()
                     {
                         Id = 1,
@@ -45,24 +46,28 @@ namespace JsonRuleEngine.Net.Tests
                  new Game()
                 {
                     Name= "Destiny",
+                    Type = GameType.RPG,
                     Price = 23.3,
                     Date =new DateTime(2021,1,12)
                 },
                  new Game()
                 {
                     Name= "The forest",
+                    Type = GameType.RPG,
                     Price = 22,
                     Date =new DateTime(2021,1,11)
                 },
                  new Game()
                 {
-                    Name= "Lowe",
+                    Name= "Sim City",
+                    Type = GameType.CityBuilder,
                     Price = 13,
                     Date =new DateTime(2021,1,2)
                 },
                  new Game()
                 {
                     Name= "GTA V",
+                    Type = GameType.Action,
                     Price = 77,
                     Date =new DateTime(2022,1,1),
                     Editor = new Editor()
@@ -86,6 +91,7 @@ namespace JsonRuleEngine.Net.Tests
                  new Game()
                 {
                     Name= "GTA IV",
+                    Type = GameType.Action,
                     Price = 24,
                     Date =new DateTime(2018,1,1),
                     Editor = new Editor()

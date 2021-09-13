@@ -17,6 +17,13 @@ namespace JsonRuleEngine.Net
             return type != typeof(string) && typeof(IEnumerable).IsAssignableFrom(type);
         }
 
+        public static bool IsNullableEnum(this Type t)
+        {
+            return t.IsGenericType &&
+                   t.GetGenericTypeDefinition() == typeof(Nullable<>) &&
+                   t.GetGenericArguments()[0].IsEnum;
+        }
+
         internal static object GetValue(this Type type, object value)
         {
             try
@@ -41,6 +48,17 @@ namespace JsonRuleEngine.Net
                 if (type == typeof(Guid) || type == typeof(Guid?))
                 {
                     return Guid.Parse(value.ToString());
+                }
+
+
+                if (type.IsEnum || type.IsNullableEnum())
+                {
+                    if (value == null)
+                    {
+                        return null;
+                    }
+
+                    return Enum.Parse(type, value.ToString());
                 }
 
                 return Convert.ChangeType(value, type);
