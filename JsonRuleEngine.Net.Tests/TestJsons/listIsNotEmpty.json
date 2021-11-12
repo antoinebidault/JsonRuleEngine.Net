@@ -1,0 +1,9 @@
+﻿{
+  "separator": "And",
+  "rules": [
+    {
+      "field": "Reviews.Id",
+      "operator": "isNotEmpty"
+    }
+  ]
+}

@@ -177,3 +177,20 @@ var list = _db.Games.Where(expression).ToList();
 |operator|enum (equal,notEqual,  lessThan, lessThanInclusive,greaterThan, greaterThanInclusive,in,notIn, contains,  doesNotContains, isNull, isNotNull) **default:equal**| The type of method used for comparing values |
 |value|object **optional, default:null**| The string value, the number or the object used for egality comparison. In case, the in operator is used, this **must be a list of string** |
 |rules| List of ConditionRuleSet **optional, default: null** | The nested rules contained in the group  |
+
+## Supported operators
+
+Here is the list of supported operators :
+equal,
+notEqual,
+lessThan,
+lessThanInclusive,
+greaterThan,
+greaterThanInclusive,
+in,
+notIn,
+contains,
+doesNotContains,
+isNull,
+isNotNull,
+isEmpty

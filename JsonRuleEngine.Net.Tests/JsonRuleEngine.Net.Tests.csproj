@@ -8,6 +8,8 @@
 
   <ItemGroup>
     <None Remove="TestJsons\enum.json" />
+    <None Remove="TestJsons\listIsEmpty.json" />
+    <None Remove="TestJsons\listIsNotEmpty.json" />
   </ItemGroup>
 
   <ItemGroup>
@@ -18,6 +20,12 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="TestJsons\enum.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestJsons\listIsNotEmpty.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestJsons\listIsEmpty.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="TestJsons\listNotIn.json">

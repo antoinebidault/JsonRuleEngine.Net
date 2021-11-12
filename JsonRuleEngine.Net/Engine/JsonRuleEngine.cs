@@ -133,6 +133,11 @@ namespace JsonRuleEngine.Net
                         .Single(m => m.Name == nameof(Enumerable.Contains)
                             && m.GetParameters().Length == 2);
 
+        private static readonly MethodInfo MethodAny = typeof(Enumerable).GetMethods(
+                        BindingFlags.Static | BindingFlags.Public)
+                        .Single(m => m.Name == nameof(Enumerable.Any)
+                            && m.GetParameters().Length == 1);
+
         private static readonly MethodInfo MethodNotContains = typeof(Enumerable).GetMethods(
                     BindingFlags.Static | BindingFlags.Public)
                     .Single(m => m.Name == nameof(Enumerable.Except)
@@ -250,7 +255,8 @@ namespace JsonRuleEngine.Net
 
             // Contains methods
             // Need a conversion to an array of string
-            if (op == ConditionRuleOperator.@in || op == ConditionRuleOperator.notIn)
+            if (op == ConditionRuleOperator.@in ||
+                op == ConditionRuleOperator.notIn)
             {
 
                 // Parsing the array
@@ -260,7 +266,6 @@ namespace JsonRuleEngine.Net
                     var array = ((JArray)value).ToObject(listType);
                     MethodInfo method = null;
                     method = MethodContains.MakeGenericMethod(property.Type);
-
 
                     // var executed = Expression.Call(property, "ToString", Type.EmptyTypes);
                     expression = Expression.Call(
@@ -281,6 +286,7 @@ namespace JsonRuleEngine.Net
                 }
 
             }
+
 
             // It's a bit tricky behaviour
             // If it's a nullable prop, scope to the .Value of the prop just if not a isNull operator
@@ -336,14 +342,44 @@ namespace JsonRuleEngine.Net
                 MethodInfo method = typeof(string).GetMethod("Except", new[] { typeof(string) });
                 expression = Expression.Call(property, method, toCompare);
             }
+
             return expression;
         }
 
-        private static MethodCallExpression HandleTableRule(ConditionRuleSet rule, string field, object value, MemberExpression property)
+        private static Expression HandleTableRule(ConditionRuleSet rule, string field, object value, MemberExpression property)
         {
-            // Get the type of T in the IEnumerable<T> or ICollection<T> list
             var childType = property.Type.GetGenericArguments().First();
 
+            // Contains methods
+            // Need a conversion to an array of string
+            if (rule.Operator == ConditionRuleOperator.isNotEmpty ||
+                rule.Operator == ConditionRuleOperator.isEmpty)
+            {
+
+                // Parsing the array
+                try
+                {
+                    var MethodAny = typeof(Enumerable).GetMethods().Single(m => m.Name == "Any" && m.GetParameters().Length == 1);
+                    var method = MethodAny.MakeGenericMethod(childType);
+
+                    var expression = Expression.Call(
+                        method,
+                         property);
+
+                    if (rule.Operator == ConditionRuleOperator.isEmpty)
+                    {
+                       return Expression.Not(expression);
+                    }
+
+                    return expression;
+                }
+                catch (Exception e)
+                {
+                    throw new JsonRuleEngineException(JsonRuleEngineExceptionCategory.InvalidValue, $"The provided value is invalid : {e.Message} ");
+                }
+            }
+
+          
             // Set it as the param of the any expression
             var param = Expression.Parameter(childType);
             var anyExpression = Expression.Lambda(GetExpression(rule, param, field, value), param);

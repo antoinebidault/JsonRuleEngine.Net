@@ -53,6 +53,24 @@ namespace JsonRuleEngine.Net.Tests
             Assert.True(list.Count > 0);
         }
 
+        [Fact]
+        public void ListIsEmpty()
+        {
+            List<Game> list = Test("listIsEmpty.json");
+
+            Assert.NotEmpty(list);
+            Assert.True(list.All(m=>!m.Reviews.Any()));
+        }
+
+        [Fact]
+        public void ListIsNotEmpty()
+        {
+            List<Game> list = Test("listIsNotEmpty.json");
+
+            Assert.NotEmpty(list);
+            Assert.True(list.All(m => m.Reviews.Any()));
+        }
+
 
         [Fact]
         public void Guid()

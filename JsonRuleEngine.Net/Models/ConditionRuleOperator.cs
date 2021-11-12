@@ -47,7 +47,18 @@ namespace JsonRuleEngine.Net
         /// Dos not contains (in string)
         /// </summary>
         doesNotContains,
+        /// <summary>
+        /// Is null
+        /// </summary>
         isNull,
-        isNotNull
+        /// <summary>
+        /// Is not null
+        /// </summary>
+        isNotNull,
+        /// <summary>
+        /// Is empty
+        /// </summary>
+        isEmpty,
+        isNotEmpty
     }
 }

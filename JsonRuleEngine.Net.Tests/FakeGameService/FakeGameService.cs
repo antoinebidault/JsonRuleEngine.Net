@@ -48,21 +48,24 @@ namespace JsonRuleEngine.Net.Tests
                     Name= "Destiny",
                     Type = GameType.RPG,
                     Price = 23.3,
-                    Date =new DateTime(2021,1,12)
+                    Date =new DateTime(2021,1,12),
+                    Reviews = new List<Review>{}
                 },
                  new Game()
                 {
                     Name= "The forest",
                     Type = GameType.RPG,
                     Price = 22,
-                    Date =new DateTime(2021,1,11)
+                    Date =new DateTime(2021,1,11),
+                    Reviews = new List<Review>{}
                 },
                  new Game()
                 {
                     Name= "Sim City",
                     Type = GameType.CityBuilder,
                     Price = 13,
-                    Date =new DateTime(2021,1,2)
+                    Date =new DateTime(2021,1,2),
+                    Reviews = new List<Review>{}
                 },
                  new Game()
                 {
@@ -98,7 +101,8 @@ namespace JsonRuleEngine.Net.Tests
                     {
                         Id = 1,
                         Name= "test"
-                    }
+                    },
+                    Reviews = new List<Review>{}
                 }
             }.AsQueryable();
         }
