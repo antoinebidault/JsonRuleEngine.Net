@@ -1,7 +1,7 @@
 
 
 [![Build status](https://ci.appveyor.com/api/projects/status/r430k8vb29wjjsfd?svg=true)](https://ci.appveyor.com/project/antoinebidault/jsonruleengine-net)
-![Nuget](https://img.shields.io/nuget/v/JsonRuleEngine.Net)
+[![Nuget](https://img.shields.io/nuget/v/JsonRuleEngine.Net)](https://www.nuget.org/packages/JsonRuleEngine.Net/)
 [![codecov](https://codecov.io/gh/antoinebidault/JsonRuleEngine.Net/branch/master/graph/badge.svg?token=3KK1MJAW46)](https://codecov.io/gh/antoinebidault/JsonRuleEngine.Net)
 
 ![Logo](/JsonRuleEngine.Net/JsonRuleEngine.Net.png)
@@ -181,16 +181,29 @@ var list = _db.Games.Where(expression).ToList();
 ## Supported operators
 
 Here is the list of supported operators :
-equal,
-notEqual,
-lessThan,
-lessThanInclusive,
-greaterThan,
-greaterThanInclusive,
-in,
-notIn,
-contains,
-doesNotContains,
-isNull,
-isNotNull,
-isEmpty
+* equal,
+* notEqual,
+* lessThan,
+* lessThanInclusive,
+* greaterThan,
+* greaterThanInclusive,
+* in,
+* notIn,
+* contains,
+* doesNotContains,
+* isNull,
+* isNotNull,
+* isEmpty
+
+
+## Support of dictionary objects (since 1.14.0)
+The library now supports For dynamic objects like Dictionary<string, object>
+This will not work with EF Core (SQL)
+```CSharp
+ var dict = new Dictionary<string, object>() {
+    {"testvariable", "test" },
+    {"1235", "ok2" }
+};
+bool result = JsonRuleEngine.Evaluate(dict, new ConditionRuleSet() { Field = "1234", Operator = ConditionRuleOperator.isNotNull });
+Assert.True(result); // Return true
+```

@@ -9,12 +9,24 @@ namespace JsonRuleEngine.Net.Tests
     public partial class BaseTests
     {
         [Fact]
+        public void Dictionary()
+        {
+            var dict = new Dictionary<string, object>() {
+                {"1234", "ok" },
+                {"1235", "ok2" }
+            };
+            bool result = JsonRuleEngine.Evaluate(dict, new ConditionRuleSet() { Field = "1234", Operator = ConditionRuleOperator.isNotNull });
+            Assert.True(result);
+        }
+
+        [Fact]
         public void Simple()
         {
             List<Game> list = Test("simple.json");
 
             Assert.True(list.Count == 1);
         }
+
 
         [Fact]
         public void InCondition()

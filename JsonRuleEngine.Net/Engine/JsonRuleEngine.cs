@@ -195,17 +195,23 @@ namespace JsonRuleEngine.Net
                 return right;
             }
 
-            MemberExpression property = null;
+            Expression property = null;
 
             try
             {
                 string field = rule.Field;
                 var fields = field.Split('.');
                 int i = 0;
+                bool isDict = typeof(IDictionary).IsAssignableFrom(parm.Type);
                 foreach (var member in fields)
                 {
                     i = i + member.Length + 1;
-                    if (property == null)
+                    if (isDict)
+                    {
+                        Expression key = Expression.Constant(member);
+                        property = Expression.Property(parm, "Item", key);
+                    }
+                    else if (property == null)
                     {
                         property = Expression.Property(parm, member);
                     }
@@ -249,7 +255,7 @@ namespace JsonRuleEngine.Net
         /// Apply the con
         /// </summary>
         /// <returns></returns>
-        private static Expression CreateOperationExpression(MemberExpression property, ConditionRuleOperator op, object value)
+        private static Expression CreateOperationExpression(Expression property, ConditionRuleOperator op, object value)
         {
             Expression expression = null;
 
@@ -346,7 +352,7 @@ namespace JsonRuleEngine.Net
             return expression;
         }
 
-        private static Expression HandleTableRule(ConditionRuleSet rule, string field, object value, MemberExpression property)
+        private static Expression HandleTableRule(ConditionRuleSet rule, string field, object value, Expression property)
         {
             var childType = property.Type.GetGenericArguments().First();
 
