@@ -128,6 +128,7 @@ namespace JsonRuleEngine.Net
         }
 
 
+
         private static readonly MethodInfo MethodContains = typeof(Enumerable).GetMethods(
                         BindingFlags.Static | BindingFlags.Public)
                         .Single(m => m.Name == nameof(Enumerable.Contains)
@@ -180,6 +181,15 @@ namespace JsonRuleEngine.Net
             return left;
         }
 
+        public static object GetValueOrDefault(this IDictionary dictionary, string key)
+        {
+            if (dictionary.Contains(key))
+            {
+                return dictionary[key];
+            }
+            return null;
+        }
+
         private static Expression CreateRuleExpression<T>(ConditionRuleSet rule, ParameterExpression parm)
         {
             Expression right = null;
@@ -208,8 +218,15 @@ namespace JsonRuleEngine.Net
                     i = i + member.Length + 1;
                     if (isDict)
                     {
+                        Dictionary<string, object> dict = new Dictionary<string, object>();
+                        
                         Expression key = Expression.Constant(member);
-                        property = Expression.Property(parm, "Item", key);
+                       property = Expression.Property(parm, "Item", key);
+
+                        var methodGetValue = (typeof(JsonRuleEngine)).GetMethods()
+                        .Single(m => m.Name == "GetValueOrDefault" && m.IsStatic);
+
+                        property = Expression.Call(methodGetValue, parm, key);
                     }
                     else if (property == null)
                     {
