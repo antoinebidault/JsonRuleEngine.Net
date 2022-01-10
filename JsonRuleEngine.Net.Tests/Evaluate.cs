@@ -1,3 +1,4 @@
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -15,13 +16,48 @@ namespace JsonRuleEngine.Net.Tests
                 {"1234", "ok" },
                 {"1235", "ok2" }
             };
-            bool result = JsonRuleEngine.Evaluate(dict, new ConditionRuleSet() { Field = "1234", Operator = ConditionRuleOperator.isNotNull });
+            bool result = JsonRuleEngine.Evaluate(dict, new ConditionRuleSet() { Field = "1234", Operator = ConditionRuleOperator.equal, Value = "ok" });
+            Assert.True(result);
+        }
+
+        [Fact]
+        public void Dictionary_Advanced()
+        {
+            var dict = new Dictionary<string, object>() {
+                {"fa3cca71-6f90-440a-bad4-217f141cf20c", "da3cca71-6f90-440a-bad4-217f141cf20c" },
+                {"1235", "nok" }
+            };
+            bool result = JsonRuleEngine.Evaluate(dict, new ConditionRuleSet()
+            {
+                Separator = ConditionRuleSeparator.And,
+                Rules = new[] {
+                   new ConditionRuleSet() { Field = "fa3cca71-6f90-440a-bad4-217f141cf20c", Operator = ConditionRuleOperator.equal, Value = "da3cca71-6f90-440a-bad4-217f141cf20c" },
+                   new ConditionRuleSet() { Field = "1235", Operator = ConditionRuleOperator.notEqual, Value = "ok" }
+                }
+            });
             Assert.True(result);
         }
 
 
         [Fact]
-        public void Dictionary_NoFierld()
+        public void DictionaryDeserialized()
+        {
+            var dict = JsonConvert.DeserializeObject<Dictionary<string, object>>("{\"Test\":\"1\"}");
+            var conditions = JsonConvert.DeserializeObject<ConditionRuleSet>("{\"operator\":\"equal\",\"field\":\"Test\",\"value\":\"1\"}");
+
+            bool result = JsonRuleEngine.Evaluate(
+                dict,
+                conditions
+                );
+            Assert.True(result); // Return true
+        }
+
+
+
+
+
+        [Fact]
+        public void Dictionary_NoField()
         {
             var dict = new Dictionary<string, object>() {
                 {"1235", "ok2" }
@@ -83,7 +119,7 @@ namespace JsonRuleEngine.Net.Tests
             List<Game> list = Test("listIsEmpty.json");
 
             Assert.NotEmpty(list);
-            Assert.True(list.All(m=>!m.Reviews.Any()));
+            Assert.True(list.All(m => !m.Reviews.Any()));
         }
 
         [Fact]

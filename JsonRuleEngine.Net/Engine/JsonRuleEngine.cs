@@ -181,11 +181,11 @@ namespace JsonRuleEngine.Net
             return left;
         }
 
-        public static object GetValueOrDefault(this IDictionary dictionary, string key)
+        public static string GetValueOrDefault(IDictionary dictionary, string key)
         {
             if (dictionary.Contains(key))
             {
-                return dictionary[key];
+                return dictionary[key].ToString();
             }
             return null;
         }
@@ -218,13 +218,10 @@ namespace JsonRuleEngine.Net
                     i = i + member.Length + 1;
                     if (isDict)
                     {
-                        Dictionary<string, object> dict = new Dictionary<string, object>();
-                        
                         Expression key = Expression.Constant(member);
                        property = Expression.Property(parm, "Item", key);
 
-                        var methodGetValue = (typeof(JsonRuleEngine)).GetMethods()
-                        .Single(m => m.Name == "GetValueOrDefault" && m.IsStatic);
+                        var methodGetValue = (typeof(JsonRuleEngine)).GetMethod("GetValueOrDefault");
 
                         property = Expression.Call(methodGetValue, parm, key);
                     }
