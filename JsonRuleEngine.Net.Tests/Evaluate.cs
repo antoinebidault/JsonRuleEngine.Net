@@ -21,6 +21,18 @@ namespace JsonRuleEngine.Net.Tests
         }
 
         [Fact]
+        public void Dictionary_NullValue()
+        {
+            var dict = new Dictionary<string, object>() {
+                {"1234", null },
+                {"1235", "ok2" }
+            };
+            bool result = JsonRuleEngine.Evaluate(dict, new ConditionRuleSet() { Field = "1234", Operator = ConditionRuleOperator.notEqual, Value = "ok" });
+            Assert.True(result);
+        }
+
+
+        [Fact]
         public void Dictionary_Advanced()
         {
             var dict = new Dictionary<string, object>() {

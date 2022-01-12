@@ -185,7 +185,7 @@ namespace JsonRuleEngine.Net
         {
             if (dictionary.Contains(key))
             {
-                return dictionary[key].ToString();
+                return dictionary[key]?.ToString();
             }
             return null;
         }
