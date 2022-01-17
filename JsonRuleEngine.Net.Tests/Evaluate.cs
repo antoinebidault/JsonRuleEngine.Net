@@ -50,6 +50,29 @@ namespace JsonRuleEngine.Net.Tests
             Assert.True(result);
         }
 
+        [Fact]
+        public void Dictionary_SpecificCase()
+        {
+            var dict = new Dictionary<string, object>() {
+                {"fa3cca71-6f90-440a-bad4-217f141cf20c", "da3cca71-6f90-440a-bad4-217f141cf20c" },
+                {"1235", "nok" }
+            };
+
+            var result = JsonRuleEngine.Evaluate(dict, new ConditionRuleSet()
+            {
+                Separator = ConditionRuleSeparator.And,
+                Rules = new[] {
+                    new ConditionRuleSet() {
+                        Field = "fa3cca71-6f90-440a-bad4-217f141cf20c",
+                        Operator = ConditionRuleOperator.contains,
+                        Value = "aaaa"
+                    }
+                }
+            });
+            Assert.False(result);
+        }
+
+
 
         [Fact]
         public void DictionaryDeserialized()
