@@ -359,11 +359,6 @@ namespace JsonRuleEngine.Net
             }
             else if (op == ConditionRuleOperator.doesNotContains)
             {
-                /*if (property.Type == typeof(string))
-                {
-                    expression = Expression.Call(property, typeof(string).GetMethod("IndexOf", new[] { typeof(string) }), Expression.Constant(-1));
-                }*/
-
                 MethodInfo method = typeof(string).GetMethod("Contains", new[] { typeof(string) });
                 expression = Expression.Not(Expression.Call(property, method, toCompare));
             }
