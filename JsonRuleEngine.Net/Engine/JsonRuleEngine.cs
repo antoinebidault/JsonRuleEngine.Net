@@ -83,11 +83,12 @@ namespace JsonRuleEngine.Net
             var itemExpression = Expression.Parameter(typeof(T));
             var conditions = ParseTree<T>(rules, itemExpression);
 
+            // Breaking change
             // If no conditions parsed
-            // Let's return a true predicate
+            // Let's return a default predicate
             if (conditions == null)
             {
-                return (m) => true;
+                return (m) => default;
             }
 
             if (conditions.CanReduce)
@@ -119,6 +120,41 @@ namespace JsonRuleEngine.Net
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="obj">The object to test</param>
+        /// <param name="jsonRules">The json string conditionRuleSet object</param>
+        /// <returns>True if the conditions are matched</returns>
+        public static TOut Evaluate<T, TOut>(T obj, string jsonRules)
+        {
+            var rules = Parse<TOut>(jsonRules);
+            return Evaluate<T, TOut>(obj, rules);
+        }
+
+        /// <summary>
+        /// Test the conditions
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="obj">The object to test</param>
+        /// <param name="rules">The conditionRuleSet object</param>
+        /// <returns>True if the conditions are matched</returns>
+        public static TOut Evaluate<T, TOut>(T obj, ConditionRuleSet<TOut> rules)
+        {
+            var query = ParseExpression<T>(rules);
+            var result = query.Compile().Invoke(obj);
+            if (result)
+            {
+                var returnValue = (TOut)Convert.ChangeType(rules.ReturnValue.Value, rules.ReturnValue.Type);
+                return returnValue;
+            }
+            else
+            {
+                return default(TOut);
+            }
+        }
+
+        /// <summary>
+        /// Test the conditions
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="obj">The object to test</param>
         /// <param name="rules">The conditionRuleSet object</param>
         /// <returns>True if the conditions are matched</returns>
         public static bool Evaluate<T>(T obj, ConditionRuleSet rules)
@@ -126,8 +162,6 @@ namespace JsonRuleEngine.Net
             var query = ParseExpression<T>(rules);
             return query.Compile().Invoke(obj);
         }
-
-
 
         private static readonly MethodInfo MethodContains = typeof(Enumerable).GetMethods(
                         BindingFlags.Static | BindingFlags.Public)
@@ -219,7 +253,7 @@ namespace JsonRuleEngine.Net
                     if (isDict)
                     {
                         Expression key = Expression.Constant(member);
-                       property = Expression.Property(parm, "Item", key);
+                        property = Expression.Property(parm, "Item", key);
 
                         var methodGetValue = (typeof(JsonRuleEngine)).GetMethod("GetValueOrDefault");
 
@@ -382,13 +416,11 @@ namespace JsonRuleEngine.Net
                     var MethodAny = typeof(Enumerable).GetMethods().Single(m => m.Name == "Any" && m.GetParameters().Length == 1);
                     var method = MethodAny.MakeGenericMethod(childType);
 
-                    var expression = Expression.Call(
-                        method,
-                         property);
+                    var expression = Expression.Call(method, property);
 
                     if (rule.Operator == ConditionRuleOperator.isEmpty)
                     {
-                       return Expression.Not(expression);
+                        return Expression.Not(expression);
                     }
 
                     return expression;
@@ -399,7 +431,7 @@ namespace JsonRuleEngine.Net
                 }
             }
 
-          
+
             // Set it as the param of the any expression
             var param = Expression.Parameter(childType);
             var anyExpression = Expression.Lambda(GetExpression(rule, param, field, value), param);
@@ -459,5 +491,16 @@ namespace JsonRuleEngine.Net
             }
         }
 
+        private static ConditionRuleSet<TOut> Parse<TOut>(string jsonRules)
+        {
+            try
+            {
+                return Newtonsoft.Json.JsonConvert.DeserializeObject<ConditionRuleSet<TOut>>(jsonRules);
+            }
+            catch (Exception e)
+            {
+                throw new JsonRuleEngineException(JsonRuleEngineExceptionCategory.InvalidJsonRules, $"Invalid json provided : {e.Message}");
+            }
+        }
     }
 }

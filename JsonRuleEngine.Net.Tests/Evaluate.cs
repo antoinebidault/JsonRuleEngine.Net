@@ -43,8 +43,8 @@ namespace JsonRuleEngine.Net.Tests
             {
                 Separator = ConditionRuleSeparator.And,
                 Rules = new[] {
-                   new ConditionRuleSet() { Field = "fa3cca71-6f90-440a-bad4-217f141cf20c", Operator = ConditionRuleOperator.equal, Value = "da3cca71-6f90-440a-bad4-217f141cf20c" },
-                   new ConditionRuleSet() { Field = "1235", Operator = ConditionRuleOperator.notEqual, Value = "ok" }
+                   new ConditionRuleSet<bool>() { Field = "fa3cca71-6f90-440a-bad4-217f141cf20c", Operator = ConditionRuleOperator.equal, Value = "da3cca71-6f90-440a-bad4-217f141cf20c" },
+                   new ConditionRuleSet<bool>() { Field = "1235", Operator = ConditionRuleOperator.notEqual, Value = "ok" }
                 }
             });
             Assert.True(result);
@@ -58,11 +58,11 @@ namespace JsonRuleEngine.Net.Tests
                 {"1235", "nok" }
             };
 
-            var result = JsonRuleEngine.Evaluate(dict, new ConditionRuleSet()
+            var result = JsonRuleEngine.Evaluate(dict, new ConditionRuleSet<bool>()
             {
                 Separator = ConditionRuleSeparator.And,
                 Rules = new[] {
-                    new ConditionRuleSet() {
+                    new ConditionRuleSet<bool>() {
                         Field = "fa3cca71-6f90-440a-bad4-217f141cf20c",
                         Operator = ConditionRuleOperator.contains,
                         Value = "aaaa"
@@ -97,7 +97,7 @@ namespace JsonRuleEngine.Net.Tests
             var dict = new Dictionary<string, object>() {
                 {"1235", "ok2" }
             };
-            bool result = JsonRuleEngine.Evaluate(dict, new ConditionRuleSet() { Field = "1234", Operator = ConditionRuleOperator.isNotNull });
+            bool result = JsonRuleEngine.Evaluate(dict, new ConditionRuleSet<bool>() { Field = "1234", Operator = ConditionRuleOperator.isNotNull });
             Assert.False(result);
         }
 
@@ -110,6 +110,33 @@ namespace JsonRuleEngine.Net.Tests
             Assert.True(list.Count == 1);
         }
 
+        [Fact]
+        public void SimpleReturn()
+        {
+            string rules = GetJsonTestFile("simpleReturn.json");
+            var data = FakeGameService.GetDatas().First(x => x.Name == "GTA V");
+
+            var returnValue = JsonRuleEngine.Evaluate<Game, string>(data, rules);
+
+            Assert.True(returnValue == "ThisIsTheReturnValue");
+        }
+
+        [Fact]
+        public void ComplexReturn()
+        {
+            string rules = GetJsonTestFile("complexReturn.json");
+            var expression = JsonRuleEngine.ParseExpression<Game>(rules);
+            var datas = FakeGameService.GetDatas().Where(expression).ToList();
+
+            foreach (var data in datas)
+            {
+                var returnValue = JsonRuleEngine.Evaluate<Game, Review>(data, rules);
+
+                Assert.True(returnValue.Id == 99);
+                Assert.True(returnValue.Text == "Defined in json");
+                Assert.True(returnValue.Author.Name == "Athur Review");
+            }
+        }
 
         [Fact]
         public void InCondition()
@@ -245,7 +272,7 @@ namespace JsonRuleEngine.Net.Tests
 
             var items = FakeGameService.GetDatas();
             bool result = JsonRuleEngine.Evaluate(items.First(), rules);
-            Assert.True(result);
+            Assert.False(result);
         }
 
         [Fact]

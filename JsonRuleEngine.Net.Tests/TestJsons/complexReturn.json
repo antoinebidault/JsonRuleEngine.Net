@@ -1,0 +1,67 @@
+﻿{
+  "separator": "And",
+  "rules": [
+    {
+      "field": "Editor.Name",
+      "operator": "equal",
+      "value": "Ubisoft"
+    },
+    {
+      "field": "Reviews.Id",
+      "operator": "in",
+      "value": [1,2]
+    },
+    {
+      "field": "Category",
+      "operator": "in",
+      "value": [
+        "Action",
+        "Adventure"
+      ]
+    },
+    {
+      "field": "Price",
+      "operator": "in",
+      "value": [
+        6,
+        7,
+        8,
+        9,
+        10,
+        39,
+        45.3
+      ]
+    },
+    {
+      "separator": "Or",
+      "rules": [
+        {
+          "field": "Name",
+          "operator": "equal",
+          "value": "Assassin's creed"
+        },
+        {
+          "field": "Name",
+          "operator": "equal",
+          "value": "Data"
+        }
+      ]
+    },
+    {
+      "field": "Price",
+      "operator": "greaterThan",
+      "value": 5
+    }
+  ],
+  "returnvalue":
+  {
+    "type": "JsonRuleEngine.Net.Tests.Review, JsonRuleEngine.Net.Tests, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null",
+    "value": {
+      "Id": 99,
+      "Text": "Defined in json",
+      "Author": {
+        "Name": "Athur Review"
+      }
+    }
+  }
+}
