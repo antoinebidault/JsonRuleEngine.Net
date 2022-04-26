@@ -133,6 +133,19 @@ namespace JsonRuleEngine.Net
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="obj">The object to test</param>
+        /// <param name="jsonRules">The json string conditionRuleSet object</param>
+        /// <returns>True if the conditions are matched</returns>
+        public static bool TryEvaluate<T, TOut>(T obj, string jsonRules, out TOut returnValue)
+        {
+            var rules = Parse<TOut>(jsonRules);
+            return JsonRuleEngine.TryEvaluate<T, TOut>(obj, rules, out returnValue);
+        }
+
+        /// <summary>
+        /// Test the conditions
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="obj">The object to test</param>
         /// <param name="rules">The conditionRuleSet object</param>
         /// <returns>True if the conditions are matched</returns>
         public static TOut Evaluate<T, TOut>(T obj, ConditionRuleSet<TOut> rules)
@@ -148,6 +161,27 @@ namespace JsonRuleEngine.Net
             {
                 return default(TOut);
             }
+        }
+
+        /// <summary>
+        /// Test the conditions
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="obj">The object to test</param>
+        /// <param name="rules">The conditionRuleSet object</param>
+        /// <returns>True if the conditions are matched</returns>
+        public static bool TryEvaluate<T, TOut>(T obj, ConditionRuleSet<TOut> rules, out TOut returnValue)
+        {
+            returnValue = default;
+            var query = ParseExpression<T>(rules);
+            var success = query.Compile().Invoke(obj);
+
+            if (!success)
+                return success;
+
+            returnValue = (TOut)Convert.ChangeType(rules.ReturnValue.Value, rules.ReturnValue.Type);
+
+            return success;
         }
 
         /// <summary>

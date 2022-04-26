@@ -122,6 +122,18 @@ namespace JsonRuleEngine.Net.Tests
         }
 
         [Fact]
+        public void TryEvaluateTest()
+        {
+            string rules = GetJsonTestFile("simpleReturn.json");
+            var data = FakeGameService.GetDatas().First(x => x.Name == "GTA V");
+
+            var result = JsonRuleEngine.TryEvaluate<Game, string>(data, rules, out var returnValue);
+
+            Assert.True(result);
+            Assert.True(returnValue == "ThisIsTheReturnValue");
+        }
+
+        [Fact]
         public void ComplexReturn()
         {
             string rules = GetJsonTestFile("complexReturn.json");
