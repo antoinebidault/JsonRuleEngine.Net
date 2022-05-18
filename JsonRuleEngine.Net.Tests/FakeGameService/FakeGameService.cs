@@ -40,6 +40,11 @@ namespace JsonRuleEngine.Net.Tests
                        {
                            Id = 2,
                            Text ="It's very cool"
+                       },
+                       new Review()
+                       {
+                           Id = 3,
+                           Text ="It's very cool"
                        }
                     }
                 },
