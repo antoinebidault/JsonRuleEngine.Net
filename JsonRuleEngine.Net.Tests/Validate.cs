@@ -13,7 +13,7 @@ namespace JsonRuleEngine.Net.Tests
         {
             var data = File.ReadAllText(Path.Combine("TestJsons/", "complex.json"));
             var items = FakeGameService.GetDatas();
-            var whiteList = new List<string>() { 
+            var whiteList = new List<string>() {
                 "Category",
                 "Price",
                 "Name",
