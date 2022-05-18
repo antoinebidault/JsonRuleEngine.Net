@@ -144,7 +144,6 @@ namespace JsonRuleEngine.Net.Tests
         public void Complex()
         {
             List<Game> list = Test("complex.json");
-
             Assert.True(list.Count > 0);
         }
 
@@ -237,7 +236,56 @@ namespace JsonRuleEngine.Net.Tests
             var items = FakeGameService.GetDatas();
             bool result = JsonRuleEngine.Evaluate(items.First(), rules);
             Assert.False(result);
+
         }
+
+        [Fact]
+        public void ListNotInAlt()
+        {
+            var rules = GetJsonTestFile("listNotInAlt.json");
+            var result = JsonRuleEngine.Evaluate(new Game()
+            {
+                Name = "Toto",
+                Reviews = new[]
+                 {
+                      new Review()
+                     {
+                         Id = 1
+                     },
+                     new Review()
+                     {
+                         Id = 2
+                     }
+                 }
+            }, rules);
+
+            Assert.False(result);
+        }
+
+        [Fact]
+        public void NotEqualList()
+        {
+            var rules = GetJsonTestFile("notEqualList.json");
+            var result = JsonRuleEngine.Evaluate(new Game()
+            {
+                Name = "Toto",
+                Reviews = new[]
+                 {
+                      new Review()
+                     {
+                         Id = 1
+                     },
+                     new Review()
+                     {
+                         Id = 2
+                     }
+                 }
+            }, rules);
+
+            Assert.False(result);
+        }
+
+
         [Fact]
         public void Empty()
         {

@@ -234,6 +234,7 @@ namespace JsonRuleEngine.Net
                         property = Expression.Property(property, member);
                     }
 
+                    
                     if (property.Type.IsArray())
                     {
                         string subField = "";
@@ -287,7 +288,6 @@ namespace JsonRuleEngine.Net
                     MethodInfo method = null;
                     method = MethodContains.MakeGenericMethod(property.Type);
 
-                    // var executed = Expression.Call(property, "ToString", Type.EmptyTypes);
                     expression = Expression.Call(
                         method,
                         Expression.Constant(array),
@@ -306,6 +306,7 @@ namespace JsonRuleEngine.Net
                 }
 
             }
+
 
 
             // It's a bit tricky behaviour
@@ -399,18 +400,24 @@ namespace JsonRuleEngine.Net
                 }
             }
 
-          
             // Set it as the param of the any expression
             var param = Expression.Parameter(childType);
             var anyExpression = Expression.Lambda(GetExpression(rule, param, field, value), param);
 
+            MethodInfo anyMethod = null;
+      
+            // In case it's a different of notEqual operator, we would like to apply the .All
+            if (rule.Operator == ConditionRuleOperator.notIn || rule.Operator == ConditionRuleOperator.notEqual)
+            {
+                anyMethod = typeof(Enumerable).GetMethods().Single(m => m.Name == "All" && m.GetParameters().Length == 2);
+                anyMethod = anyMethod.MakeGenericMethod(childType);
+                return Expression.Call(anyMethod, property, anyExpression);
+            }
 
-            var anyMethod = typeof(Enumerable).GetMethods().Single(m => m.Name == "Any" && m.GetParameters().Length == 2);
+            anyMethod = typeof(Enumerable).GetMethods().Single(m => m.Name == "Any" && m.GetParameters().Length == 2);
             anyMethod = anyMethod.MakeGenericMethod(childType);
 
-            var predicate = Expression.Call(anyMethod, property, anyExpression);
-
-            return predicate;
+            return Expression.Call(anyMethod, property, anyExpression);
         }
 
 
