@@ -1,5 +1,3 @@
-
-
 [![Build status](https://ci.appveyor.com/api/projects/status/r430k8vb29wjjsfd?svg=true)](https://ci.appveyor.com/project/antoinebidault/jsonruleengine-net)
 [![Nuget](https://img.shields.io/nuget/v/JsonRuleEngine.Net)](https://www.nuget.org/packages/JsonRuleEngine.Net/)
 [![codecov](https://codecov.io/gh/antoinebidault/JsonRuleEngine.Net/branch/master/graph/badge.svg?token=3KK1MJAW46)](https://codecov.io/gh/antoinebidault/JsonRuleEngine.Net)
@@ -13,10 +11,13 @@ This lib is inspired by the [json rules engine](https://github.com/cachecontrol/
 We are currently plan using it in production in the [Dastra](https://www.dastra.eu) filtering engine.
 
 # Purpose
+
 In some case you'll need to store some complex conditions objects in database. The purpose of this library is to provide a simple way to store and transform to linq Expression tree nested conditional rules stored in a simple json format. in database, filesystem... You'll be able to evaluate it as a Linq Expression and use it for applying filters in Entity Framework.
 
 # Json format of queries
+
 Here is a basic JSON sample that represents rules
+
 ```javascript
 {
   "separator": "And",
@@ -54,6 +55,7 @@ Here is a basic JSON sample that represents rules
 ```
 
 You can post it to a simple controller using the ConditionRuleSet class
+
 ```CSharp
 [HttpPost]
 public IActionResult PostRules([FromBody] ConditionRuleSet rules) {
@@ -66,21 +68,23 @@ public IActionResult PostRules([FromBody] ConditionRuleSet rules) {
 
 ```
 
-
 # Simple use
 
 ## Installation
+
 You need to install the nuget library
+
 ```
 install-package JsonRuleEngine.Net
 ```
 
 ## For evaluating a rule with a single object
+
 ```CSharp
 // Simple json rule definition
 string ruleJson = "{\"field\": \"Name\",\"operator\": \"equal\",\"value\": \"Assassin's creed\" }";
 
-Game objectToTest = new Game() { 
+Game objectToTest = new Game() {
     Name = "Assassin's creed"
 };
 
@@ -89,10 +93,27 @@ bool result = JsonRuleEngine.Evaluate(objectToTest, ruleJson);
 return result; // this must display "True"
 ```
 
+## For evaluating a rule with return value
+
+```CSharp
+// Simple json rule definition
+string ruleJson = "{\"field\": \"Name\",\"operator\": \"equal\",\"value\": \"Assassin's creed\", \"returnValue\":{\"type\": System.String\", \"value\": \"Good game\" } }";
+
+Game objectToTest = new Game() {
+    Name = "Assassin's creed"
+};
+
+string result = JsonRuleEngine.Evaluate<Game, String>(objectToTest, ruleJson);
+
+return result; // this must display "Good Game"
+```
+
 ## Support of navigation properties
+
 If you have complex models with nested list or object, you are able to apply filters on them using the dot (.) separator on field.
 
 Example of model with a nested list and object :
+
 ```CSharp
 public class Game {
     public Guid Id { get; set; }
@@ -112,13 +133,14 @@ public class Reviews {
 ```
 
 If you want all the game with author named "John Doe" and one review with a score of 3 or 5
+
 ```CSharp
 string ruleJson = "{ \"rules\": [ " +
    " {\"field\": \"Author.Name\",\"operator\": \"equal\",\"value\": \"John Doe\" }, " +
    " {\"field\": \"Reviews.Score\",\"operator\": \"in\",\"value\": [3,5] } " +
 " ]";
 
-Game objectToTest = new Game() { 
+Game objectToTest = new Game() {
     Name = "Assassin's creed",
     Author = new Author(){
         Name = "John Doe"
@@ -144,7 +166,9 @@ Assert.True(result)
 Limitations : for nested list it works only with one level.
 
 ## For filtering a list using an expression
+
 The expression parsed will work with LinqToSql query with EntityFramework Core.
+
 ```CSharp
 string ruleJson = ""{\"field\": \"Name\",\"operator\": \"notEqual\",\"value\": \"test\" }"
 var expression = JsonRuleEngine.ParseExpression<Game>(ruleJson);
@@ -161,6 +185,7 @@ Assert.Equal(list.Count(), 1);
 ```
 
 ## Entity Framework Core support
+
 ```CSharp
 string ruleJson = ""{\"field\": \"Name\",\"operator\": \"notEqual\",\"value\": \"test\" }"
 var expression = JsonRuleEngine.ParseExpression<Game>(ruleJson);
@@ -169,36 +194,40 @@ var list = _db.Games.Where(expression).ToList();
 ```
 
 # The nested rules object / classname : ConditionRuleSet
+
 ## ConditionRuleSet
-|Field name| Type| Description |
-|--|--|--|
-|separator|enum (Or, And) **optional**| The type of condition rules  |
-|field|string **optional**| The name of the field used for filtering (Camel sensitive). If the rules properties contains no element **this field must be set**  |
-|operator|enum (equal,notEqual,  lessThan, lessThanInclusive,greaterThan, greaterThanInclusive,in,notIn, contains,  doesNotContains, isNull, isNotNull) **default:equal**| The type of method used for comparing values |
-|value|object **optional, default:null**| The string value, the number or the object used for egality comparison. In case, the in operator is used, this **must be a list of string** |
-|rules| List of ConditionRuleSet **optional, default: null** | The nested rules contained in the group  |
+
+| Field name | Type                                                                                                                                                          | Description                                                                                                                                 |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| separator  | enum (Or, And) **optional**                                                                                                                                   | The type of condition rules                                                                                                                 |
+| field      | string **optional**                                                                                                                                           | The name of the field used for filtering (Camel sensitive). If the rules properties contains no element **this field must be set**          |
+| operator   | enum (equal,notEqual, lessThan, lessThanInclusive,greaterThan, greaterThanInclusive,in,notIn, contains, doesNotContains, isNull, isNotNull) **default:equal** | The type of method used for comparing values                                                                                                |
+| value      | object **optional, default:null**                                                                                                                             | The string value, the number or the object used for egality comparison. In case, the in operator is used, this **must be a list of string** |
+| rules      | List of ConditionRuleSet **optional, default: null**                                                                                                          | The nested rules contained in the group                                                                                                     |
 
 ## Supported operators
 
 Here is the list of supported operators :
-* equal,
-* notEqual,
-* lessThan,
-* lessThanInclusive,
-* greaterThan,
-* greaterThanInclusive,
-* in,
-* notIn,
-* contains,
-* doesNotContains,
-* isNull,
-* isNotNull,
-* isEmpty
 
+- equal,
+- notEqual,
+- lessThan,
+- lessThanInclusive,
+- greaterThan,
+- greaterThanInclusive,
+- in,
+- notIn,
+- contains,
+- doesNotContains,
+- isNull,
+- isNotNull,
+- isEmpty
 
 ## Support of dictionary objects (since 1.14.0)
+
 The library now supports For dynamic objects like Dictionary<string, object>
 This will not work with EF Core (SQL)
+
 ```CSharp
  var dict = new Dictionary<string, object>() {
     {"testvariable", "test" },

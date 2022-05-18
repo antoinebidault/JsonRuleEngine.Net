@@ -1,0 +1,11 @@
+﻿{
+  "separator": "And",
+  "field": "Name",
+  "operator": "equal",
+  "value": "GTA V",
+  "returnvalue":
+  {
+    "type": "System.String",
+    "value": "ThisIsTheReturnValue"
+  }
+}
