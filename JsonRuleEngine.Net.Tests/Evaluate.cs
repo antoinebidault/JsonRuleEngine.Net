@@ -9,6 +9,8 @@ namespace JsonRuleEngine.Net.Tests
 {
     public partial class BaseTests
     {
+
+
         [Fact]
         public void Dictionary()
         {
@@ -236,9 +238,20 @@ namespace JsonRuleEngine.Net.Tests
             Assert.True(result);
         }
 
-
         [Fact]
         public void Object()
+        {
+            var dict = new Game()
+            {
+                Name = "Warzone"
+            };
+            bool result = JsonRuleEngine.Evaluate((object)dict, new ConditionRuleSet() { Field = "Name", Operator = ConditionRuleOperator.equal, Value = "Warzone" });
+            Assert.True(result);
+        }
+
+
+        [Fact]
+        public void ObjectSubProperty()
         {
             string rules = GetJsonTestFile("object.json");
 

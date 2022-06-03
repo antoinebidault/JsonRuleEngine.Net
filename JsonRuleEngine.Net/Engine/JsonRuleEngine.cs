@@ -185,6 +185,26 @@ namespace JsonRuleEngine.Net
         }
 
         /// <summary>
+        /// Evaluate a simple object (it will uses the inferred type)
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <param name="rules"></param>
+        /// <returns></returns>
+        public static bool Evaluate(object obj, ConditionRuleSet rules)
+        {
+            MethodInfo method = typeof(JsonRuleEngine).GetMethods(BindingFlags.Static | BindingFlags.Public)
+                .Single(m=> m.Name == nameof(JsonRuleEngine.Evaluate) &&
+                        m.GetParameters() != null &&
+                        m.ContainsGenericParameters &&
+                      m.GetParameters().Length == 2 &&
+                     m.GetParameters().Select(c=>c.ParameterType).Contains(typeof(ConditionRuleSet)));
+
+            MethodInfo generic = method.MakeGenericMethod(obj.GetType());
+            return (bool)generic.Invoke(null, parameters: new[] { obj, rules });
+        }
+
+
+        /// <summary>
         /// Test the conditions
         /// </summary>
         /// <typeparam name="T"></typeparam>
