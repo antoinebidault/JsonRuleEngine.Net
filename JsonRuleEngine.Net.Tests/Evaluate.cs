@@ -238,6 +238,17 @@ namespace JsonRuleEngine.Net.Tests
             Assert.True(result);
         }
 
+
+        [Fact]
+        public void TimeSpan()
+        {
+            string rules = GetJsonTestFile("timespan.json");
+
+            var items = FakeGameService.GetDatas();
+            bool result = JsonRuleEngine.Evaluate(items.First(), rules);
+            Assert.True(result);
+        }
+
         [Fact]
         public void Object()
         {

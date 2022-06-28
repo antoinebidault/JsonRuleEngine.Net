@@ -1,3 +1,4 @@
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections;
@@ -105,7 +106,7 @@ namespace JsonRuleEngine.Net
         /// <summary>
         /// Test the conditions
         /// </summary>
-        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="T">Input type</typeparam>
         /// <param name="obj">The object to test</param>
         /// <param name="jsonRules">The json string conditionRuleSet object</param>
         /// <returns>True if the conditions are matched</returns>
@@ -118,7 +119,8 @@ namespace JsonRuleEngine.Net
         /// <summary>
         /// Test the conditions
         /// </summary>
-        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="T">Input type</typeparam>
+        /// <typeparam name="TOut">Output type</typeparam>
         /// <param name="obj">The object to test</param>
         /// <param name="jsonRules">The json string conditionRuleSet object</param>
         /// <returns>True if the conditions are matched</returns>
@@ -131,9 +133,11 @@ namespace JsonRuleEngine.Net
         /// <summary>
         /// Test the conditions
         /// </summary>
-        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="T">Input type</typeparam>
+        /// <typeparam name="TOut">Output type</typeparam>
         /// <param name="obj">The object to test</param>
         /// <param name="jsonRules">The json string conditionRuleSet object</param>
+        /// <param name="returnValue">The json string conditionRuleSet object</param>
         /// <returns>True if the conditions are matched</returns>
         public static bool TryEvaluate<T, TOut>(T obj, string jsonRules, out TOut returnValue)
         {
@@ -144,7 +148,8 @@ namespace JsonRuleEngine.Net
         /// <summary>
         /// Test the conditions
         /// </summary>
-        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="T">Input type</typeparam>
+        /// <typeparam name="TOut">Output type</typeparam>
         /// <param name="obj">The object to test</param>
         /// <param name="rules">The conditionRuleSet object</param>
         /// <returns>True if the conditions are matched</returns>
@@ -166,7 +171,8 @@ namespace JsonRuleEngine.Net
         /// <summary>
         /// Test the conditions
         /// </summary>
-        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="T">Input type</typeparam>
+        /// <typeparam name="TOut">Output type</typeparam>
         /// <param name="obj">The object to test</param>
         /// <param name="rules">The conditionRuleSet object</param>
         /// <returns>True if the conditions are matched</returns>
@@ -193,11 +199,11 @@ namespace JsonRuleEngine.Net
         public static bool Evaluate(object obj, ConditionRuleSet rules)
         {
             MethodInfo method = typeof(JsonRuleEngine).GetMethods(BindingFlags.Static | BindingFlags.Public)
-                .Single(m=> m.Name == nameof(JsonRuleEngine.Evaluate) &&
+                .Single(m => m.Name == nameof(JsonRuleEngine.Evaluate) &&
                         m.GetParameters() != null &&
                         m.ContainsGenericParameters &&
                       m.GetParameters().Length == 2 &&
-                     m.GetParameters().Select(c=>c.ParameterType).Contains(typeof(ConditionRuleSet)));
+                     m.GetParameters().Select(c => c.ParameterType).Contains(typeof(ConditionRuleSet)));
 
             MethodInfo generic = method.MakeGenericMethod(obj.GetType());
             return (bool)generic.Invoke(null, parameters: new[] { obj, rules });
@@ -322,7 +328,7 @@ namespace JsonRuleEngine.Net
                         property = Expression.Property(property, member);
                     }
 
-                    
+
                     if (property.Type.IsArray())
                     {
                         string subField = "";
@@ -406,8 +412,20 @@ namespace JsonRuleEngine.Net
                 property = Expression.Property(property, "Value");
             }
 
+
+            if (value != null)
+            {
+                var valueType = value.GetType();
+                if (property.Type == typeof(DateTime) && valueType == typeof(string) && value.ToString().StartsWith("\""))
+                {
+                    value = ParseDate(value.ToString());
+                }
+            }
+
             value = property.Type.GetValue(value);
             var toCompare = Expression.Constant(value);
+
+
 
             if (op == ConditionRuleOperator.isNull)
             {
@@ -455,6 +473,13 @@ namespace JsonRuleEngine.Net
             return expression;
         }
 
+        private static DateTime ParseDate(string str)
+        {
+            string ts2 = JsonConvert.SerializeObject(TimeSpan.FromDays(10));
+            TimeSpan ts = JsonConvert.DeserializeObject<TimeSpan>(str);
+            return DateTime.UtcNow.Date.Add(ts);
+        }
+
         private static Expression HandleTableRule(ConditionRuleSet rule, string field, object value, Expression property)
         {
             var childType = property.Type.GetGenericArguments().First();
@@ -491,7 +516,7 @@ namespace JsonRuleEngine.Net
             var anyExpression = Expression.Lambda(GetExpression(rule, param, field, value), param);
 
             MethodInfo anyMethod = null;
-      
+
             // In case it's a different of notEqual operator, we would like to apply the .All
             if (rule.Operator == ConditionRuleOperator.notIn || rule.Operator == ConditionRuleOperator.notEqual)
             {

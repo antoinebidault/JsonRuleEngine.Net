@@ -1,0 +1,10 @@
+﻿{
+  "separator": "And",
+  "rules": [
+    {
+      "field": "Date",
+      "operator": "greaterThanInclusive",
+      "value": "\"-20000.10:00:00\""
+    }
+  ]
+}
