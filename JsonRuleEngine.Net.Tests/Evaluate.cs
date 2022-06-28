@@ -245,7 +245,7 @@ namespace JsonRuleEngine.Net.Tests
             string rules = GetJsonTestFile("timespan.json");
 
             var items = FakeGameService.GetDatas();
-            bool result = JsonRuleEngine.Evaluate(items.First(), rules);
+            bool result = JsonRuleEngine.Evaluate(new Game() { Date = DateTime.UtcNow }, rules);
             Assert.True(result);
         }
 
