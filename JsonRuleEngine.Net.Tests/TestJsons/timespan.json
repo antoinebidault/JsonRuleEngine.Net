@@ -4,7 +4,7 @@
     {
       "field": "Date",
       "operator": "greaterThanInclusive",
-      "value": "\"-20000.10:00:00\""
+      "value": "\"-2000.10:00:00\""
     }
   ]
 }

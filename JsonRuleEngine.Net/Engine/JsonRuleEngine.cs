@@ -475,9 +475,8 @@ namespace JsonRuleEngine.Net
 
         private static DateTime ParseDate(string str)
         {
-            string ts2 = JsonConvert.SerializeObject(TimeSpan.FromDays(10));
             TimeSpan ts = JsonConvert.DeserializeObject<TimeSpan>(str);
-            return DateTime.UtcNow.Date.Add(ts);
+            return DateTime.UtcNow.Add(ts);
         }
 
         private static Expression HandleTableRule(ConditionRuleSet rule, string field, object value, Expression property)
