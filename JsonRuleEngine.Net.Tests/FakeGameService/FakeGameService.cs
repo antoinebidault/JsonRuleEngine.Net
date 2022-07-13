@@ -33,13 +33,35 @@ namespace JsonRuleEngine.Net.Tests
                            Text ="It's cool",
                            Author = new Author()
                            {
-                               Name = "Johnny"
+                               Name = "Johnny",
+                               Types = new []
+                               {
+                                   new AuthorType
+                                   {
+                                       Name = "Admin"
+                                   }, 
+                                   new AuthorType
+                                   {
+                                       Name = "Reviewer"
+                                   }
+                               }
                            },
                        },
                        new Review()
                        {
                            Id = 2,
-                           Text ="It's very cool"
+                           Text ="It's very cool",
+                           Author = new Author()
+                           {
+                               Name = "Phillips",
+                               Types = new []
+                               {
+                                   new AuthorType
+                                   {
+                                       Name = "Reviewer"
+                                   }
+                               }
+                           }
                        },
                        new Review()
                        {

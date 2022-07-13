@@ -1,0 +1,9 @@
+﻿{
+  "rules": [
+    {
+      "field": "Reviews.Author.Types.Name",
+      "operator": "equal",
+      "value": "Reviewer"
+    }
+  ]
+}

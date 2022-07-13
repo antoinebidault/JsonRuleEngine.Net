@@ -239,6 +239,17 @@ namespace JsonRuleEngine.Net.Tests
         }
 
 
+
+        [Fact]
+        public void DeepProps()
+        {
+            string rules = GetJsonTestFile("deepProps.json");
+            var items = FakeGameService.GetDatas();
+            var result = JsonRuleEngine.Evaluate(items.First(), rules);
+            Assert.True(result);
+        }
+
+
         [Fact]
         public void TimeSpan()
         {

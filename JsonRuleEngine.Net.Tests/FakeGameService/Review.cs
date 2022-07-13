@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace JsonRuleEngine.Net.Tests
 {
@@ -11,6 +12,12 @@ namespace JsonRuleEngine.Net.Tests
     }
 
     public class Author
+    {
+        public string Name { get; set; }
+        public IEnumerable<AuthorType> Types { get; set; }
+    }
+
+    public class AuthorType
     {
         public string Name { get; set; }
     }

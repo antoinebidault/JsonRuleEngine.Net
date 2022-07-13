@@ -299,64 +299,122 @@ namespace JsonRuleEngine.Net
                 return right;
             }
 
-            Expression property = null;
+            Expression expression = null;
 
             try
             {
                 string field = rule.Field;
-                var fields = field.Split('.');
+                var fields = field.Split('.').ToList();
                 int i = 0;
                 bool isDict = typeof(IDictionary).IsAssignableFrom(parm.Type);
-                foreach (var member in fields)
+
+                while (fields.Count > 0)
                 {
-                    i = i + member.Length + 1;
-                    if (isDict)
-                    {
-                        Expression key = Expression.Constant(member);
-                        property = Expression.Property(parm, "Item", key);
-
-                        var methodGetValue = (typeof(JsonRuleEngine)).GetMethod("GetValueOrDefault");
-
-                        property = Expression.Call(methodGetValue, parm, key);
-                    }
-                    else if (property == null)
-                    {
-                        property = Expression.Property(parm, member);
-                    }
-                    else
-                    {
-                        property = Expression.Property(property, member);
-                    }
-
-
-                    if (property.Type.IsArray())
-                    {
-                        string subField = "";
-                        try
-                        {
-                            subField = field.Substring(i, field.Length - i);
-                            if (string.IsNullOrEmpty(subField))
-                            {
-                                throw new Exception("");
-                            }
-                        }
-                        catch
-                        {
-                            throw new JsonRuleEngineException(JsonRuleEngineExceptionCategory.InvalidField, $"The array {field} does not have a subfield. e.g. {field}.Id");
-                        }
-                        right = HandleTableRule(rule, subField, rule.Value, property);
-                        return right;
-                    }
+                    expression = CompileExpression(expression, fields, isDict, parm, rule.Operator, rule.Value);
                 }
 
-
+                return expression;
             }
             catch (Exception e)
             {
                 throw new JsonRuleEngineException(JsonRuleEngineExceptionCategory.InvalidField, $"The provided field is invalid {rule.Field} : {e.Message} ");
             }
+        }
 
-            return CreateOperationExpression(property, rule.Operator, rule.Value);
+        private static Expression CompileExpression(Expression expression, List<string> remainingFields, bool isDict, Expression parm, ConditionRuleOperator op, object value)
+        {
+            var member = remainingFields.First();
+            if (isDict)
+            {
+                Expression key = Expression.Constant(member);
+                expression = Expression.Property(parm, "Item", key);
+
+                var methodGetValue = (typeof(JsonRuleEngine)).GetMethod("GetValueOrDefault");
+
+                expression = Expression.Call(methodGetValue, parm, key);
+            }
+            else if (expression == null)
+            {
+                expression = Expression.Property(parm, member);
+            }
+            else
+            {
+                expression = Expression.Property(expression, member);
+            }
+
+            if (expression.Type.IsArray())
+            {
+                return HandleTableRuleBis(expression, parm, op, value, remainingFields);
+            }
+
+            remainingFields.Remove(member);
+            if (remainingFields.Count == 0)
+            {
+                return CreateOperationExpression(expression, op, value);
+            }
+            else
+            {
+                return expression;
+            }
+        }
+
+        private static Expression HandleTableRuleBis(Expression property, Expression param, ConditionRuleOperator op, object value, List<string> remainingFields)
+        {
+            var currentField = remainingFields.First();
+            var childType = property.Type.GetGenericArguments().First();
+
+            // Contains methods
+            // Need a conversion to an array of string
+            if (op == ConditionRuleOperator.isNotEmpty ||
+                op == ConditionRuleOperator.isEmpty)
+            {
+
+                // Parsing the array
+                try
+                {
+                    remainingFields.Clear();
+
+                    var MethodAny = typeof(Enumerable).GetMethods().Single(m => m.Name == "Any" && m.GetParameters().Length == 1);
+                    var method = MethodAny.MakeGenericMethod(childType);
+
+                    var expression = Expression.Call(method, property);
+
+                    if (op == ConditionRuleOperator.isEmpty)
+                    {
+                        return Expression.Not(expression);
+                    }
+
+                    return expression;
+                }
+                catch (Exception e)
+                {
+                    throw new JsonRuleEngineException(JsonRuleEngineExceptionCategory.InvalidValue, $"The provided value is invalid : {e.Message} ");
+                }
+            }
+
+            // Set it as the param of the any expression
+            var childParam = Expression.Parameter(childType);
+            remainingFields.Remove(currentField);
+            Expression exp = null;
+            while (remainingFields.Count > 0)
+            {
+                exp = CompileExpression(exp ?? childParam, remainingFields, false, param, op, value);
+            }
+            var anyExpression = Expression.Lambda(exp, childParam);
+            MethodInfo anyMethod = null;
+
+            // In case it's a different of notEqual operator, we would like to apply the .All
+            if (op == ConditionRuleOperator.notIn || op == ConditionRuleOperator.notEqual)
+            {
+                anyMethod = typeof(Enumerable).GetMethods().Single(m => m.Name == "All" && m.GetParameters().Length == 2);
+                anyMethod = anyMethod.MakeGenericMethod(childType);
+                return Expression.Call(anyMethod, property, anyExpression);
+            }
+
+            anyMethod = typeof(Enumerable).GetMethods().Single(m => m.Name == "Any" && m.GetParameters().Length == 2);
+            anyMethod = anyMethod.MakeGenericMethod(childType);
+
+            return Expression.Call(anyMethod, property, anyExpression);
         }
 
 
@@ -478,78 +536,6 @@ namespace JsonRuleEngine.Net
             TimeSpan ts = JsonConvert.DeserializeObject<TimeSpan>(str);
             return DateTime.UtcNow.Add(ts);
         }
-
-        private static Expression HandleTableRule(ConditionRuleSet rule, string field, object value, Expression property)
-        {
-            var childType = property.Type.GetGenericArguments().First();
-
-            // Contains methods
-            // Need a conversion to an array of string
-            if (rule.Operator == ConditionRuleOperator.isNotEmpty ||
-                rule.Operator == ConditionRuleOperator.isEmpty)
-            {
-
-                // Parsing the array
-                try
-                {
-                    var MethodAny = typeof(Enumerable).GetMethods().Single(m => m.Name == "Any" && m.GetParameters().Length == 1);
-                    var method = MethodAny.MakeGenericMethod(childType);
-
-                    var expression = Expression.Call(method, property);
-
-                    if (rule.Operator == ConditionRuleOperator.isEmpty)
-                    {
-                        return Expression.Not(expression);
-                    }
-
-                    return expression;
-                }
-                catch (Exception e)
-                {
-                    throw new JsonRuleEngineException(JsonRuleEngineExceptionCategory.InvalidValue, $"The provided value is invalid : {e.Message} ");
-                }
-            }
-
-            // Set it as the param of the any expression
-            var param = Expression.Parameter(childType);
-            var anyExpression = Expression.Lambda(GetExpression(rule, param, field, value), param);
-
-            MethodInfo anyMethod = null;
-
-            // In case it's a different of notEqual operator, we would like to apply the .All
-            if (rule.Operator == ConditionRuleOperator.notIn || rule.Operator == ConditionRuleOperator.notEqual)
-            {
-                anyMethod = typeof(Enumerable).GetMethods().Single(m => m.Name == "All" && m.GetParameters().Length == 2);
-                anyMethod = anyMethod.MakeGenericMethod(childType);
-                return Expression.Call(anyMethod, property, anyExpression);
-            }
-
-            anyMethod = typeof(Enumerable).GetMethods().Single(m => m.Name == "Any" && m.GetParameters().Length == 2);
-            anyMethod = anyMethod.MakeGenericMethod(childType);
-
-            return Expression.Call(anyMethod, property, anyExpression);
-        }
-
-
-        private static Expression GetExpression(ConditionRuleSet rule, ParameterExpression param, string field, object value)
-        {
-            MemberExpression property = null;
-
-            foreach (var member in field.Split('.'))
-            {
-                if (property == null)
-                {
-                    property = Expression.Property(param, member);
-                }
-                else
-                {
-                    property = Expression.Property(property, member);
-                }
-            }
-
-            return CreateOperationExpression(property, rule.Operator, value);
-        }
-
 
 
         private static string[] ToArray(object obj)

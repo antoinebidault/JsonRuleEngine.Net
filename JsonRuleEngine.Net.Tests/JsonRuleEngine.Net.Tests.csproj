@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="TestJsons\deepProps.json" />
     <None Remove="TestJsons\enum.json" />
     <None Remove="TestJsons\listIsEmpty.json" />
     <None Remove="TestJsons\listIsNotEmpty.json" />
@@ -70,6 +71,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="TestJsons\wrongField.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestJsons\deepProps.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="TestJsons\wrongFormat.json">
