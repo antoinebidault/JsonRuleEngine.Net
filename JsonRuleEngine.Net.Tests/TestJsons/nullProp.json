@@ -1,0 +1,10 @@
+﻿{
+  "separator": "And",
+  "rules": [
+    {
+      "field": "Stock",
+      "operator": "equal",
+      "value": 1
+    }
+  ]
+}

@@ -12,10 +12,14 @@
     <None Remove="TestJsons\listIsNotEmpty.json" />
     <None Remove="TestJsons\listNotInAlt.json" />
     <None Remove="TestJsons\notEqualList.json" />
+    <None Remove="TestJsons\nullProp.json" />
     <None Remove="TestJsons\timespan.json" />
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="TestJsons\nullProp.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="TestJsons\timespan.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

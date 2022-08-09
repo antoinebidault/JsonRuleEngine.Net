@@ -11,6 +11,7 @@ namespace JsonRuleEngine.Net.Tests
         public GameType Type { get; set; } = GameType.Action;
         public string Name { get; set; }
         public double Price { get; set; }
+        public int? Stock { get; set; }
         public string Category { get; set; } = "Action";
         public Editor Editor { get; set; } = new Editor();
         public IEnumerable<Review> Reviews { get; set; } = new List<Review>();

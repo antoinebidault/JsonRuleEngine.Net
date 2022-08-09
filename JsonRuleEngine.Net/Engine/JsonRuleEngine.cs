@@ -422,7 +422,7 @@ namespace JsonRuleEngine.Net
         /// Apply the con
         /// </summary>
         /// <returns></returns>
-        private static Expression CreateOperationExpression(Expression property, ConditionRuleOperator op, object value)
+        private static Expression CreateOperationExpression(Expression inputProperty, ConditionRuleOperator op, object value)
         {
             Expression expression = null;
 
@@ -435,15 +435,15 @@ namespace JsonRuleEngine.Net
                 // Parsing the array
                 try
                 {
-                    var listType = typeof(IEnumerable<>).MakeGenericType(property.Type);
+                    var listType = typeof(IEnumerable<>).MakeGenericType(inputProperty.Type);
                     var array = ((JArray)value).ToObject(listType);
                     MethodInfo method = null;
-                    method = MethodContains.MakeGenericMethod(property.Type);
+                    method = MethodContains.MakeGenericMethod(inputProperty.Type);
 
                     expression = Expression.Call(
                         method,
                         Expression.Constant(array),
-                         property);
+                         inputProperty);
 
                     if (op == ConditionRuleOperator.notIn)
                     {
@@ -460,17 +460,22 @@ namespace JsonRuleEngine.Net
             }
 
 
+            var property = inputProperty;
 
             // It's a bit tricky behaviour
             // If it's a nullable prop, scope to the .Value of the prop just if not a isNull operator
-            if (property.Type.IsNullable() &&
+            var addNotNullCondition = false;
+            if (inputProperty.Type.IsNullable() &&
                 (op != ConditionRuleOperator.isNotNull &&
                 op != ConditionRuleOperator.isNull))
             {
-                property = Expression.Property(property, "Value");
+                addNotNullCondition = true;
+                var method = inputProperty.Type.GetMethods().FirstOrDefault(m => m.Name == "GetValueOrDefault" && m.IsPublic);
+                //  property = Expression.Property(inputProperty, "Value");
+               property = Expression.Call(inputProperty, method);
             }
 
-
+            // Specific case of TimeSpan Stored as "\00:22:00"\""
             if (value != null)
             {
                 var valueType = value.GetType();
@@ -526,6 +531,11 @@ namespace JsonRuleEngine.Net
             {
                 MethodInfo method = typeof(string).GetMethod("Contains", new[] { typeof(string) });
                 expression = Expression.Not(Expression.Call(property, method, toCompare));
+            }
+
+            if (addNotNullCondition)
+            {
+                expression = Expression.And(Expression.Property(inputProperty, "HasValue"), expression);
             }
 
             return expression;
