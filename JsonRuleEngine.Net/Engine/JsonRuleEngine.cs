@@ -462,6 +462,18 @@ namespace JsonRuleEngine.Net
 
             var property = inputProperty;
 
+
+            // Specific case of TimeSpan Stored as "\00:22:00"\""
+            if (value != null)
+            {
+                var valueType = value.GetType();
+                if ((property.Type == typeof(DateTime) || (property.Type == typeof(DateTime?)) && valueType == typeof(string) && value.ToString().StartsWith("\"")))
+                {
+                    value = ParseDate(value.ToString());
+                }
+            }
+
+
             // It's a bit tricky behaviour
             // If it's a nullable prop, scope to the .Value of the prop just if not a isNull operator
             var addNotNullCondition = false;
@@ -469,20 +481,9 @@ namespace JsonRuleEngine.Net
                 (op != ConditionRuleOperator.isNotNull &&
                 op != ConditionRuleOperator.isNull))
             {
-                addNotNullCondition = true;
-                var method = inputProperty.Type.GetMethods().FirstOrDefault(m => m.Name == "GetValueOrDefault" && m.IsPublic);
-                //  property = Expression.Property(inputProperty, "Value");
-               property = Expression.Call(inputProperty, method);
-            }
-
-            // Specific case of TimeSpan Stored as "\00:22:00"\""
-            if (value != null)
-            {
-                var valueType = value.GetType();
-                if (property.Type == typeof(DateTime) && valueType == typeof(string) && value.ToString().StartsWith("\""))
-                {
-                    value = ParseDate(value.ToString());
-                }
+                //  addNotNullCondition = true;
+                property = Expression.Coalesce(inputProperty, Expression.Constant(Activator.CreateInstance(Nullable.GetUnderlyingType(inputProperty.Type))));
+                // property = Expression.Call(inputProperty, method);
             }
 
             value = property.Type.GetValue(value);
@@ -540,6 +541,7 @@ namespace JsonRuleEngine.Net
 
             return expression;
         }
+
 
         private static DateTime ParseDate(string str)
         {
