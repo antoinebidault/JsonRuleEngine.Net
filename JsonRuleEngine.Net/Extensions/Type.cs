@@ -31,7 +31,7 @@ namespace JsonRuleEngine.Net
                 if (type == typeof(DateTime?))
                 {
                     DateTime? output = null;
-                    if (value != null || value.ToString() != "")
+                    if (value != null && value.ToString() != "")
                     {
                         output = DateTime.Parse(value.ToString());
                     }

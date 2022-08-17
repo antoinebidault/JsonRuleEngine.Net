@@ -197,6 +197,16 @@ namespace JsonRuleEngine.Net.Tests
             Assert.True(list.All(m => m.Stock == null));
         }
 
+
+        [Fact]
+        public void NullPropIsNull()
+        {
+            List<Game> list = Test("nullPropIsNull.json");
+
+            Assert.NotEmpty(list);
+            Assert.True(list.All(m => m.Stock == null));
+        }
+
         [Fact]
         public void ListIsEmpty()
         {

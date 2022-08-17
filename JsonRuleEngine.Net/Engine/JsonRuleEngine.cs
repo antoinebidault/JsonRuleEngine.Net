@@ -493,11 +493,25 @@ namespace JsonRuleEngine.Net
 
             if (op == ConditionRuleOperator.isNull)
             {
-                expression = Expression.Equal(property, Expression.Default(property.Type));
+                if (inputProperty.Type.IsNullable())
+                {
+                    expression = Expression.Not(Expression.Property(property, "HasValue"));
+                }
+                else
+                {
+                    expression = Expression.Equal(property, Expression.Default(property.Type));
+                }
             }
             else if (op == ConditionRuleOperator.isNotNull)
             {
-                expression = Expression.NotEqual(property, Expression.Default(property.Type));
+                if (inputProperty.Type.IsNullable())
+                {
+                    expression = Expression.Property(property, "HasValue");
+                }
+                else
+                {
+                    expression = Expression.NotEqual(property, Expression.Default(property.Type));
+                }
             }
             else if (op == ConditionRuleOperator.equal)
             {
