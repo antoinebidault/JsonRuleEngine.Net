@@ -13,11 +13,19 @@
     <None Remove="TestJsons\listNotInAlt.json" />
     <None Remove="TestJsons\notEqualList.json" />
     <None Remove="TestJsons\nullProp.json" />
+    <None Remove="TestJsons\nullPropIsEqual.json" />
     <None Remove="TestJsons\nullPropIsNull.json" />
+    <None Remove="TestJsons\nullPropNullableEnum.json" />
     <None Remove="TestJsons\timespan.json" />
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="TestJsons\nullPropIsEqual.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestJsons\nullPropNullableEnum.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="TestJsons\nullPropIsNull.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

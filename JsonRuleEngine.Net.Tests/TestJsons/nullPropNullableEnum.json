@@ -1,0 +1,10 @@
+﻿{
+  "separator": "And",
+  "rules": [
+    {
+      "field": "State",
+      "operator": "equal",
+      "value": "New"
+    }
+  ]
+}

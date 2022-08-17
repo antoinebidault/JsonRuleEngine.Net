@@ -9,6 +9,7 @@ namespace JsonRuleEngine.Net.Tests
         public bool BoolValue { get; set; }
         public DateTime? Date { get; set; } = DateTime.UtcNow;
         public GameType Type { get; set; } = GameType.Action;
+        public GameState? State { get; set; } 
         public string Name { get; set; }
         public double Price { get; set; }
         public int? Stock { get; set; }
@@ -22,6 +23,13 @@ namespace JsonRuleEngine.Net.Tests
         Action,
         RPG,
         CityBuilder
+    }
+
+    public enum GameState
+    {
+        New,
+        Active,
+        Removed
     }
 }
 

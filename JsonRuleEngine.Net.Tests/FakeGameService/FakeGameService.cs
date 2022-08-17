@@ -16,6 +16,8 @@ namespace JsonRuleEngine.Net.Tests
                 {
                     Name= "Assassin's creed",
                     Price = 45.3,
+                    Stock = 1,
+                    State = GameState.New,
                     Category = "Adventure",
                     BoolValue = true,
                     Date =new DateTime(2021,1,1),

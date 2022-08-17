@@ -275,6 +275,12 @@ namespace JsonRuleEngine.Net
             return left;
         }
 
+        /// <summary>
+        /// Do not delete !
+        /// </summary>
+        /// <param name="dictionary"></param>
+        /// <param name="key"></param>
+        /// <returns></returns>
         public static string GetValueOrDefault(IDictionary dictionary, string key)
         {
             if (dictionary.Contains(key))
@@ -474,22 +480,19 @@ namespace JsonRuleEngine.Net
             }
 
 
-            // It's a bit tricky behaviour
-            // If it's a nullable prop, scope to the .Value of the prop just if not a isNull operator
-            var addNotNullCondition = false;
-            if (inputProperty.Type.IsNullable() &&
-                (op != ConditionRuleOperator.isNotNull &&
-                op != ConditionRuleOperator.isNull))
+            if (value != null && inputProperty.Type.IsNullable())
             {
-                //  addNotNullCondition = true;
-                property = Expression.Coalesce(inputProperty, Expression.Constant(Activator.CreateInstance(Nullable.GetUnderlyingType(inputProperty.Type))));
-                // property = Expression.Call(inputProperty, method);
+                value = Nullable.GetUnderlyingType(inputProperty.Type).GetValue(value);
+            }
+            else { 
+                value = property.Type.GetValue(value);
             }
 
-            value = property.Type.GetValue(value);
-            var toCompare = Expression.Constant(value);
-
-
+            Expression toCompare = Expression.Constant(value);
+            if (toCompare.Type != inputProperty.Type)
+            {
+                toCompare = Expression.Convert(Expression.Constant(value), inputProperty.Type);
+            }
 
             if (op == ConditionRuleOperator.isNull)
             {
@@ -546,11 +549,6 @@ namespace JsonRuleEngine.Net
             {
                 MethodInfo method = typeof(string).GetMethod("Contains", new[] { typeof(string) });
                 expression = Expression.Not(Expression.Call(property, method, toCompare));
-            }
-
-            if (addNotNullCondition)
-            {
-                expression = Expression.And(Expression.Property(inputProperty, "HasValue"), expression);
             }
 
             return expression;
