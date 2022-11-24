@@ -342,7 +342,7 @@ namespace JsonRuleEngine.Net
             if (JsonRuleEngine.CustomPropertyAccessor != null)
             {
                 expression = JsonRuleEngine.CustomPropertyAccessor.Invoke(value, memberName, inputParam);
-                if (expression == null)
+                if (expression != null)
                 {
                     return expression;
                 }
@@ -351,7 +351,7 @@ namespace JsonRuleEngine.Net
             if (isDict)
             {
                 Expression key = Expression.Constant(memberName);
-                expression = Expression.Property(inputParam, "Item", key);
+                //  expression = Expression.Property(inputParam, "Item", key);
 
                 var methodGetValue = (typeof(JsonRuleEngine)).GetMethod("GetValueOrDefault");
 
