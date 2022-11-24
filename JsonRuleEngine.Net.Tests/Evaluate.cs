@@ -1,15 +1,35 @@
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
 using Xunit;
 
 namespace JsonRuleEngine.Net.Tests
 {
+    public static class JH
+    {
+        // Than define your function
+        [DbFunction("CodeFirstDatabaseSchema", "JSON_VALUE")]
+        public static string JsonValue(string expression, string path)
+        {
+            throw new NotSupportedException();
+        }
+    }
     public partial class BaseTests
     {
-
+        [Fact]
+        public void Dictionary_CustomPropertyAccessor()
+        {
+            var dict = new Dictionary<string, object>() {
+                {"1234", "ok" },
+                {"1235", "ok2" }
+            };
+            bool result = JsonRuleEngine.Evaluate(dict, new ConditionRuleSet() { Field = "1234", Operator = ConditionRuleOperator.equal, Value = "ok" });
+            Assert.True(result);
+        }
 
         [Fact]
         public void Dictionary()

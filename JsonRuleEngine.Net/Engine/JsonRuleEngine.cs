@@ -327,33 +327,51 @@ namespace JsonRuleEngine.Net
             }
         }
 
-        private static Expression CompileExpression(Expression expression, List<string> remainingFields, bool isDict, Expression parm, ConditionRuleOperator op, object value)
+        /// <summary>
+        /// You can setup here a custom property accessor
+        /// For example, for using library like https://github.com/iozcelik/EntityFrameworkCore.SqlServer.JsonExtention
+        /// (string fieldName, inputPara) => {  EF.Functions.JsonValue(w.ExtraInformation, "InternetTLD") }
+        /// </summary>
+        /// <return>Expresssion</return>
+        public static Func<string, Expression, Expression> CustomPropertyAccessor { get; set; }
+
+        private static Expression CompileExpression(Expression expression, List<string> remainingFields, bool isDict, Expression inputParam, ConditionRuleOperator op, object value)
         {
-            var member = remainingFields.First();
+            string memberName = remainingFields.First();
+
+            if (JsonRuleEngine.CustomPropertyAccessor != null)
+            {
+                expression = JsonRuleEngine.CustomPropertyAccessor.Invoke(memberName, inputParam);
+                if (expression == null)
+                {
+                    return expression;
+                }
+            }
+
             if (isDict)
             {
-                Expression key = Expression.Constant(member);
-                expression = Expression.Property(parm, "Item", key);
+                Expression key = Expression.Constant(memberName);
+                expression = Expression.Property(inputParam, "Item", key);
 
                 var methodGetValue = (typeof(JsonRuleEngine)).GetMethod("GetValueOrDefault");
 
-                expression = Expression.Call(methodGetValue, parm, key);
+                expression = Expression.Call(methodGetValue, inputParam, key);
             }
             else if (expression == null)
             {
-                expression = Expression.Property(parm, member);
+                expression = Expression.Property(inputParam, memberName);
             }
             else
             {
-                expression = Expression.Property(expression, member);
+                expression = Expression.Property(expression, memberName);
             }
 
             if (expression.Type.IsArray())
             {
-                return HandleTableRuleBis(expression, parm, op, value, remainingFields);
+                return HandleTableRule(expression, inputParam, op, value, remainingFields);
             }
 
-            remainingFields.Remove(member);
+            remainingFields.Remove(memberName);
             if (remainingFields.Count == 0)
             {
                 return CreateOperationExpression(expression, op, value);
@@ -364,7 +382,18 @@ namespace JsonRuleEngine.Net
             }
         }
 
-        private static Expression HandleTableRuleBis(Expression property, Expression param, ConditionRuleOperator op, object value, List<string> remainingFields)
+
+        /// <summary>
+        /// Handle table rule
+        /// </summary>
+        /// <param name="property"></param>
+        /// <param name="param"></param>
+        /// <param name="op"></param>
+        /// <param name="value"></param>
+        /// <param name="remainingFields"></param>
+        /// <returns></returns>
+        /// <exception cref="JsonRuleEngineException"></exception>
+        private static Expression HandleTableRule(Expression property, Expression param, ConditionRuleOperator op, object value, List<string> remainingFields)
         {
             var currentField = remainingFields.First();
             var childType = property.Type.GetGenericArguments().First();
@@ -425,9 +454,13 @@ namespace JsonRuleEngine.Net
 
 
         /// <summary>
-        /// Apply the con
+        /// Create an operation expression from the input prop to value
         /// </summary>
+        /// <param name="inputProperty"></param>
+        /// <param name="op"></param>
+        /// <param name="value"></param>
         /// <returns></returns>
+        /// <exception cref="JsonRuleEngineException"></exception>
         private static Expression CreateOperationExpression(Expression inputProperty, ConditionRuleOperator op, object value)
         {
             Expression expression = null;

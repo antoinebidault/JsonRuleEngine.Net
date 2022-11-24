@@ -12,7 +12,7 @@ We are using it in production in the [Dastra](https://www.dastra.eu) complex tab
 
 # Purpose
 
-In some case you'll need to store some complex conditions objects in database. The purpose of this library is to provide a simple way to store and transform to linq Expression tree nested conditional rules stored in a simple json format. in database, filesystem... You'll be able to evaluate it as a Linq Expression and use it for applying filters in Entity Framework.
+In some case you'll need to store some complex conditions objects in database. The purpose of this library is to provide a simple way to store and transform to linq Expression tree nested conditional rules stored in a simple json format you can save in database, filesystem... Out of the box, you'll be able to evaluate it as a Linq Expression and use it for applying filters in Entity Framework.
 
 # Json format of queries
 
