@@ -1,0 +1,10 @@
+﻿{
+  "separator": "And",
+  "rules": [
+    {
+      "field": "Reviews.Text",
+      "operator": "equal",
+      "value": "It's cool"
+    }
+  ]
+}

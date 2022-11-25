@@ -339,12 +339,13 @@ namespace JsonRuleEngine.Net
         {
             string memberName = remainingFields.First();
 
+            // If a custom accessor is set
             if (JsonRuleEngine.CustomPropertyAccessor != null)
             {
-                expression = JsonRuleEngine.CustomPropertyAccessor.Invoke(expression, memberName, inputParam);
-                if (expression != null)
+                var tmpExpression = JsonRuleEngine.CustomPropertyAccessor.Invoke(expression, memberName, inputParam);
+                if (tmpExpression != null)
                 {
-                    return expression;
+                    return tmpExpression;
                 }
             }
 
