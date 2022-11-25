@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -9,27 +10,66 @@ using Xunit;
 
 namespace JsonRuleEngine.Net.Tests
 {
-    public static class JH
-    {
-        // Than define your function
-        [DbFunction("CodeFirstDatabaseSchema", "JSON_VALUE")]
-        public static string JsonValue(string expression, string path)
-        {
-            throw new NotSupportedException();
-        }
-    }
     public partial class BaseTests
     {
+
+
         [Fact]
         public void Dictionary_CustomPropertyAccessor()
         {
-            var dict = new Dictionary<string, object>() {
-                {"1234", "ok" },
-                {"1235", "ok2" }
+            var game = new Game()
+            {
+                Id = System.Guid.NewGuid(),
+                CustomFields = new Dictionary<string, object>()
+                {
+                    {"testSuccess","success" },
+                    {"test2","failure" }
+                },
+                Reviews = new[]
+                {
+                    new Review()
+                    {
+                        Text = "Test"
+                    }
+                }
             };
-            bool result = JsonRuleEngine.Evaluate(dict, new ConditionRuleSet() { Field = "1234", Operator = ConditionRuleOperator.equal, Value = "ok" });
-            Assert.True(result);
+
+            bool setDic = false;
+            JsonRuleEngine.CustomPropertyAccessor = (exp, fieldName, value) =>
+            {
+                if (exp != null && exp.Type == typeof(Dictionary<string, object>))
+                {
+                    setDic = true;
+                    Expression key = Expression.Constant(fieldName);
+                    var methodGetValue = (typeof(BaseTests)).GetMethod("GetValueOrDefault");
+                    return Expression.Call(methodGetValue, exp, key);
+                }
+
+                return null;
+            };
+
+
+
+            bool resultSuccess = JsonRuleEngine.Evaluate(game, new ConditionRuleSet() { Field = "CustomFields.testSuccess", Operator = ConditionRuleOperator.equal, Value = "success" });
+            Assert.True(resultSuccess);
+
+            bool resultFailure= JsonRuleEngine.Evaluate(game, new ConditionRuleSet() { Field = "CustomFields.testFailure", Operator = ConditionRuleOperator.equal, Value = "success" });
+            Assert.False(resultFailure);
+
+            JsonRuleEngine.CustomPropertyAccessor = null;
+
+            Assert.True(setDic);
         }
+
+        public static string GetValueOrDefault(Dictionary<string,object> dictionary, string key)
+        {
+            if (dictionary.ContainsKey(key))
+            {
+                return dictionary[key]?.ToString();
+            }
+            return null;
+        }
+
 
         [Fact]
         public void Dictionary()
@@ -235,7 +275,8 @@ namespace JsonRuleEngine.Net.Tests
             Assert.True(list.Count(m => m.Stock == 1) == 1);
         }
         [Fact]
-        public void NullPropNullableEnum() { 
+        public void NullPropNullableEnum()
+        {
             List<Game> list = Test("nullPropNullableEnum.json");
 
             Assert.True(list.Count() == 1);

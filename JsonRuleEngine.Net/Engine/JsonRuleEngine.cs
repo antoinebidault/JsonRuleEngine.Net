@@ -345,15 +345,14 @@ namespace JsonRuleEngine.Net
                 var tmpExpression = JsonRuleEngine.CustomPropertyAccessor.Invoke(expression, memberName, inputParam);
                 if (tmpExpression != null)
                 {
-                    return tmpExpression;
+                    remainingFields.Remove(memberName);
+                    return CreateOperationExpression(tmpExpression, op, value);
                 }
             }
 
             if (isDict)
             {
                 Expression key = Expression.Constant(memberName);
-                //  expression = Expression.Property(inputParam, "Item", key);
-
                 var methodGetValue = (typeof(JsonRuleEngine)).GetMethod("GetValueOrDefault");
 
                 expression = Expression.Call(methodGetValue, inputParam, key);
@@ -396,6 +395,7 @@ namespace JsonRuleEngine.Net
         /// <exception cref="JsonRuleEngineException"></exception>
         private static Expression HandleTableRule(Expression property, Expression param, ConditionRuleOperator op, object value, List<string> remainingFields)
         {
+
             var currentField = remainingFields.First();
             var childType = property.Type.GetGenericArguments().First();
 

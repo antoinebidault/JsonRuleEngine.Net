@@ -15,6 +15,7 @@ namespace JsonRuleEngine.Net.Tests
         public int? Stock { get; set; }
         public string Category { get; set; } = "Action";
         public Editor Editor { get; set; } = new Editor();
+        public Dictionary<string, object> CustomFields { get; set; } = new Dictionary<string, object>();
         public IEnumerable<Review> Reviews { get; set; } = new List<Review>();
     }
 

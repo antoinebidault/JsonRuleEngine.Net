@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
@@ -14,7 +15,15 @@ namespace JsonRuleEngine.Net
 
         internal static bool IsArray(this Type type)
         {
-            return type != typeof(string) && typeof(IEnumerable).IsAssignableFrom(type);
+            return type != typeof(string) &&
+                    type.IsGenericType &&
+                    !type.IsDictionary() &&
+                    typeof(IEnumerable).IsAssignableFrom(type);
+        }
+
+        public static bool IsDictionary(this Type type)
+        {
+            return (type.GetGenericTypeDefinition().IsAssignableFrom(typeof(IDictionary<,>)) || type.GetGenericTypeDefinition().IsAssignableFrom(typeof(Dictionary<,>)));
         }
 
         public static bool IsNullableEnum(this Type t)
