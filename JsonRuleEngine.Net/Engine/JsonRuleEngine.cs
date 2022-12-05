@@ -333,7 +333,7 @@ namespace JsonRuleEngine.Net
         /// (string fieldName, inputPara) => {  EF.Functions.JsonValue(w.ExtraInformation, "InternetTLD") }
         /// </summary>
         /// <return>Expresssion</return>
-        public static Func<Expression, string, Expression, Expression> CustomPropertyAccessor { get; set; }
+        public static Func<PropertyAccessorContext, Expression> CustomPropertyAccessor { get; set; }
 
         private static Expression CompileExpression(Expression expression, List<string> remainingFields, bool isDict, Expression inputParam, ConditionRuleOperator op, object value)
         {
@@ -342,7 +342,13 @@ namespace JsonRuleEngine.Net
             // If a custom accessor is set
             if (JsonRuleEngine.CustomPropertyAccessor != null)
             {
-                var tmpExpression = JsonRuleEngine.CustomPropertyAccessor.Invoke(expression, memberName, inputParam);
+                var tmpExpression = JsonRuleEngine.CustomPropertyAccessor.Invoke(new PropertyAccessorContext()
+                {
+                    ValueCompared = value,
+                    MemberName = memberName,
+                    Expression = expression,
+                    InputParam = inputParam
+                });
                 if (tmpExpression != null)
                 {
                     remainingFields.Remove(memberName);
@@ -518,7 +524,8 @@ namespace JsonRuleEngine.Net
             {
                 value = Nullable.GetUnderlyingType(inputProperty.Type).GetValue(value);
             }
-            else { 
+            else
+            {
                 value = property.Type.GetValue(value);
             }
 

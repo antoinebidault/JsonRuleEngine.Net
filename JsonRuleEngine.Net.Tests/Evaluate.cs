@@ -35,8 +35,10 @@ namespace JsonRuleEngine.Net.Tests
             };
 
             bool setDic = false;
-            JsonRuleEngine.CustomPropertyAccessor = (exp, fieldName, value) =>
+            JsonRuleEngine.CustomPropertyAccessor = (ctx) =>
             {
+                var exp = ctx.Expression;
+                var fieldName = ctx.MemberName;
                 if (exp != null && exp.Type == typeof(Dictionary<string, object>))
                 {
                     setDic = true;
@@ -47,8 +49,6 @@ namespace JsonRuleEngine.Net.Tests
 
                 return null;
             };
-
-
 
             bool resultSuccess = JsonRuleEngine.Evaluate(game, new ConditionRuleSet() { Field = "CustomFields.testSuccess", Operator = ConditionRuleOperator.equal, Value = "success" });
             Assert.True(resultSuccess);
