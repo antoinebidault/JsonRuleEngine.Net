@@ -507,6 +507,8 @@ namespace JsonRuleEngine.Net
 
 
             var property = inputProperty;
+            bool isMethodCall = property is MethodCallExpression;
+
 
 
             // Specific case of TimeSpan Stored as "\00:22:00"\""
@@ -537,7 +539,7 @@ namespace JsonRuleEngine.Net
 
             if (op == ConditionRuleOperator.isNull)
             {
-                if (inputProperty.Type.IsNullable())
+                if (!isMethodCall && inputProperty.Type.IsNullable())
                 {
                     expression = Expression.Not(Expression.Property(property, "HasValue"));
                 }
@@ -548,7 +550,7 @@ namespace JsonRuleEngine.Net
             }
             else if (op == ConditionRuleOperator.isNotNull)
             {
-                if (inputProperty.Type.IsNullable())
+                if (!isMethodCall && inputProperty.Type.IsNullable())
                 {
                     expression = Expression.Property(property, "HasValue");
                 }

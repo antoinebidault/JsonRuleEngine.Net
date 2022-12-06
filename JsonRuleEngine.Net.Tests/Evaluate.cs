@@ -23,7 +23,8 @@ namespace JsonRuleEngine.Net.Tests
                 CustomFields = new Dictionary<string, object>()
                 {
                     {"testSuccess","success" },
-                    {"test2","failure" }
+                    {"test2","failure" },
+                    {"testNull",null }
                 },
                 Reviews = new[]
                 {
@@ -55,6 +56,15 @@ namespace JsonRuleEngine.Net.Tests
 
             bool resultFailure= JsonRuleEngine.Evaluate(game, new ConditionRuleSet() { Field = "CustomFields.testFailure", Operator = ConditionRuleOperator.equal, Value = "success" });
             Assert.False(resultFailure);
+
+
+            bool resultNull = JsonRuleEngine.Evaluate(game, new ConditionRuleSet() { Field = "CustomFields.testNull", Operator = ConditionRuleOperator.isNull });
+            Assert.True(resultNull);
+
+
+            bool resultNotNull = JsonRuleEngine.Evaluate(game, new ConditionRuleSet() { Field = "CustomFields.testSuccess", Operator = ConditionRuleOperator.isNotNull });
+            Assert.True(resultNotNull);
+
 
             JsonRuleEngine.CustomPropertyAccessor = null;
 
