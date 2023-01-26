@@ -8,6 +8,7 @@ namespace JsonRuleEngine.Net.Tests
         public Guid Id { get; set; } = Guid.NewGuid();
         public bool BoolValue { get; set; }
         public DateTime? Date { get; set; } = DateTime.UtcNow;
+        public DateTime DateCreation { get; set; } = DateTime.UtcNow;
         public GameType Type { get; set; } = GameType.Action;
         public GameState? State { get; set; } 
         public string Name { get; set; }

@@ -515,7 +515,7 @@ namespace JsonRuleEngine.Net
             if (value != null)
             {
                 var valueType = value.GetType();
-                if ((property.Type == typeof(DateTime) || (property.Type == typeof(DateTime?)) && valueType == typeof(string) && value.ToString().StartsWith("\"")))
+                if (((property.Type == typeof(DateTime) || (property.Type == typeof(DateTime?))) && valueType == typeof(string) && value.ToString().StartsWith("\"")))
                 {
                     value = ParseDate(value.ToString());
                 }

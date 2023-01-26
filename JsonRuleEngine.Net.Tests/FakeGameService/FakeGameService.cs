@@ -21,6 +21,7 @@ namespace JsonRuleEngine.Net.Tests
                     Category = "Adventure",
                     BoolValue = true,
                     Date =new DateTime(2021,1,1),
+                    DateCreation =new DateTime(2021,1,1),
                     Type = GameType.RPG,
                     Editor = new Editor()
                     {
@@ -78,6 +79,7 @@ namespace JsonRuleEngine.Net.Tests
                     Type = GameType.RPG,
                     Price = 23.3,
                     Date =new DateTime(2021,1,12),
+                    DateCreation =new DateTime(2021,1,22),
                     Reviews = new List<Review>{}
                 },
                  new Game()

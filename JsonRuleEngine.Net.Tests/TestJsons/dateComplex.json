@@ -7,14 +7,14 @@
     {
       "separator": null,
       "operator": "greaterThanInclusive",
-      "field": "Date",
+      "field": "DateCreation",
       "value": "2021-01-01T00:00:00",
       "rules": null
     },
     {
       "separator": null,
       "operator": "lessThanInclusive",
-      "field": "Date",
+      "field": "DateCreation",
       "value": "2021-01-26T23:59:59",
       "rules": null
     }
