@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="TestJsons\dateComplex.json" />
     <None Remove="TestJsons\deepProps.json" />
     <None Remove="TestJsons\enum.json" />
     <None Remove="TestJsons\listEqual.json" />
@@ -19,7 +20,6 @@
     <None Remove="TestJsons\nullPropNullableEnum.json" />
     <None Remove="TestJsons\timespan.json" />
   </ItemGroup>
-
   <ItemGroup>
     <Content Include="TestJsons\listEqual.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -111,6 +111,9 @@
     <Content Include="TestJsons\complexReturn.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+	  <Content Include="TestJsons\dateComplex.json">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Content>
   </ItemGroup>
 
   <ItemGroup>

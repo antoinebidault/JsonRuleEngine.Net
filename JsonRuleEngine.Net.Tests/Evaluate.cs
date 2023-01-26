@@ -351,6 +351,16 @@ namespace JsonRuleEngine.Net.Tests
             Assert.True(result);
         }
 
+        [Fact]
+        public void DateComplex()
+        {
+            string rules = GetJsonTestFile("dateComplex.json");
+
+            var items = FakeGameService.GetDatas();
+            bool result = JsonRuleEngine.Evaluate(items.First(), rules);
+            Assert.True(result);
+        }
+
 
 
         [Fact]

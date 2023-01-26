@@ -9,7 +9,7 @@
     {
       "field": "Date",
       "operator": "lessThan",
-      "value": "2021-01-02"
+      "value": "2021-01-26T23:12:01"
     }
   ]
 }
