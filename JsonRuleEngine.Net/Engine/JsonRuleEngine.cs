@@ -392,18 +392,18 @@ namespace JsonRuleEngine.Net
         /// <summary>
         /// Handle table rule
         /// </summary>
-        /// <param name="property"></param>
+        /// <param name="array"></param>
         /// <param name="param"></param>
         /// <param name="op"></param>
         /// <param name="value"></param>
         /// <param name="remainingFields"></param>
         /// <returns></returns>
         /// <exception cref="JsonRuleEngineException"></exception>
-        private static Expression HandleTableRule(Expression property, Expression param, ConditionRuleOperator op, object value, List<string> remainingFields)
+        private static Expression HandleTableRule(Expression array, Expression param, ConditionRuleOperator op, object value, List<string> remainingFields)
         {
 
             var currentField = remainingFields.First();
-            var childType = property.Type.GetGenericArguments().First();
+            var childType = array.Type.GetGenericArguments().First();
 
             // Contains methods
             // Need a conversion to an array of string
@@ -419,14 +419,14 @@ namespace JsonRuleEngine.Net
                     var MethodAny = typeof(Enumerable).GetMethods().Single(m => m.Name == "Any" && m.GetParameters().Length == 1);
                     var method = MethodAny.MakeGenericMethod(childType);
 
-                    var expression = Expression.Call(method, property);
+                    var expression = Expression.Call(method, array);
 
                     if (op == ConditionRuleOperator.isEmpty)
                     {
-                        return Expression.Not(expression);
+                        return Expression.AndAlso(Expression.NotEqual(array, Expression.Constant(null)), Expression.Not(expression));
                     }
 
-                    return expression;
+                    return Expression.AndAlso(Expression.NotEqual(array, Expression.Constant(null)), expression);
                 }
                 catch (Exception e)
                 {
@@ -450,13 +450,13 @@ namespace JsonRuleEngine.Net
             {
                 anyMethod = typeof(Enumerable).GetMethods().Single(m => m.Name == "All" && m.GetParameters().Length == 2);
                 anyMethod = anyMethod.MakeGenericMethod(childType);
-                return Expression.Call(anyMethod, property, anyExpression);
+                return Expression.Call(anyMethod, array, anyExpression);
             }
 
             anyMethod = typeof(Enumerable).GetMethods().Single(m => m.Name == "Any" && m.GetParameters().Length == 2);
             anyMethod = anyMethod.MakeGenericMethod(childType);
 
-            return Expression.Call(anyMethod, property, anyExpression);
+            return Expression.AndAlso( Expression.NotEqual(array, Expression.Constant(null)), Expression.Call(anyMethod, array, anyExpression));
         }
 
 

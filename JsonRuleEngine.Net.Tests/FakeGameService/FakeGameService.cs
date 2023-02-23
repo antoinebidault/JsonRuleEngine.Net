@@ -88,7 +88,7 @@ namespace JsonRuleEngine.Net.Tests
                     Type = GameType.RPG,
                     Price = 22,
                     Date =new DateTime(2021,1,11),
-                    Reviews = new List<Review>{}
+                    Reviews = null
                 },
                  new Game()
                 {
