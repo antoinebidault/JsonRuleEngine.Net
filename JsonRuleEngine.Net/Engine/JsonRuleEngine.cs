@@ -290,6 +290,15 @@ namespace JsonRuleEngine.Net
             return null;
         }
 
+        public static T GetValueOrDefaultObject<T>(Dictionary<string,object> dictionary, string key)
+        {
+            if (dictionary.ContainsKey(key))
+            {
+                return (T)dictionary[key];
+            }
+            return default(T);
+        }
+
         private static Expression CreateRuleExpression<T>(ConditionRuleSet rule, ParameterExpression parm)
         {
             Expression right = null;
@@ -311,12 +320,11 @@ namespace JsonRuleEngine.Net
             {
                 string field = rule.Field;
                 var fields = field.Split('.').ToList();
-                int i = 0;
                 bool isDict = typeof(IDictionary).IsAssignableFrom(parm.Type);
 
                 while (fields.Count > 0)
                 {
-                    expression = CompileExpression(expression, fields, isDict, parm, rule.Operator, rule.Value);
+                    expression = CompileExpression(expression ?? parm, fields, isDict, parm, rule.Operator, rule.Value);
                 }
 
                 return expression;
@@ -356,7 +364,13 @@ namespace JsonRuleEngine.Net
                 }
             }
 
-            if (isDict)
+            if (expression != null && typeof(Dictionary<string, object>).IsAssignableFrom(expression.Type))
+            {
+                Expression key = Expression.Constant(memberName);
+                var methodGetValue = (typeof(JsonRuleEngine)).GetMethod("GetValueOrDefaultObject").MakeGenericMethod(value?.GetType() ?? typeof(string));
+                expression = Expression.Call(methodGetValue, expression, key);
+            }
+            else if (isDict)
             {
                 Expression key = Expression.Constant(memberName);
                 var methodGetValue = (typeof(JsonRuleEngine)).GetMethod("GetValueOrDefault");
@@ -371,6 +385,8 @@ namespace JsonRuleEngine.Net
             {
                 expression = Expression.Property(expression, memberName);
             }
+
+    
 
             if (expression.Type.IsArray())
             {
@@ -456,7 +472,7 @@ namespace JsonRuleEngine.Net
             anyMethod = typeof(Enumerable).GetMethods().Single(m => m.Name == "Any" && m.GetParameters().Length == 2);
             anyMethod = anyMethod.MakeGenericMethod(childType);
 
-            return Expression.AndAlso( Expression.NotEqual(array, Expression.Constant(null)), Expression.Call(anyMethod, array, anyExpression));
+            return Expression.AndAlso(Expression.NotEqual(array, Expression.Constant(null)), Expression.Call(anyMethod, array, anyExpression));
         }
 
 

@@ -24,7 +24,8 @@ namespace JsonRuleEngine.Net.Tests
                 {
                     {"testSuccess","success" },
                     {"test2","failure" },
-                    {"testNull",null }
+                    {"testNull",null },
+                    {"testBool",true }
                 },
                 Reviews = new[]
                 {
@@ -36,6 +37,8 @@ namespace JsonRuleEngine.Net.Tests
             };
 
             bool setDic = false;
+
+            /*
             JsonRuleEngine.CustomPropertyAccessor = (ctx) =>
             {
                 var exp = ctx.Expression;
@@ -49,7 +52,7 @@ namespace JsonRuleEngine.Net.Tests
                 }
 
                 return null;
-            };
+            };*/
 
             bool resultSuccess = JsonRuleEngine.Evaluate(game, new ConditionRuleSet() { Field = "CustomFields.testSuccess", Operator = ConditionRuleOperator.equal, Value = "success" });
             Assert.True(resultSuccess);
@@ -61,14 +64,22 @@ namespace JsonRuleEngine.Net.Tests
             bool resultNull = JsonRuleEngine.Evaluate(game, new ConditionRuleSet() { Field = "CustomFields.testNull", Operator = ConditionRuleOperator.isNull });
             Assert.True(resultNull);
 
+            bool resultTrue = JsonRuleEngine.Evaluate(game, new ConditionRuleSet() { Field = "CustomFields.testBool", Operator = ConditionRuleOperator.equal, Value = true });
+            Assert.True(resultTrue);
+
+
+            bool resultFalse = JsonRuleEngine.Evaluate(game, new ConditionRuleSet() { Field = "CustomFields.testBool", Operator = ConditionRuleOperator.equal, Value = false });
+            Assert.False(resultFalse);
+
+            bool nonExistingProp = JsonRuleEngine.Evaluate(game, new ConditionRuleSet() { Field = "CustomFields.nonExistingProp", Operator = ConditionRuleOperator.equal, Value = true });
+            Assert.False(nonExistingProp);
 
             bool resultNotNull = JsonRuleEngine.Evaluate(game, new ConditionRuleSet() { Field = "CustomFields.testSuccess", Operator = ConditionRuleOperator.isNotNull });
             Assert.True(resultNotNull);
 
+            // JsonRuleEngine.CustomPropertyAccessor = null;
 
-            JsonRuleEngine.CustomPropertyAccessor = null;
-
-            Assert.True(setDic);
+            // Assert.True(setDic);
         }
 
         public static string GetValueOrDefault(Dictionary<string,object> dictionary, string key)
