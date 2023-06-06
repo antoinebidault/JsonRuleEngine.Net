@@ -1,0 +1,10 @@
+﻿{
+  "separator": "And",
+  "rules": [
+    {
+      "field": "Tags",
+      "operator": "equal",
+      "value": "RPG"
+    }
+  ]
+}

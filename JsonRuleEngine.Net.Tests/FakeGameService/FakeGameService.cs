@@ -17,6 +17,7 @@ namespace JsonRuleEngine.Net.Tests
                     Name= "Assassin's creed",
                     Price = 45.3,
                     Stock = 1,
+                    Tags = new[]{ "RPG" },
                     State = GameState.New,
                     Category = "Adventure",
                     BoolValue = true,
@@ -85,6 +86,7 @@ namespace JsonRuleEngine.Net.Tests
                  new Game()
                 {
                     Name= "The forest",
+                    Tags = new[]{ "Survival" },
                     Type = GameType.RPG,
                     Price = 22,
                     Date =new DateTime(2021,1,11),

@@ -290,7 +290,7 @@ namespace JsonRuleEngine.Net
             return null;
         }
 
-        public static T GetValueOrDefaultObject<T>(Dictionary<string,object> dictionary, string key)
+        public static T GetValueOrDefaultObject<T>(Dictionary<string, object> dictionary, string key)
         {
             if (dictionary.ContainsKey(key))
             {
@@ -357,6 +357,7 @@ namespace JsonRuleEngine.Net
                     Expression = expression,
                     InputParam = inputParam
                 });
+
                 if (tmpExpression != null)
                 {
                     remainingFields.Remove(memberName);
@@ -386,7 +387,7 @@ namespace JsonRuleEngine.Net
                 expression = Expression.Property(expression, memberName);
             }
 
-    
+
 
             if (expression.Type.IsArray())
             {
@@ -452,14 +453,25 @@ namespace JsonRuleEngine.Net
 
             // Set it as the param of the any expression
             var childParam = Expression.Parameter(childType);
-            remainingFields.Remove(currentField);
             Expression exp = null;
-            while (remainingFields.Count > 0)
-            {
-                exp = CompileExpression(exp ?? childParam, remainingFields, false, param, op, value);
-            }
-            var anyExpression = Expression.Lambda(exp, childParam);
             MethodInfo anyMethod = null;
+            Expression anyExpression = null;
+            remainingFields.Remove(currentField);
+
+            // True if it is a class
+            if (childType.IsClass())
+            {
+                while (remainingFields.Count > 0)
+                {
+                    exp = CompileExpression(exp ?? childParam, remainingFields, false, param, op, value);
+                }
+                 anyExpression = Expression.Lambda(exp, childParam);
+            }
+            else
+            {
+                exp = CreateOperationExpression(exp ?? childParam, op, value);
+                anyExpression = Expression.Lambda(exp, childParam);
+            }
 
             // In case it's a different of notEqual operator, we would like to apply the .All
             if (op == ConditionRuleOperator.notIn || op == ConditionRuleOperator.notEqual)
@@ -473,6 +485,11 @@ namespace JsonRuleEngine.Net
             anyMethod = anyMethod.MakeGenericMethod(childType);
 
             return Expression.AndAlso(Expression.NotEqual(array, Expression.Constant(null)), Expression.Call(anyMethod, array, anyExpression));
+        }
+
+        private static bool IsClass(this Type type)
+        {
+            return type.GetConstructor(new Type[0]) != null;
         }
 
 

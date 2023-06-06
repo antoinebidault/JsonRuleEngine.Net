@@ -227,6 +227,18 @@ namespace JsonRuleEngine.Net.Tests
             Assert.True(datas.Count() == 2);
         }
 
+
+
+        [Fact]
+        public void ListStringEqualReturn()
+        {
+            // Get all games with at least one review with the text value "It's cool"
+            string rules = GetJsonTestFile("listStringEqual.json");
+            var expression = JsonRuleEngine.ParseExpression<Game>(rules);
+            var datas = FakeGameService.GetDatas().Where(expression).ToList();
+            Assert.True(datas.Count() == 1);
+        }
+
         [Fact]
         public void ComplexReturn()
         {
