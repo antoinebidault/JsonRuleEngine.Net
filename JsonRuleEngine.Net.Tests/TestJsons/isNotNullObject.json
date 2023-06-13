@@ -1,0 +1,9 @@
+﻿{
+  "separator": "And",
+  "rules": [
+    {
+      "field": "Editor.Id",
+      "operator": "isNotNull"
+    }
+  ]
+}

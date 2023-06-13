@@ -401,7 +401,7 @@ namespace JsonRuleEngine.Net
             }
             else
             {
-                return expression;
+                return Expression.AndAlso(Expression.NotEqual(expression, Expression.Constant(null)), CompileExpression(expression, remainingFields, isDict, inputParam, op, value));
             }
         }
 

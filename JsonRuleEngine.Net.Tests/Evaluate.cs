@@ -57,7 +57,7 @@ namespace JsonRuleEngine.Net.Tests
             bool resultSuccess = JsonRuleEngine.Evaluate(game, new ConditionRuleSet() { Field = "CustomFields.testSuccess", Operator = ConditionRuleOperator.equal, Value = "success" });
             Assert.True(resultSuccess);
 
-            bool resultFailure= JsonRuleEngine.Evaluate(game, new ConditionRuleSet() { Field = "CustomFields.testFailure", Operator = ConditionRuleOperator.equal, Value = "success" });
+            bool resultFailure = JsonRuleEngine.Evaluate(game, new ConditionRuleSet() { Field = "CustomFields.testFailure", Operator = ConditionRuleOperator.equal, Value = "success" });
             Assert.False(resultFailure);
 
 
@@ -82,7 +82,7 @@ namespace JsonRuleEngine.Net.Tests
             // Assert.True(setDic);
         }
 
-        public static string GetValueOrDefault(Dictionary<string,object> dictionary, string key)
+        public static string GetValueOrDefault(Dictionary<string, object> dictionary, string key)
         {
             if (dictionary.ContainsKey(key))
             {
@@ -534,6 +534,21 @@ namespace JsonRuleEngine.Net.Tests
             bool result = JsonRuleEngine.Evaluate(new Game() { Category = "Titi", Date = DateTime.UtcNow }, rules);
             Assert.True(result);
         }
+
+
+        [Fact]
+        public void IsNotNullObject()
+        {
+            string rules = GetJsonTestFile("isNotNullObject.json");
+
+            var result = JsonRuleEngine.Evaluate(new Game() { Editor = new Editor() { Id = 1, Name = "Ubisoft" } }, rules);
+            Assert.True(result);
+
+
+            result = JsonRuleEngine.Evaluate(new Game() { Editor = null }, rules);
+            Assert.False(result);
+        }
+
 
 
         [Fact]

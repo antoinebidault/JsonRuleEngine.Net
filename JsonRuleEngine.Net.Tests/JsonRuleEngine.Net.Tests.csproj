@@ -21,6 +21,7 @@
     <None Remove="TestJsons\nullPropNullableEnum.json" />
     <None Remove="TestJsons\timespan.json" />
   </ItemGroup>
+
   <ItemGroup>
     <Content Include="TestJsons\listStringEqual.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -134,6 +135,12 @@
 
   <ItemGroup>
     <ProjectReference Include="..\JsonRuleEngine.Net\JsonRuleEngine.Net.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="TestJsons\isNotNullObject.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>
