@@ -2,8 +2,17 @@
   "separator": "And",
   "rules": [
     {
+      "field": "Editor.Company.Id",
+      "operator": "isNull"
+    },
+    {
       "field": "Editor.Id",
       "operator": "isNotNull"
+    },
+    {
+      "field": "Editor.Id",
+      "operator": "notEqual",
+      "value": 1
     }
   ]
 }

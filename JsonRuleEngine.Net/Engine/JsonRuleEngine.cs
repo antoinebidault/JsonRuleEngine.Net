@@ -401,6 +401,10 @@ namespace JsonRuleEngine.Net
             }
             else
             {
+                if (op == ConditionRuleOperator.isNull)
+                {
+                    return Expression.OrElse(Expression.Equal(expression, Expression.Constant(null)), CompileExpression(expression, remainingFields, isDict, inputParam, op, value));
+                }
                 return Expression.AndAlso(Expression.NotEqual(expression, Expression.Constant(null)), CompileExpression(expression, remainingFields, isDict, inputParam, op, value));
             }
         }

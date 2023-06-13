@@ -541,7 +541,7 @@ namespace JsonRuleEngine.Net.Tests
         {
             string rules = GetJsonTestFile("isNotNullObject.json");
 
-            var result = JsonRuleEngine.Evaluate(new Game() { Editor = new Editor() { Id = 1, Name = "Ubisoft" } }, rules);
+            var result = JsonRuleEngine.Evaluate(new Game() { Editor = new Editor() { Id = 2, Name = "Ubisoft" } }, rules);
             Assert.True(result);
 
 
