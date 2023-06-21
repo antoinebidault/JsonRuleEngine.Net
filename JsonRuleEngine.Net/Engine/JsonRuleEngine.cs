@@ -281,11 +281,11 @@ namespace JsonRuleEngine.Net
         /// <param name="dictionary"></param>
         /// <param name="key"></param>
         /// <returns></returns>
-        public static string GetValueOrDefault(IDictionary dictionary, string key)
+        public static object GetValueOrDefault(IDictionary dictionary, string key)
         {
             if (dictionary.Contains(key))
             {
-                return dictionary[key]?.ToString();
+                return dictionary[key];
             }
             return null;
         }
@@ -368,8 +368,10 @@ namespace JsonRuleEngine.Net
             if (expression != null && typeof(Dictionary<string, object>).IsAssignableFrom(expression.Type))
             {
                 Expression key = Expression.Constant(memberName);
-                var methodGetValue = (typeof(JsonRuleEngine)).GetMethod("GetValueOrDefaultObject").MakeGenericMethod(value?.GetType() ?? typeof(string));
+                var type = GetDictionaryType(value, op);
+                var methodGetValue = (typeof(JsonRuleEngine)).GetMethod(nameof(GetValueOrDefaultObject)).MakeGenericMethod(type);
                 expression = Expression.Call(methodGetValue, expression, key);
+
             }
             else if (isDict)
             {
@@ -407,6 +409,33 @@ namespace JsonRuleEngine.Net
                 }
                 return Expression.AndAlso(Expression.NotEqual(expression, Expression.Constant(null)), CompileExpression(expression, remainingFields, isDict, inputParam, op, value));
             }
+        }
+
+        private static Type GetDictionaryType(object value, ConditionRuleOperator op)
+        {
+            if (value == null)
+            {
+                return typeof(string);
+            }
+
+            // Specific case
+            // Try to parse the number if greater than or less than is used
+            if (op == ConditionRuleOperator.greaterThan ||
+                op == ConditionRuleOperator.lessThan ||
+                op == ConditionRuleOperator.lessThanInclusive ||
+                op == ConditionRuleOperator.greaterThanInclusive)
+            {
+                if (value.IsStringInt())
+                {
+                    return typeof(int);
+                }
+                if (value.IsStringDouble())
+                {
+                    return typeof(double);
+                }
+            }
+
+            return value.GetType();
         }
 
 
@@ -469,7 +498,7 @@ namespace JsonRuleEngine.Net
                 {
                     exp = CompileExpression(exp ?? childParam, remainingFields, false, param, op, value);
                 }
-                 anyExpression = Expression.Lambda(exp, childParam);
+                anyExpression = Expression.Lambda(exp, childParam);
             }
             else
             {

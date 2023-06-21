@@ -2,7 +2,9 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace JsonRuleEngine.Net
 {
@@ -11,6 +13,27 @@ namespace JsonRuleEngine.Net
         internal static bool IsNullable(this Type type)
         {
             return Nullable.GetUnderlyingType(type) != null;
+        }
+        internal static bool IsStringInt(this object value)
+        {
+            if (value is string)
+            {
+                if (int.TryParse(value.ToString(), out int result))
+                    return true;
+            }
+
+            return false;
+        }
+
+        internal static bool IsStringDouble(this object value)
+        {
+            if (value is string)
+            {
+                if (double.TryParse(value.ToString(),NumberStyles.Number, CultureInfo.CreateSpecificCulture("en-US"), out double result))
+                    return true;
+            }
+
+            return false;
         }
 
         internal static bool IsArray(this Type type)

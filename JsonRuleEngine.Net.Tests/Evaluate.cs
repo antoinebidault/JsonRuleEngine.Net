@@ -15,7 +15,7 @@ namespace JsonRuleEngine.Net.Tests
 
 
         [Fact]
-        public void Dictionary_CustomPropertyAccessor()
+        public void Dictionary_Works()
         {
             var game = new Game()
             {
@@ -25,7 +25,9 @@ namespace JsonRuleEngine.Net.Tests
                     {"testSuccess","success" },
                     {"test2","failure" },
                     {"testNull",null },
-                    {"testBool",true }
+                    {"testBool",true },
+                    {"testInt",4 },
+                    {"testDouble",4.3 }
                 },
                 Reviews = new[]
                 {
@@ -54,6 +56,12 @@ namespace JsonRuleEngine.Net.Tests
                 return null;
             };*/
 
+            bool resultInt = JsonRuleEngine.Evaluate(game, new ConditionRuleSet() { Field = "CustomFields.testInt", Operator = ConditionRuleOperator.greaterThan, Value = "3" });
+            Assert.True(resultInt);
+
+            bool resultDouble = JsonRuleEngine.Evaluate(game, new ConditionRuleSet() { Field = "CustomFields.testDouble", Operator = ConditionRuleOperator.greaterThan, Value = "3.1" });
+            Assert.True(resultDouble);
+
             bool resultSuccess = JsonRuleEngine.Evaluate(game, new ConditionRuleSet() { Field = "CustomFields.testSuccess", Operator = ConditionRuleOperator.equal, Value = "success" });
             Assert.True(resultSuccess);
 
@@ -66,6 +74,7 @@ namespace JsonRuleEngine.Net.Tests
 
             bool resultTrue = JsonRuleEngine.Evaluate(game, new ConditionRuleSet() { Field = "CustomFields.testBool", Operator = ConditionRuleOperator.equal, Value = true });
             Assert.True(resultTrue);
+
 
 
             bool resultFalse = JsonRuleEngine.Evaluate(game, new ConditionRuleSet() { Field = "CustomFields.testBool", Operator = ConditionRuleOperator.equal, Value = false });

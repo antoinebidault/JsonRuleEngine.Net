@@ -4,7 +4,7 @@
     {
       "field": "Price",
       "operator": "greaterThan",
-      "value": 50
+      "value": "50"
     }
   ]
 }
