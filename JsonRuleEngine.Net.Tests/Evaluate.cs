@@ -233,7 +233,7 @@ namespace JsonRuleEngine.Net.Tests
             string rules = GetJsonTestFile("listEqual.json");
             var expression = JsonRuleEngine.ParseExpression<Game>(rules);
             var datas = FakeGameService.GetDatas().Where(expression).ToList();
-            Assert.True(datas.Count() == 2);
+            Assert.True(datas.Count() == 1);
         }
 
 

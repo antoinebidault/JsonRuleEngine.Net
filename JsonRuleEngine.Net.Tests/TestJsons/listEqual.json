@@ -5,6 +5,11 @@
       "field": "Reviews.Text",
       "operator": "equal",
       "value": "It's cool"
+    },
+    {
+      "field": "Reviews.Id",
+      "operator": "equal",
+      "value": "1"
     }
   ]
 }

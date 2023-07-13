@@ -522,7 +522,7 @@ namespace JsonRuleEngine.Net
 
         private static bool IsClass(this Type type)
         {
-            return type.GetConstructor(new Type[0]) != null;
+            return type.IsClass && !type.IsArray && !type.IsAbstract && !type.IsEnum && type != typeof(string);
         }
 
 
