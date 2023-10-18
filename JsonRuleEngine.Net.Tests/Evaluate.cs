@@ -193,6 +193,13 @@ namespace JsonRuleEngine.Net.Tests
             Assert.False(result);
         }
 
+        [Fact]
+        public void DateEqual()
+        {
+            List<Game> list = Test("dateEqual.json");
+
+            Assert.True(list.Count == 1);
+        }
 
         [Fact]
         public void Simple()

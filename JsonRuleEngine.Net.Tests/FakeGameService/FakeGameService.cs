@@ -129,7 +129,7 @@ namespace JsonRuleEngine.Net.Tests
                     Name= "GTA IV",
                     Type = GameType.Action,
                     Price = 24,
-                    Date =new DateTime(2018,1,1),
+                    Date =new DateTime(2018,1,1,1,2,4),
                     Editor = new Editor()
                     {
                         Id = 1,
