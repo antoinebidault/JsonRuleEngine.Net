@@ -582,14 +582,14 @@ namespace JsonRuleEngine.Net
                 var valueType = value.GetType();
                 if (property.Type == typeof(DateTime) || property.Type == typeof(DateTime?))
                 {
+                    var dateStr = value.ToString();
                     // It's a date
-                    if (valueType == typeof(string) && value.ToString().StartsWith("\""))
+                    if (valueType == typeof(string) && dateStr.StartsWith("\""))
                     {
-                        value = ParseDate(value.ToString());
+                        value = ParseDate(dateStr);
                     }
-
                     // Date format "yyyy-mm-dd"
-                    if ((op == ConditionRuleOperator.equal || op == ConditionRuleOperator.notEqual) && value.ToString().Length == 10)
+                    else if (dateStr.Length == 10 && dateStr.IndexOf("-") == 4)
                     {
                         if (property.Type.IsNullable())
                         {
