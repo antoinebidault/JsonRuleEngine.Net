@@ -194,13 +194,22 @@ namespace JsonRuleEngine.Net.Tests
             var conditions = JsonConvert.DeserializeObject<ConditionRuleSet>("{\"operator\":\"in\",\"field\":\"Test\"}");
             conditions.Value = new List<string>()
                 {
-                    "1",
-                    "2"
+                    "1"
                 };
             bool result = JsonRuleEngine.Evaluate(
                 dict,
                 conditions
                 );
+
+            conditions = JsonConvert.DeserializeObject<ConditionRuleSet>("{\"operator\":\"in\",\"field\":\"Test\"}");
+            conditions.Value = new JArray
+                {
+                    "2"
+                };
+            result = JsonRuleEngine.Evaluate(
+               dict,
+               conditions
+               );
             Assert.True(result); // Return true
         }
 

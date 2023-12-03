@@ -435,7 +435,36 @@ namespace JsonRuleEngine.Net
                 }
             }
 
+            if (value is JArray)
+                return typeof(IEnumerable<>).MakeGenericType(((JArray)value).GetJArrayType());
+
             return value.GetType();
+        }
+
+        private static Type GetJArrayType(this JArray array)
+        {
+            var firstValue = array.FirstOrDefault();
+            if (firstValue != null)
+            {
+                switch (firstValue.Type)
+                {
+                    case JTokenType.String:
+                        return typeof(string);
+                    case JTokenType.Float:
+                        return typeof(double);
+                    case JTokenType.Object:
+                        return typeof(object);
+                    case JTokenType.Date:
+                        return typeof(DateTime);
+                    case JTokenType.Boolean:
+                        return typeof(Boolean);
+                    case JTokenType.Integer:
+                        return typeof(int);
+                    case JTokenType.Array:
+                        return typeof(JArray);
+                }
+            }
+            return null;
         }
 
 
@@ -453,7 +482,7 @@ namespace JsonRuleEngine.Net
         {
 
             var currentField = remainingFields.First();
-            var childType = array.Type == typeof(JArray) ? ((JArray)value).FirstOrDefault()?.GetType() : array.Type.GetGenericArguments().First();
+            var childType = array.Type == typeof(JArray) ? ((JArray)value).GetJArrayType() : array.Type.GetGenericArguments().First();
 
             // Contains methods
             // Need a conversion to an array of string
