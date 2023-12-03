@@ -453,7 +453,7 @@ namespace JsonRuleEngine.Net
         {
 
             var currentField = remainingFields.First();
-            var childType = array.Type.GetGenericArguments().First();
+            var childType = array.Type == typeof(JArray) ? ((JArray)value).FirstOrDefault()?.GetType() : array.Type.GetGenericArguments().First();
 
             // Contains methods
             // Need a conversion to an array of string
@@ -547,8 +547,17 @@ namespace JsonRuleEngine.Net
                 // Parsing the array
                 try
                 {
-                    var listType = typeof(IEnumerable<>).MakeGenericType(inputProperty.Type);
-                    var array = ((JArray)value).ToObject(listType);
+                    object array;
+                    if (value is JArray)
+                    {
+                        var listType = typeof(IEnumerable<>).MakeGenericType(inputProperty.Type);
+                        array = ((JArray)value).ToObject(listType);
+                    }
+                    else
+                    {
+                        array = value;
+                    }
+
                     MethodInfo method = null;
                     method = MethodContains.MakeGenericMethod(inputProperty.Type);
 

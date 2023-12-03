@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -180,6 +181,28 @@ namespace JsonRuleEngine.Net.Tests
         }
 
 
+        [Fact]
+        public void DictionaryList()
+        {
+            var dict = new Dictionary<string, object>{
+                {"Test", new List<string>()
+                {
+                    "1",
+                    "2"
+                } }
+            };
+            var conditions = JsonConvert.DeserializeObject<ConditionRuleSet>("{\"operator\":\"in\",\"field\":\"Test\"}");
+            conditions.Value = new List<string>()
+                {
+                    "1",
+                    "2"
+                };
+            bool result = JsonRuleEngine.Evaluate(
+                dict,
+                conditions
+                );
+            Assert.True(result); // Return true
+        }
 
 
 

@@ -38,10 +38,10 @@ namespace JsonRuleEngine.Net
 
         internal static bool IsArray(this Type type)
         {
-            return type != typeof(string) &&
+            return( type != typeof(string) &&
                     type.IsGenericType &&
                     !type.IsDictionary() &&
-                    typeof(IEnumerable).IsAssignableFrom(type);
+                    typeof(IEnumerable).IsAssignableFrom(type)) || type == typeof(JArray);
         }
 
         public static bool IsDictionary(this Type type)
