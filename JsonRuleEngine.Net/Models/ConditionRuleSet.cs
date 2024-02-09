@@ -32,5 +32,10 @@ namespace JsonRuleEngine.Net
         /// List of sub rules
         /// </summary>
         public IEnumerable<ConditionRuleSet> Rules { get; set; }
+
+        /// <summary>
+        /// Type
+        /// </summary>
+        public Type Type { get; set; }
     }
 }

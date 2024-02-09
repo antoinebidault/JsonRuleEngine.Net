@@ -1,0 +1,20 @@
+{
+  "separator": "And",
+  "rules": [
+    {
+      "field": "ItemCode",
+      "operator": "equal",
+      "value": "BU"
+    },
+    {
+      "field": "Angle",
+      "operator": "equal",
+      "value": 90
+    },
+    {
+      "field": "DuctConnectionDiameter",
+      "operator": "in",
+      "value": [ 125, 160, 200 ]
+    }
+  ]
+}

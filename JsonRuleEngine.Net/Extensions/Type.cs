@@ -14,11 +14,11 @@ namespace JsonRuleEngine.Net
         {
             return Nullable.GetUnderlyingType(type) != null;
         }
-        internal static bool IsStringInt(this object value)
+        internal static bool IsStringLong(this object value)
         {
             if (value is string)
             {
-                if (int.TryParse(value.ToString(), out int result))
+                if (long.TryParse(value.ToString(), out long result))
                     return true;
             }
 

@@ -1,3 +1,4 @@
+using JsonRuleEngine.Net.Models;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -57,6 +58,7 @@ namespace JsonRuleEngine.Net.Tests
                 return null;
             };*/
 
+    
             bool resultInt = JsonRuleEngine.Evaluate(game, new ConditionRuleSet() { Field = "CustomFields.testInt", Operator = ConditionRuleOperator.greaterThan, Value = "3" });
             Assert.True(resultInt);
 
@@ -76,8 +78,6 @@ namespace JsonRuleEngine.Net.Tests
             bool resultTrue = JsonRuleEngine.Evaluate(game, new ConditionRuleSet() { Field = "CustomFields.testBool", Operator = ConditionRuleOperator.equal, Value = true });
             Assert.True(resultTrue);
 
-
-
             bool resultFalse = JsonRuleEngine.Evaluate(game, new ConditionRuleSet() { Field = "CustomFields.testBool", Operator = ConditionRuleOperator.equal, Value = false });
             Assert.False(resultFalse);
 
@@ -92,6 +92,33 @@ namespace JsonRuleEngine.Net.Tests
             // Assert.True(setDic);
         }
 
+
+
+        [Fact]
+        public void EvaluateOptions()
+        {
+            var evaluateOptions = new EvaluateOptions<Game>();
+            evaluateOptions.ForProperty("Toto", c => c.DateCreation);
+            evaluateOptions.ForProperty("Titi", c => c.Editor.Name);
+            // evaluateOptions.ForProperty("ReviewsComputed", c => c.Reviews.Count());
+            var date = DateTime.UtcNow.AddMinutes(-1);
+            var conditions = new ConditionRuleSet()
+            {
+                Rules = new[]
+                {
+                     new ConditionRuleSet() { Field = "Toto", Operator = ConditionRuleOperator.lessThan, Value = date },
+                     new ConditionRuleSet() { Field = "Titi", Operator = ConditionRuleOperator.equal, Value = "Test" },
+                }
+            };
+
+            var expectedResult = FakeGameService.GetDatas().Count(m => m.DateCreation < date && m.Editor.Name == "Test");
+           var result = FakeGameService.GetDatas()
+                .Where(m=>  JsonRuleEngine.Evaluate<Game>(m, conditions, evaluateOptions))
+                .ToList();
+         
+            Assert.True(result.Count() == expectedResult);
+        }
+
         public static string GetValueOrDefault(Dictionary<string, object> dictionary, string key)
         {
             if (dictionary.ContainsKey(key))
@@ -99,6 +126,22 @@ namespace JsonRuleEngine.Net.Tests
                 return dictionary[key]?.ToString();
             }
             return null;
+        }
+
+        [Fact]
+        public void In_With_Dictionary()
+        {
+            var attributeValues = new Dictionary<string, object>()
+            {
+                {"DuctConnectionDiameter", 160 },
+                {"ItemCode", "BU" },
+                {"Angle",  90 }
+            };
+
+            var jsonFile = GetJsonTestFile("sdb.json");
+            bool resultInt = JsonRuleEngine.Evaluate( attributeValues, jsonFile );
+
+            Assert.True( resultInt );
         }
 
 
@@ -186,10 +229,11 @@ namespace JsonRuleEngine.Net.Tests
         {
             var dict = new Dictionary<string, object>{
                 {"Test", new List<string>()
-                {
-                    "1",
-                    "2"
-                } }
+                    {
+                        "1",
+                        "2"
+                    }
+                }
             };
             var conditions = JsonConvert.DeserializeObject<ConditionRuleSet>("{\"operator\":\"in\",\"field\":\"Test\"}");
             conditions.Value = new List<string>()
