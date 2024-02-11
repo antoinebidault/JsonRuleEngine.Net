@@ -58,7 +58,7 @@ namespace JsonRuleEngine.Net.Tests
                 return null;
             };*/
 
-    
+
             bool resultInt = JsonRuleEngine.Evaluate(game, new ConditionRuleSet() { Field = "CustomFields.testInt", Operator = ConditionRuleOperator.greaterThan, Value = "3" });
             Assert.True(resultInt);
 
@@ -112,10 +112,10 @@ namespace JsonRuleEngine.Net.Tests
             };
 
             var expectedResult = FakeGameService.GetDatas().Count(m => m.DateCreation < date && m.Editor.Name == "Test");
-           var result = FakeGameService.GetDatas()
-                .Where(m=>  JsonRuleEngine.Evaluate<Game>(m, conditions, evaluateOptions))
-                .ToList();
-         
+            var result = FakeGameService.GetDatas()
+                 .Where(m => JsonRuleEngine.Evaluate<Game>(m, conditions, evaluateOptions))
+                 .ToList();
+
             Assert.True(result.Count() == expectedResult);
         }
 
@@ -139,9 +139,9 @@ namespace JsonRuleEngine.Net.Tests
             };
 
             var jsonFile = GetJsonTestFile("sdb.json");
-            bool resultInt = JsonRuleEngine.Evaluate( attributeValues, jsonFile );
+            bool resultInt = JsonRuleEngine.Evaluate(attributeValues, jsonFile);
 
-            Assert.True( resultInt );
+            Assert.True(resultInt);
         }
 
 
@@ -214,13 +214,9 @@ namespace JsonRuleEngine.Net.Tests
         public void DictionaryDeserialized()
         {
             var dict = JsonConvert.DeserializeObject<Dictionary<string, object>>("{\"Test\":\"1\"}");
-            var conditions = JsonConvert.DeserializeObject<ConditionRuleSet>("{\"operator\":\"equal\",\"field\":\"Test\",\"value\":\"1\"}");
-
-            bool result = JsonRuleEngine.Evaluate(
-                dict,
-                conditions
-                );
-            Assert.True(result); // Return true
+            var conditions = JsonConvert.DeserializeObject<ConditionRuleSet>("{ \"operator\":\"equal\",\"field\":\"Test\",\"value\":\"1\"}");
+            bool result = JsonRuleEngine.Evaluate(dict, conditions);
+            Assert.True(result);
         }
 
 
@@ -228,32 +224,25 @@ namespace JsonRuleEngine.Net.Tests
         public void DictionaryList()
         {
             var dict = new Dictionary<string, object>{
-                {"Test", new List<string>()
-                    {
-                        "1",
-                        "2"
-                    }
+                {
+                    "Test", 
+                    new List<string>() {
+                    "1", 
+                    "2"
+                } 
                 }
             };
+
             var conditions = JsonConvert.DeserializeObject<ConditionRuleSet>("{\"operator\":\"in\",\"field\":\"Test\"}");
-            conditions.Value = new List<string>()
-                {
-                    "1"
-                };
-            bool result = JsonRuleEngine.Evaluate(
-                dict,
-                conditions
-                );
+            conditions.Value = new List<string>() { "1" };
+
+            bool result = JsonRuleEngine.Evaluate(dict, conditions);
 
             conditions = JsonConvert.DeserializeObject<ConditionRuleSet>("{\"operator\":\"in\",\"field\":\"Test\"}");
-            conditions.Value = new JArray
-                {
-                    "2"
-                };
-            result = JsonRuleEngine.Evaluate(
-               dict,
-               conditions
-               );
+            conditions.Value = new JArray { "2" };
+
+            result = JsonRuleEngine.Evaluate(dict, conditions);
+
             Assert.True(result); // Return true
         }
 
@@ -444,7 +433,6 @@ namespace JsonRuleEngine.Net.Tests
             bool result = JsonRuleEngine.Evaluate(items.First(), rules);
             Assert.False(result);
         }
-
 
         [Fact]
         public void Bool()

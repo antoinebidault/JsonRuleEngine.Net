@@ -42,10 +42,13 @@ namespace JsonRuleEngine.Net
         /// <typeparam name="T"></typeparam>
         /// <param name="jsonRules"></param>
         /// <param name="evaluateOptions"></param>
+        /// <param name="obj"></param>
         /// <returns>Expression function</returns>
-        public static Expression<Func<T, bool>> ParseExpression<T>(string jsonRules, EvaluateOptions<T> evaluateOptions = null)
+        public static Expression<Func<T, bool>> ParseExpression<T>(string jsonRules, EvaluateOptions<T> evaluateOptions = null, T obj = default)
         {
-            return ParseExpression<T>(Parse(jsonRules), evaluateOptions);
+            ConditionRuleSet ruleSet = Parse(jsonRules);
+
+            return ParseExpression<T>(ruleSet, evaluateOptions, obj);
         }
 
         /// <summary>
@@ -55,11 +58,12 @@ namespace JsonRuleEngine.Net
         /// <typeparam name="T"></typeparam>
         /// <param name="rules"></param>
         /// <param name="evaluateOptions"></param>
+        /// <param name="dictionary">The object</param>
         /// <returns></returns>
-        public static Expression<Func<T, bool>> ParseExpression<T>(ConditionRuleSet rules, EvaluateOptions<T> evaluateOptions = null)
+        public static Expression<Func<T, bool>> ParseExpression<T>(ConditionRuleSet rules, EvaluateOptions<T> evaluateOptions = null, T dictionary = default)
         {
             var itemExpression = Expression.Parameter(typeof(T));
-            var conditions = ParseTree<T>(rules, itemExpression, evaluateOptions);
+            var conditions = ParseTree<T>(rules, itemExpression, dictionary, evaluateOptions);
 
             // Breaking change
             // If no conditions parsed
@@ -73,8 +77,6 @@ namespace JsonRuleEngine.Net
             {
                 conditions = conditions.ReduceAndCheck();
             }
-
-            Console.WriteLine(conditions.ToString());
 
             var query = Expression.Lambda<Func<T, bool>>(conditions, itemExpression);
             return query;
@@ -90,7 +92,7 @@ namespace JsonRuleEngine.Net
         /// <returns>True if the conditions are matched</returns>
         public static bool Evaluate<T>(T obj, string jsonRules, EvaluateOptions<T> evaluateOptions = null)
         {
-            var query = ParseExpression<T>(jsonRules, evaluateOptions);
+            var query = ParseExpression<T>(jsonRules, evaluateOptions, obj);
             return query.Compile().Invoke(obj);
         }
 
@@ -133,7 +135,7 @@ namespace JsonRuleEngine.Net
         /// <returns>True if the conditions are matched</returns>
         public static TOut Evaluate<T, TOut>(T obj, ConditionRuleSet<TOut> rules)
         {
-            var query = ParseExpression<T>(rules);
+            var query = ParseExpression<T>(rules, null, obj);
             var result = query.Compile().Invoke(obj);
             if (result)
             {
@@ -157,7 +159,7 @@ namespace JsonRuleEngine.Net
         public static bool TryEvaluate<T, TOut>(T obj, ConditionRuleSet<TOut> rules, out TOut returnValue)
         {
             returnValue = default;
-            var query = ParseExpression<T>(rules);
+            var query = ParseExpression<T>(rules, null, obj);
             var success = query.Compile().Invoke(obj);
 
             if (!success)
@@ -198,7 +200,7 @@ namespace JsonRuleEngine.Net
         /// <returns>True if the conditions are matched</returns>
         public static bool Evaluate<T>(T obj, ConditionRuleSet rules, EvaluateOptions<T> evaluateOptions = null)
         {
-            var query = ParseExpression<T>(rules, evaluateOptions);
+            var query = ParseExpression<T>(rules, evaluateOptions, obj);
             return query.Compile().Invoke(obj);
         }
 
@@ -223,6 +225,7 @@ namespace JsonRuleEngine.Net
         /// Parse the expression tree
         /// </summary>
         /// <typeparam name="T"></typeparam>
+        /// <param name="dictionary"></param>
         /// <param name="condition"></param>
         /// <param name="parm"></param>
         /// <param name="evaluateOptions"></param>
@@ -230,6 +233,7 @@ namespace JsonRuleEngine.Net
         private static Expression ParseTree<T>(
         ConditionRuleSet condition,
         ParameterExpression parm,
+        T dictionary = default,
         EvaluateOptions<T> evaluateOptions = null)
         {
             IEnumerable<ConditionRuleSet> rules = condition.Rules;
@@ -245,12 +249,12 @@ namespace JsonRuleEngine.Net
             {
                 foreach (var rule in condition.Rules)
                 {
-                    left = bind(left, CreateRuleExpression<T>(rule, parm, evaluateOptions));
+                    left = bind(left, CreateRuleExpression<T>(rule, parm, evaluateOptions, dictionary));
                 }
             }
             else
             {
-                left = bind(left, CreateRuleExpression<T>(condition, parm, evaluateOptions));
+                left = bind(left, CreateRuleExpression<T>(condition, parm, evaluateOptions, dictionary));
             }
 
             return left;
@@ -283,12 +287,12 @@ namespace JsonRuleEngine.Net
             return default(T);
         }
 
-        private static Expression CreateRuleExpression<T>(ConditionRuleSet rule, ParameterExpression parm, EvaluateOptions<T> evaluateOptions)
+        private static Expression CreateRuleExpression<T>(ConditionRuleSet rule, ParameterExpression parm, EvaluateOptions<T> evaluateOptions, T dictionary = default)
         {
             Expression right = null;
             if (rule.Separator.HasValue && rule.Rules != null && rule.Rules.Any())
             {
-                right = ParseTree<T>(rule, parm);
+                right = ParseTree<T>(rule, parm, dictionary);
                 return right;
             }
 
@@ -306,16 +310,15 @@ namespace JsonRuleEngine.Net
 
                 if (evaluateOptions != null && evaluateOptions.HasTransformer(field))
                 {
-                    expression = CompileExpression(evaluateOptions.GetTransformer<T>(field, parm), new List<string> { field }, false, parm, rule.Operator, rule.Value, true);
+                    expression = CompileExpression(evaluateOptions.GetTransformer<T>(field, parm), new List<string> { field }, parm, rule.Operator, rule.Value, true, dictionary);
                 }
                 else
                 {
                     var fields = field.Split('.').ToList();
-                    bool isDict = typeof(IDictionary).IsAssignableFrom(parm.Type);
 
                     while (fields.Count > 0)
                     {
-                        expression = CompileExpression(expression ?? parm, fields, isDict, parm, rule.Operator, rule.Value);
+                        expression = CompileExpression(expression ?? parm, fields,  parm, rule.Operator, rule.Value, false, dictionary);
                     }
                 }
                 return expression;
@@ -334,7 +337,7 @@ namespace JsonRuleEngine.Net
         /// <return>Expresssion</return>
         public static Func<PropertyAccessorContext, Expression> CustomPropertyAccessor { get; set; }
 
-        private static Expression CompileExpression(Expression expression, List<string> remainingFields, bool isDict, Expression inputParam, ConditionRuleOperator op, object value, bool isOverride = false)
+        private static Expression CompileExpression(Expression expression, List<string> remainingFields, Expression inputParam, ConditionRuleOperator op, object value, bool isOverride = false, object dictionary = null)
         {
             string memberName = remainingFields.First();
 
@@ -356,33 +359,42 @@ namespace JsonRuleEngine.Net
                 }
             }
 
+            var isDictionary = typeof(Dictionary<string, object>).IsAssignableFrom(expression.Type);
+
             // If we are at root of the dictionary
-            if (expression != null && typeof(Dictionary<string, object>).IsAssignableFrom(expression.Type))
+            if (expression != null && isDictionary)
             {
+                if (dictionary == null)
+                    throw new InvalidOperationException("The dictionary must be properly provided to the function");
+
                 Expression key = Expression.Constant(memberName);
-                var type = GetDictionaryType(value, op);
-                var methodGetValue = (typeof(JsonRuleEngine)).GetMethod(nameof(GetValueOrDefault)).MakeGenericMethod(type);
+                var dic = ((Dictionary<string, object>)(dictionary));
+                Type type = typeof(string);
+                if (dic.ContainsKey(memberName) && dic[memberName] != null)
+                {
+                    type = dic[memberName].GetType();
+                }
+                else
+                {
+                    dic[memberName] = default(string);
+                }
+
+                var methodGetValue = (typeof(JsonRuleEngine)).GetMethod(nameof(GetValueOrDefaultObject)).MakeGenericMethod(type);
+
+
                 expression = Expression.Call(methodGetValue, expression, key);
             }
-            else if (isDict)
-            {
-                Expression key = Expression.Constant(memberName);
-                var methodGetValue = (typeof(JsonRuleEngine)).GetMethod("GetValueOrDefault");
-                expression = Expression.Call(methodGetValue, inputParam, key);
-            }
-            else if (expression == null)
+            else if (expression == null || !isOverride)
             {
                 expression = Expression.Property(inputParam, memberName);
-            }
-            else if (!isOverride)
-            {
-                expression = Expression.Property(expression, memberName);
+                if (dictionary != null)
+                    dictionary = dictionary.GetType().GetProperty(memberName).GetValue(dictionary);
             }
 
 
             if (expression.Type.IsArray())
             {
-                return HandleTableRule(expression, inputParam, op, value, remainingFields);
+                return HandleTableRule(expression, inputParam, op, value, remainingFields, isOverride, dictionary);
             }
 
             remainingFields.Remove(memberName);
@@ -394,9 +406,9 @@ namespace JsonRuleEngine.Net
             {
                 if (op == ConditionRuleOperator.isNull)
                 {
-                    return Expression.OrElse(Expression.Equal(expression, Expression.Constant(null)), CompileExpression(expression, remainingFields, isDict, inputParam, op, value));
+                    return Expression.OrElse(Expression.Equal(expression, Expression.Constant(null)), CompileExpression(expression, remainingFields, inputParam, op, value, isOverride, dictionary));
                 }
-                return Expression.AndAlso(Expression.NotEqual(expression, Expression.Constant(null)), CompileExpression(expression, remainingFields, isDict, inputParam, op, value));
+                return Expression.AndAlso(Expression.NotEqual(expression, Expression.Constant(null)), CompileExpression(expression, remainingFields,inputParam, op, value, isOverride, dictionary));
             }
         }
 
@@ -424,7 +436,7 @@ namespace JsonRuleEngine.Net
                 }
             }
 
-            
+
             if (value is JArray)
                 return typeof(IEnumerable<>).MakeGenericType(((JArray)value).GetJArrayType());
 
@@ -472,7 +484,7 @@ namespace JsonRuleEngine.Net
         /// <param name="remainingFields"></param>
         /// <returns></returns>
         /// <exception cref="JsonRuleEngineException"></exception>
-        private static Expression HandleTableRule(Expression array, Expression param, ConditionRuleOperator op, object value, List<string> remainingFields)
+        private static Expression HandleTableRule(Expression array, Expression param, ConditionRuleOperator op, object value, List<string> remainingFields, bool isOverride, object dictionary)
         {
 
             var currentField = remainingFields.First();
@@ -519,7 +531,7 @@ namespace JsonRuleEngine.Net
             {
                 while (remainingFields.Count > 0)
                 {
-                    exp = CompileExpression(exp ?? childParam, remainingFields, false, param, op, value);
+                    exp = CompileExpression(exp ?? childParam, remainingFields, param, op, value, isOverride, dictionary);
                 }
                 anyExpression = Expression.Lambda(exp, childParam);
             }
