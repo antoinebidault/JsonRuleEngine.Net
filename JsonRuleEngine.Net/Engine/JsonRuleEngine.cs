@@ -628,7 +628,7 @@ namespace JsonRuleEngine.Net
                     if (valueType == typeof(string) && dateStr.StartsWith("\""))
                     {
                         value = ParseTimeSpan(dateStr);
-                        if (dateStr.EndsWith(".00:00:00"))
+                        if (dateStr.EndsWith(".00:00:00\""))
                         {
                             isDatePeriod = true;
                         }
