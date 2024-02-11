@@ -621,13 +621,21 @@ namespace JsonRuleEngine.Net
                 if (property.Type == typeof(DateTime) || property.Type == typeof(DateTime?))
                 {
                     var dateStr = value.ToString();
+
+                    bool isDatePeriod = false;
+
                     // It's a date
                     if (valueType == typeof(string) && dateStr.StartsWith("\""))
                     {
-                        value = ParseDate(dateStr);
+                        value = ParseTimeSpan(dateStr);
+                        if (dateStr.EndsWith(".00:00:00"))
+                        {
+                            isDatePeriod = true;
+                        }
                     }
+
                     // Date format "yyyy-mm-dd"
-                    else if (dateStr.Length == 10 && dateStr.IndexOf("-") == 4)
+                    if (isDatePeriod  || (dateStr.Length == 10 && dateStr.IndexOf("-") == 4))
                     {
                         if (property.Type.IsNullable())
                         {
@@ -717,7 +725,7 @@ namespace JsonRuleEngine.Net
         }
 
 
-        private static DateTime ParseDate(string str)
+        private static DateTime ParseTimeSpan(string str)
         {
             TimeSpan ts = JsonConvert.DeserializeObject<TimeSpan>(str);
             return DateTime.UtcNow.Add(ts);
