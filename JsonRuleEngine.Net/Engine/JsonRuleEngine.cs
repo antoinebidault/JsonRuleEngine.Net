@@ -631,6 +631,7 @@ namespace JsonRuleEngine.Net
                         if (dateStr.EndsWith(".00:00:00\""))
                         {
                             isDatePeriod = true;
+                            value = ((DateTime)value).Date;
                         }
                     }
 
