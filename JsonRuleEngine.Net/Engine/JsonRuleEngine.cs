@@ -201,7 +201,6 @@ namespace JsonRuleEngine.Net
         /// </summary>
         /// <param name="obj"></param>
         /// <param name="rules"></param>
-        /// <param name="evaluateOptions"></param>
         /// <returns></returns>
         public static bool Evaluate(object obj, ConditionRuleSet rules)
         {
@@ -209,11 +208,11 @@ namespace JsonRuleEngine.Net
                 .Single(m => m.Name == nameof(JsonRuleEngine.Evaluate) &&
                         m.GetParameters() != null &&
                         m.ContainsGenericParameters &&
-                      m.GetParameters().Length == 2 &&
+                      m.GetParameters().Length == 3 &&
                      m.GetParameters().Select(c => c.ParameterType).Contains(typeof(ConditionRuleSet)));
 
             MethodInfo generic = method.MakeGenericMethod(obj.GetType());
-            return (bool)generic.Invoke(null, parameters: new[] { obj, rules });
+            return (bool)generic.Invoke(null, parameters: new[] { obj, rules, null });
         }
 
 
