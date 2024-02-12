@@ -1,3 +1,4 @@
+using JsonRuleEngine.Net.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -66,10 +67,11 @@ namespace JsonRuleEngine.Net
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="jsonRules"></param>
+        /// <param name="evaluateOptions"></param>
         /// <returns>Expression function</returns>
-        public static Expression<Func<T, bool>> ParseExpression<T>(string jsonRules)
+        public static Expression<Func<T, bool>> ParseExpression<T>(string jsonRules, EvaluateOptions<T> evaluateOptions = null)
         {
-            return ParseExpression<T>(Parse(jsonRules));
+            return ParseExpression<T>(Parse(jsonRules), evaluateOptions);
         }
 
         /// <summary>
@@ -78,11 +80,12 @@ namespace JsonRuleEngine.Net
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="rules"></param>
+        /// <param name="evaluateOptions"></param>
         /// <returns></returns>
-        public static Expression<Func<T, bool>> ParseExpression<T>(ConditionRuleSet rules)
+        public static Expression<Func<T, bool>> ParseExpression<T>(ConditionRuleSet rules, EvaluateOptions<T> evaluateOptions = null)
         {
             var itemExpression = Expression.Parameter(typeof(T));
-            var conditions = ParseTree<T>(rules, itemExpression);
+            var conditions = ParseTree<T>(rules, itemExpression, evaluateOptions);
 
             // Breaking change
             // If no conditions parsed
@@ -249,7 +252,8 @@ namespace JsonRuleEngine.Net
         /// <returns></returns>
         private static Expression ParseTree<T>(
         ConditionRuleSet condition,
-        ParameterExpression parm)
+        ParameterExpression parm
+        , EvaluateOptions<T> evaluateOptions)
         {
             IEnumerable<ConditionRuleSet> rules = condition.Rules;
 
@@ -264,12 +268,12 @@ namespace JsonRuleEngine.Net
             {
                 foreach (var rule in condition.Rules)
                 {
-                    left = bind(left, CreateRuleExpression<T>(rule, parm));
+                    left = bind(left, CreateRuleExpression<T>(rule, parm, evaluateOptions));
                 }
             }
             else
             {
-                left = bind(left, CreateRuleExpression<T>(condition, parm));
+                left = bind(left, CreateRuleExpression<T>(condition, parm, evaluateOptions));
             }
 
             return left;
@@ -299,12 +303,12 @@ namespace JsonRuleEngine.Net
             return default(T);
         }
 
-        private static Expression CreateRuleExpression<T>(ConditionRuleSet rule, ParameterExpression parm)
+        private static Expression CreateRuleExpression<T>(ConditionRuleSet rule, ParameterExpression parm, EvaluateOptions<T> evaluateOptions)
         {
             Expression right = null;
             if (rule.Separator.HasValue && rule.Rules != null && rule.Rules.Any())
             {
-                right = ParseTree<T>(rule, parm);
+                right = ParseTree<T>(rule, parm, evaluateOptions);
                 return right;
             }
 
@@ -328,7 +332,7 @@ namespace JsonRuleEngine.Net
                     var visitor = new ParameterReplaceVisitor(parm);
                     Expression newBody = visitor.Visit(transformer);
 
-                    expression = CompileExpression(newBody, new List<string> { field }, parm, rule.Operator, rule.Value, true, dictionary);
+                    expression = CompileExpression(newBody, new List<string> { field }, false, parm, rule.Operator, rule.Value);
                 }
                 else
                 {
