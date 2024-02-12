@@ -108,7 +108,7 @@ namespace JsonRuleEngine.Net.Tests
             var evaluateOptions = new EvaluateOptions<Game>();
             evaluateOptions.ForProperty("Toto", c => c.DateCreation);
             evaluateOptions.ForProperty("Titi", c => c.Editor.Name);
-            // evaluateOptions.ForProperty("ReviewsComputed", c => c.Reviews.Count());
+            evaluateOptions.ForProperty("ReviewsComputed", c => (c.Reviews != null ? c.Reviews.Count() :0));
             var date = DateTime.UtcNow.AddMinutes(-1);
             var conditions = new ConditionRuleSet()
             {
@@ -116,10 +116,11 @@ namespace JsonRuleEngine.Net.Tests
                 {
                      new ConditionRuleSet() { Field = "Toto", Operator = ConditionRuleOperator.lessThan, Value = date },
                      new ConditionRuleSet() { Field = "Titi", Operator = ConditionRuleOperator.equal, Value = "Test" },
+                     new ConditionRuleSet() { Field = "ReviewsComputed", Operator = ConditionRuleOperator.greaterThan, Value = 0 },
                 }
             };
 
-            var expectedResult = FakeGameService.GetDatas().Count(m => m.DateCreation < date && m.Editor.Name == "Test");
+            var expectedResult = FakeGameService.GetDatas().Count(m => m.DateCreation < date && m.Editor.Name == "Test" && m.Reviews.Count() > 0);
             var result = FakeGameService.GetDatas()
                  .Where(m => JsonRuleEngine.Evaluate<Game>(m, conditions, evaluateOptions))
                  .ToList();
