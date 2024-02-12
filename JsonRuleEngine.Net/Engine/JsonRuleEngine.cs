@@ -112,10 +112,11 @@ namespace JsonRuleEngine.Net
         /// <typeparam name="T">Input type</typeparam>
         /// <param name="obj">The object to test</param>
         /// <param name="jsonRules">The json string conditionRuleSet object</param>
+        /// <param name="evaluateOptions"></param>
         /// <returns>True if the conditions are matched</returns>
-        public static bool Evaluate<T>(T obj, string jsonRules)
+        public static bool Evaluate<T>(T obj, string jsonRules, EvaluateOptions<T> evaluateOptions = null)
         {
-            var query = ParseExpression<T>(jsonRules);
+            var query = ParseExpression<T>(jsonRules, evaluateOptions);
             return query.Compile().Invoke(obj);
         }
 
@@ -126,11 +127,12 @@ namespace JsonRuleEngine.Net
         /// <typeparam name="TOut">Output type</typeparam>
         /// <param name="obj">The object to test</param>
         /// <param name="jsonRules">The json string conditionRuleSet object</param>
+        /// <param name="evaluateOptions"></param>
         /// <returns>True if the conditions are matched</returns>
-        public static TOut Evaluate<T, TOut>(T obj, string jsonRules)
+        public static TOut Evaluate<T, TOut>(T obj, string jsonRules, EvaluateOptions<T> evaluateOptions = null)
         {
             var rules = Parse<TOut>(jsonRules);
-            return Evaluate<T, TOut>(obj, rules);
+            return Evaluate<T, TOut>(obj, rules, evaluateOptions);
         }
 
         /// <summary>
@@ -155,10 +157,11 @@ namespace JsonRuleEngine.Net
         /// <typeparam name="TOut">Output type</typeparam>
         /// <param name="obj">The object to test</param>
         /// <param name="rules">The conditionRuleSet object</param>
+        /// <param name="evaluateOptions"></param>
         /// <returns>True if the conditions are matched</returns>
-        public static TOut Evaluate<T, TOut>(T obj, ConditionRuleSet<TOut> rules)
+        public static TOut Evaluate<T, TOut>(T obj, ConditionRuleSet<TOut> rules,EvaluateOptions<T> evaluateOptions)
         {
-            var query = ParseExpression<T>(rules);
+            var query = ParseExpression<T>(rules, evaluateOptions);
             var result = query.Compile().Invoke(obj);
             if (result)
             {
@@ -198,6 +201,7 @@ namespace JsonRuleEngine.Net
         /// </summary>
         /// <param name="obj"></param>
         /// <param name="rules"></param>
+        /// <param name="evaluateOptions"></param>
         /// <returns></returns>
         public static bool Evaluate(object obj, ConditionRuleSet rules)
         {
@@ -219,10 +223,11 @@ namespace JsonRuleEngine.Net
         /// <typeparam name="T"></typeparam>
         /// <param name="obj">The object to test</param>
         /// <param name="rules">The conditionRuleSet object</param>
+        /// <param name="evaluateOptions"></param>
         /// <returns>True if the conditions are matched</returns>
-        public static bool Evaluate<T>(T obj, ConditionRuleSet rules)
+        public static bool Evaluate<T>(T obj, ConditionRuleSet rules, EvaluateOptions<T> evaluateOptions = null)
         {
-            var query = ParseExpression<T>(rules);
+            var query = ParseExpression<T>(rules, evaluateOptions);
             return query.Compile().Invoke(obj);
         }
 

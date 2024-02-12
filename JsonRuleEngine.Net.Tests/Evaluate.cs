@@ -1,3 +1,4 @@
+using JsonRuleEngine.Net.Models;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -101,6 +102,30 @@ namespace JsonRuleEngine.Net.Tests
             return null;
         }
 
+        [Fact]
+        public void EvaluateOptions()
+        {
+            var evaluateOptions = new EvaluateOptions<Game>();
+            evaluateOptions.ForProperty("Toto", c => c.DateCreation);
+            evaluateOptions.ForProperty("Titi", c => c.Editor.Name);
+            // evaluateOptions.ForProperty("ReviewsComputed", c => c.Reviews.Count());
+            var date = DateTime.UtcNow.AddMinutes(-1);
+            var conditions = new ConditionRuleSet()
+            {
+                Rules = new[]
+                {
+                     new ConditionRuleSet() { Field = "Toto", Operator = ConditionRuleOperator.lessThan, Value = date },
+                     new ConditionRuleSet() { Field = "Titi", Operator = ConditionRuleOperator.equal, Value = "Test" },
+                }
+            };
+
+            var expectedResult = FakeGameService.GetDatas().Count(m => m.DateCreation < date && m.Editor.Name == "Test");
+            var result = FakeGameService.GetDatas()
+                 .Where(m => JsonRuleEngine.Evaluate<Game>(m, conditions, evaluateOptions))
+                 .ToList();
+
+            Assert.True(result.Count() == expectedResult);
+        }
 
         [Fact]
         public void Dictionary()
