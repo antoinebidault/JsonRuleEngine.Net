@@ -319,12 +319,26 @@ namespace JsonRuleEngine.Net
             try
             {
                 string field = rule.Field;
-                var fields = field.Split('.').ToList();
-                bool isDict = typeof(IDictionary).IsAssignableFrom(parm.Type);
 
-                while (fields.Count > 0)
+
+                if (evaluateOptions != null && evaluateOptions.HasTransformer(field))
                 {
-                    expression = CompileExpression(expression ?? parm, fields, isDict, parm, rule.Operator, rule.Value);
+                    var transformer = evaluateOptions.GetTransformer<T>(field, parm);
+
+                    var visitor = new ParameterReplaceVisitor(parm);
+                    Expression newBody = visitor.Visit(transformer);
+
+                    expression = CompileExpression(newBody, new List<string> { field }, parm, rule.Operator, rule.Value, true, dictionary);
+                }
+                else
+                {
+                    var fields = field.Split('.').ToList();
+                    bool isDict = typeof(IDictionary).IsAssignableFrom(parm.Type);
+
+                    while (fields.Count > 0)
+                    {
+                        expression = CompileExpression(expression ?? parm, fields, isDict, parm, rule.Operator, rule.Value);
+                    }
                 }
 
                 return expression;
