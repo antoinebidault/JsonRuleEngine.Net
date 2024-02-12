@@ -236,3 +236,27 @@ This will not work with EF Core (SQL)
 bool result = JsonRuleEngine.Evaluate(dict, new ConditionRuleSet() { Field = "1234", Operator = ConditionRuleOperator.isNotNull });
 Assert.True(result); // Return true
 ```
+
+
+## New feature : EvaluationOptions (since 1.0.95)
+
+You can now override the behavior of a client specified property. For example, you want to map from a more user friendly name like "EditorName" to "model.Editor.Name"
+
+Here is a simple sample
+```CSharp
+   var evaluateOptions = new EvaluateOptions<Game>();
+    evaluateOptions.ForProperty("EditorName", c => c.Editor.Name);
+
+    var conditions = new ConditionRuleSet()
+    {
+        Rules = new[]
+        {
+                new ConditionRuleSet() { Field = "EditorName", Operator = ConditionRuleOperator.equal, Value = "Jean-Marc" },
+        }
+    };
+
+    var expectedResult = FakeGameService.GetDatas().Count(m => m.DateCreation < date && m.Editor.Name == "Jean-Marc");
+    var result = FakeGameService.GetDatas()
+            .Where(m => JsonRuleEngine.Evaluate<Game>(m, conditions, evaluateOptions))
+            .ToList();
+```

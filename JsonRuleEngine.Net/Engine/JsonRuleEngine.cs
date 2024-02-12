@@ -337,7 +337,7 @@ namespace JsonRuleEngine.Net
                     var visitor = new ParameterReplaceVisitor(parm);
                     Expression newBody = visitor.Visit(transformer);
 
-                    expression = CompileExpression(newBody, new List<string> { field }, false, parm, rule.Operator, rule.Value);
+                    expression = CompileExpression(newBody, new List<string> { field }, false, parm, rule.Operator, rule.Value, true);
                 }
                 else
                 {
@@ -346,7 +346,7 @@ namespace JsonRuleEngine.Net
 
                     while (fields.Count > 0)
                     {
-                        expression = CompileExpression(expression ?? parm, fields, isDict, parm, rule.Operator, rule.Value);
+                        expression = CompileExpression(expression ?? parm, fields, isDict, parm, rule.Operator, rule.Value,false);
                     }
                 }
 
@@ -366,7 +366,7 @@ namespace JsonRuleEngine.Net
         /// <return>Expresssion</return>
         public static Func<PropertyAccessorContext, Expression> CustomPropertyAccessor { get; set; }
 
-        private static Expression CompileExpression(Expression expression, List<string> remainingFields, bool isDict, Expression inputParam, ConditionRuleOperator op, object value)
+        private static Expression CompileExpression(Expression expression, List<string> remainingFields, bool isDict, Expression inputParam, ConditionRuleOperator op, object value, bool isOverride)
         {
             string memberName = remainingFields.First();
 
@@ -407,7 +407,7 @@ namespace JsonRuleEngine.Net
             {
                 expression = Expression.Property(inputParam, memberName);
             }
-            else
+            else if (!isOverride)
             {
                 expression = Expression.Property(expression, memberName);
             }
@@ -428,9 +428,9 @@ namespace JsonRuleEngine.Net
             {
                 if (op == ConditionRuleOperator.isNull)
                 {
-                    return Expression.OrElse(Expression.Equal(expression, Expression.Constant(null)), CompileExpression(expression, remainingFields, isDict, inputParam, op, value));
+                    return Expression.OrElse(Expression.Equal(expression, Expression.Constant(null)), CompileExpression(expression, remainingFields, isDict, inputParam, op, value, isOverride));
                 }
-                return Expression.AndAlso(Expression.NotEqual(expression, Expression.Constant(null)), CompileExpression(expression, remainingFields, isDict, inputParam, op, value));
+                return Expression.AndAlso(Expression.NotEqual(expression, Expression.Constant(null)), CompileExpression(expression, remainingFields, isDict, inputParam, op, value, isOverride));
             }
         }
 
@@ -548,7 +548,7 @@ namespace JsonRuleEngine.Net
             {
                 while (remainingFields.Count > 0)
                 {
-                    exp = CompileExpression(exp ?? childParam, remainingFields, false, param, op, value);
+                    exp = CompileExpression(exp ?? childParam, remainingFields, false, param, op, value, false);
                 }
                 anyExpression = Expression.Lambda(exp, childParam);
             }
