@@ -242,6 +242,13 @@ namespace JsonRuleEngine.Net.Tests
 
 
         [Fact]
+        public void Contains_NullValue()
+        {
+            List<Game> list = Test("containsNull.json");
+            Assert.False(list.Count > 0);
+        }
+
+        [Fact]
         public void Dictionary_NoField()
         {
             var dict = new Dictionary<string, object>() {

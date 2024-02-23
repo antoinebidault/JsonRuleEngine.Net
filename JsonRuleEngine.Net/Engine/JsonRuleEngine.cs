@@ -672,7 +672,9 @@ namespace JsonRuleEngine.Net
                 }
             }
 
-            if (value != null && property.Type.IsNullable())
+
+            bool isNullable = property.Type.IsNullable();
+            if (value != null && isNullable)
             {
                 value = Nullable.GetUnderlyingType(property.Type).GetValue(value);
             }
@@ -689,7 +691,7 @@ namespace JsonRuleEngine.Net
 
             if (op == ConditionRuleOperator.isNull)
             {
-                if (!isMethodCall && property.Type.IsNullable())
+                if (!isMethodCall && isNullable)
                 {
                     expression = Expression.Not(Expression.Property(property, "HasValue"));
                 }
@@ -700,7 +702,7 @@ namespace JsonRuleEngine.Net
             }
             else if (op == ConditionRuleOperator.isNotNull)
             {
-                if (!isMethodCall && property.Type.IsNullable())
+                if (!isMethodCall && isNullable)
                 {
                     expression = Expression.Property(property, "HasValue");
                 }
@@ -735,13 +737,24 @@ namespace JsonRuleEngine.Net
             }
             else if (op == ConditionRuleOperator.contains)
             {
+              
                 MethodInfo method = typeof(string).GetMethod("Contains", new[] { typeof(string) });
                 expression = Expression.Call(property, method, toCompare);
+                if (property.Type == typeof(string))
+                {
+                    var notExp = Expression.NotEqual(property, Expression.Default(property.Type));
+                    expression = Expression.AndAlso(notExp, expression);
+                }
             }
             else if (op == ConditionRuleOperator.doesNotContains)
             {
                 MethodInfo method = typeof(string).GetMethod("Contains", new[] { typeof(string) });
                 expression = Expression.Not(Expression.Call(property, method, toCompare));
+                if (property.Type == typeof(string))
+                {
+                    var notExp = Expression.NotEqual(property, Expression.Default(property.Type));
+                    expression = Expression.AndAlso(notExp, expression);
+                }
             }
 
             return expression;

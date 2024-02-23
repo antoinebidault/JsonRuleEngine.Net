@@ -1,0 +1,6 @@
+﻿{
+  "separator": "And",
+  "field": "Category",
+  "operator": "contains",
+  "value": "GTA"
+}
