@@ -20,7 +20,7 @@ namespace JsonRuleEngine.Net.Tests
                 "Editor.Name",
                 "Reviews.Id"
             };
-            var result = JsonRuleEngine.ValidateExpressionFields(data, whiteList);
+            var result = new JsonRuleEngine().ValidateExpressionFields(data, whiteList);
             Assert.True(result.Success);
         }
 

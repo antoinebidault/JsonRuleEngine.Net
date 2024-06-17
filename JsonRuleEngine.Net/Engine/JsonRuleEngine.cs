@@ -11,11 +11,10 @@ using System.Text;
 
 namespace JsonRuleEngine.Net
 {
-
     /// <summary>
     /// The JsonRuleEngine class that contains
     /// </summary>
-    public static class JsonRuleEngine
+    public class JsonRuleEngine
     {
         /// <summary>
         /// Validate expression against a list of white listed field
@@ -24,7 +23,7 @@ namespace JsonRuleEngine.Net
         /// <param name="jsonRules"></param>
         /// <param name="fieldWhiteList"></param>
         /// <returns></returns>
-        public static ValidateExpressionResult ValidateExpressionFields(string jsonRules, IEnumerable<string> fieldWhiteList)
+        public ValidateExpressionResult ValidateExpressionFields(string jsonRules, IEnumerable<string> fieldWhiteList)
         {
             var data = Parse(jsonRules);
             if (data == null)
@@ -35,7 +34,7 @@ namespace JsonRuleEngine.Net
             return ValidateExpressionRecursive(data, fieldWhiteList);
         }
 
-        private static ValidateExpressionResult ValidateExpressionRecursive(ConditionRuleSet rule, IEnumerable<string> fieldWhiteList)
+        private ValidateExpressionResult ValidateExpressionRecursive(ConditionRuleSet rule, IEnumerable<string> fieldWhiteList)
         {
             if (!string.IsNullOrEmpty(rule.Field) && !fieldWhiteList.Contains(rule.Field))
             {
@@ -60,7 +59,6 @@ namespace JsonRuleEngine.Net
             return ValidateExpressionResult.Valid;
         }
 
-
         /// <summary>
         /// Transform the ConditionRuleSet object to an expression function 
         /// that can be evaluated in LinqToSql queries or whatever
@@ -69,7 +67,7 @@ namespace JsonRuleEngine.Net
         /// <param name="jsonRules"></param>
         /// <param name="evaluateOptions"></param>
         /// <returns>Expression function</returns>
-        public static Expression<Func<T, bool>> ParseExpression<T>(string jsonRules, EvaluateOptions<T> evaluateOptions = null)
+        public Expression<Func<T, bool>> ParseExpression<T>(string jsonRules, EvaluateOptions<T> evaluateOptions = null)
         {
             return ParseExpression<T>(Parse(jsonRules), evaluateOptions);
         }
@@ -82,7 +80,7 @@ namespace JsonRuleEngine.Net
         /// <param name="rules"></param>
         /// <param name="evaluateOptions"></param>
         /// <returns></returns>
-        public static Expression<Func<T, bool>> ParseExpression<T>(ConditionRuleSet rules, EvaluateOptions<T> evaluateOptions = null)
+        public Expression<Func<T, bool>> ParseExpression<T>(ConditionRuleSet rules, EvaluateOptions<T> evaluateOptions = null)
         {
             var itemExpression = Expression.Parameter(typeof(T));
             var conditions = ParseTree<T>(rules, itemExpression, evaluateOptions);
@@ -114,7 +112,7 @@ namespace JsonRuleEngine.Net
         /// <param name="jsonRules">The json string conditionRuleSet object</param>
         /// <param name="evaluateOptions"></param>
         /// <returns>True if the conditions are matched</returns>
-        public static bool Evaluate<T>(T obj, string jsonRules, EvaluateOptions<T> evaluateOptions = null)
+        public bool Evaluate<T>(T obj, string jsonRules, EvaluateOptions<T> evaluateOptions = null)
         {
             var query = ParseExpression<T>(jsonRules, evaluateOptions);
             return query.Compile().Invoke(obj);
@@ -129,7 +127,7 @@ namespace JsonRuleEngine.Net
         /// <param name="jsonRules">The json string conditionRuleSet object</param>
         /// <param name="evaluateOptions"></param>
         /// <returns>True if the conditions are matched</returns>
-        public static TOut Evaluate<T, TOut>(T obj, string jsonRules, EvaluateOptions<T> evaluateOptions = null)
+        public TOut Evaluate<T, TOut>(T obj, string jsonRules, EvaluateOptions<T> evaluateOptions = null)
         {
             var rules = Parse<TOut>(jsonRules);
             return Evaluate<T, TOut>(obj, rules, evaluateOptions);
@@ -144,10 +142,10 @@ namespace JsonRuleEngine.Net
         /// <param name="jsonRules">The json string conditionRuleSet object</param>
         /// <param name="returnValue">The json string conditionRuleSet object</param>
         /// <returns>True if the conditions are matched</returns>
-        public static bool TryEvaluate<T, TOut>(T obj, string jsonRules, out TOut returnValue)
+        public bool TryEvaluate<T, TOut>(T obj, string jsonRules, out TOut returnValue)
         {
             var rules = Parse<TOut>(jsonRules);
-            return JsonRuleEngine.TryEvaluate<T, TOut>(obj, rules, out returnValue);
+            return TryEvaluate<T, TOut>(obj, rules, out returnValue);
         }
 
         /// <summary>
@@ -159,7 +157,7 @@ namespace JsonRuleEngine.Net
         /// <param name="rules">The conditionRuleSet object</param>
         /// <param name="evaluateOptions"></param>
         /// <returns>True if the conditions are matched</returns>
-        public static TOut Evaluate<T, TOut>(T obj, ConditionRuleSet<TOut> rules,EvaluateOptions<T> evaluateOptions)
+        public TOut Evaluate<T, TOut>(T obj, ConditionRuleSet<TOut> rules, EvaluateOptions<T> evaluateOptions)
         {
             var query = ParseExpression<T>(rules, evaluateOptions);
             var result = query.Compile().Invoke(obj);
@@ -182,7 +180,7 @@ namespace JsonRuleEngine.Net
         /// <param name="obj">The object to test</param>
         /// <param name="rules">The conditionRuleSet object</param>
         /// <returns>True if the conditions are matched</returns>
-        public static bool TryEvaluate<T, TOut>(T obj, ConditionRuleSet<TOut> rules, out TOut returnValue)
+        public bool TryEvaluate<T, TOut>(T obj, ConditionRuleSet<TOut> rules, out TOut returnValue)
         {
             returnValue = default;
             var query = ParseExpression<T>(rules);
@@ -202,9 +200,9 @@ namespace JsonRuleEngine.Net
         /// <param name="obj"></param>
         /// <param name="rules"></param>
         /// <returns></returns>
-        public static bool Evaluate(object obj, ConditionRuleSet rules)
+        public bool Evaluate(object obj, ConditionRuleSet rules)
         {
-            MethodInfo method = typeof(JsonRuleEngine).GetMethods(BindingFlags.Static | BindingFlags.Public)
+            MethodInfo method = typeof(JsonRuleEngine).GetMethods(BindingFlags.Instance | BindingFlags.Public)
                 .Single(m => m.Name == nameof(JsonRuleEngine.Evaluate) &&
                         m.GetParameters() != null &&
                         m.ContainsGenericParameters &&
@@ -212,9 +210,8 @@ namespace JsonRuleEngine.Net
                      m.GetParameters().Select(c => c.ParameterType).Contains(typeof(ConditionRuleSet)));
 
             MethodInfo generic = method.MakeGenericMethod(obj.GetType());
-            return (bool)generic.Invoke(null, parameters: new[] { obj, rules, null });
+            return (bool)generic.Invoke(this, parameters: new[] { obj, rules, null });
         }
-
 
         /// <summary>
         /// Test the conditions
@@ -224,23 +221,23 @@ namespace JsonRuleEngine.Net
         /// <param name="rules">The conditionRuleSet object</param>
         /// <param name="evaluateOptions"></param>
         /// <returns>True if the conditions are matched</returns>
-        public static bool Evaluate<T>(T obj, ConditionRuleSet rules, EvaluateOptions<T> evaluateOptions = null)
+        public bool Evaluate<T>(T obj, ConditionRuleSet rules, EvaluateOptions<T> evaluateOptions = null)
         {
             var query = ParseExpression<T>(rules, evaluateOptions);
             return query.Compile().Invoke(obj);
         }
 
-        private static readonly MethodInfo MethodContains = typeof(Enumerable).GetMethods(
+        private readonly MethodInfo MethodContains = typeof(Enumerable).GetMethods(
                         BindingFlags.Static | BindingFlags.Public)
                         .Single(m => m.Name == nameof(Enumerable.Contains)
                             && m.GetParameters().Length == 2);
 
-        private static readonly MethodInfo MethodAny = typeof(Enumerable).GetMethods(
+        private readonly MethodInfo MethodAny = typeof(Enumerable).GetMethods(
                         BindingFlags.Static | BindingFlags.Public)
                         .Single(m => m.Name == nameof(Enumerable.Any)
                             && m.GetParameters().Length == 1);
 
-        private static readonly MethodInfo MethodNotContains = typeof(Enumerable).GetMethods(
+        private readonly MethodInfo MethodNotContains = typeof(Enumerable).GetMethods(
                     BindingFlags.Static | BindingFlags.Public)
                     .Single(m => m.Name == nameof(Enumerable.Except)
                         && m.GetParameters().Length == 2);
@@ -253,8 +250,9 @@ namespace JsonRuleEngine.Net
         /// <typeparam name="T"></typeparam>
         /// <param name="condition"></param>
         /// <param name="parm"></param>
+        /// <param name="evaluateOptions"></param>
         /// <returns></returns>
-        private static Expression ParseTree<T>(
+        private Expression ParseTree<T>(
         ConditionRuleSet condition,
         ParameterExpression parm
         , EvaluateOptions<T> evaluateOptions)
@@ -307,7 +305,7 @@ namespace JsonRuleEngine.Net
             return default(T);
         }
 
-        private static Expression CreateRuleExpression<T>(ConditionRuleSet rule, ParameterExpression parm, EvaluateOptions<T> evaluateOptions)
+        private Expression CreateRuleExpression<T>(ConditionRuleSet rule, ParameterExpression parm, EvaluateOptions<T> evaluateOptions)
         {
             Expression right = null;
             if (rule.Separator.HasValue && rule.Rules != null && rule.Rules.Any())
@@ -328,7 +326,6 @@ namespace JsonRuleEngine.Net
             {
                 string field = rule.Field;
 
-
                 if (evaluateOptions != null && evaluateOptions.HasTransformer(field))
                 {
                     var transformer = evaluateOptions.GetTransformer<T>(field, parm);
@@ -345,7 +342,7 @@ namespace JsonRuleEngine.Net
 
                     while (fields.Count > 0)
                     {
-                        expression = CompileExpression(expression ?? parm, fields, isDict, parm, rule.Operator, rule.Value,false);
+                        expression = CompileExpression(expression ?? parm, fields, isDict, parm, rule.Operator, rule.Value, false);
                     }
                 }
 
@@ -363,16 +360,16 @@ namespace JsonRuleEngine.Net
         /// (string fieldName, inputPara) => {  EF.Functions.JsonValue(w.ExtraInformation, "InternetTLD") }
         /// </summary>
         /// <return>Expresssion</return>
-        public static Func<PropertyAccessorContext, Expression> CustomPropertyAccessor { get; set; }
+        public Func<PropertyAccessorContext, Expression> CustomPropertyAccessor { get; set; }
 
-        private static Expression CompileExpression(Expression expression, List<string> remainingFields, bool isDict, Expression inputParam, ConditionRuleOperator op, object value, bool isOverride)
+        private Expression CompileExpression(Expression expression, List<string> remainingFields, bool isDict, Expression inputParam, ConditionRuleOperator op, object value, bool isOverride)
         {
             string memberName = remainingFields.First();
 
             // If a custom accessor is set
-            if (JsonRuleEngine.CustomPropertyAccessor != null)
+            if (this.CustomPropertyAccessor != null)
             {
-                var tmpExpression = JsonRuleEngine.CustomPropertyAccessor.Invoke(new PropertyAccessorContext()
+                var tmpExpression = this.CustomPropertyAccessor.Invoke(new PropertyAccessorContext()
                 {
                     ValueCompared = value,
                     MemberName = memberName,
@@ -391,14 +388,13 @@ namespace JsonRuleEngine.Net
             {
                 Expression key = Expression.Constant(memberName);
                 var type = GetDictionaryType(value, op);
-                var methodGetValue = (typeof(JsonRuleEngine)).GetMethod(nameof(GetValueOrDefaultObject)).MakeGenericMethod(type);
+                var methodGetValue = (this.GetType()).GetMethod(nameof(GetValueOrDefaultObject)).MakeGenericMethod(type);
                 expression = Expression.Call(methodGetValue, expression, key);
-
             }
             else if (isDict)
             {
                 Expression key = Expression.Constant(memberName);
-                var methodGetValue = (typeof(JsonRuleEngine)).GetMethod("GetValueOrDefault");
+                var methodGetValue = (this.GetType()).GetMethod("GetValueOrDefault");
 
                 expression = Expression.Call(methodGetValue, inputParam, key);
             }
@@ -410,8 +406,6 @@ namespace JsonRuleEngine.Net
             {
                 expression = Expression.Property(expression, memberName);
             }
-
-
 
             if (expression.Type.IsArray())
             {
@@ -433,7 +427,7 @@ namespace JsonRuleEngine.Net
             }
         }
 
-        private static Type GetDictionaryType(object value, ConditionRuleOperator op)
+        private Type GetDictionaryType(object value, ConditionRuleOperator op)
         {
             if (value == null)
             {
@@ -458,12 +452,12 @@ namespace JsonRuleEngine.Net
             }
 
             if (value is JArray)
-                return typeof(IEnumerable<>).MakeGenericType(((JArray)value).GetJArrayType());
+                return typeof(IEnumerable<>).MakeGenericType(GetJArrayType((JArray)value));
 
             return value.GetType();
         }
 
-        private static Type GetJArrayType(this JArray array)
+        private Type GetJArrayType(JArray array)
         {
             var firstValue = array.FirstOrDefault();
             if (firstValue != null)
@@ -489,7 +483,6 @@ namespace JsonRuleEngine.Net
             return null;
         }
 
-
         /// <summary>
         /// Handle table rule
         /// </summary>
@@ -500,11 +493,10 @@ namespace JsonRuleEngine.Net
         /// <param name="remainingFields"></param>
         /// <returns></returns>
         /// <exception cref="JsonRuleEngineException"></exception>
-        private static Expression HandleTableRule(Expression array, Expression param, ConditionRuleOperator op, object value, List<string> remainingFields)
+        private Expression HandleTableRule(Expression array, Expression param, ConditionRuleOperator op, object value, List<string> remainingFields)
         {
-
             var currentField = remainingFields.First();
-            var childType = array.Type == typeof(JArray) ? ((JArray)value).GetJArrayType() : array.Type.GetGenericArguments().First();
+            var childType = array.Type == typeof(JArray) ? GetJArrayType((JArray)value) : array.Type.GetGenericArguments().First();
 
             // Contains methods
             // Need a conversion to an array of string
@@ -543,7 +535,7 @@ namespace JsonRuleEngine.Net
             remainingFields.Remove(currentField);
 
             // True if it is a class
-            if (childType.IsClass())
+            if (IsClass(childType))
             {
                 while (remainingFields.Count > 0)
                 {
@@ -571,11 +563,10 @@ namespace JsonRuleEngine.Net
             return Expression.AndAlso(Expression.NotEqual(array, Expression.Constant(null)), Expression.Call(anyMethod, array, anyExpression));
         }
 
-        private static bool IsClass(this Type type)
+        private bool IsClass(Type type)
         {
             return type.IsClass && !type.IsArray && !type.IsAbstract && !type.IsEnum && type != typeof(string);
         }
-
 
         /// <summary>
         /// Create an operation expression from the input prop to value
@@ -585,7 +576,7 @@ namespace JsonRuleEngine.Net
         /// <param name="value"></param>
         /// <returns></returns>
         /// <exception cref="JsonRuleEngineException"></exception>
-        private static Expression CreateOperationExpression(Expression inputProperty, ConditionRuleOperator op, object value)
+        private Expression CreateOperationExpression(Expression inputProperty, ConditionRuleOperator op, object value)
         {
             Expression expression = null;
 
@@ -594,7 +585,6 @@ namespace JsonRuleEngine.Net
             if (op == ConditionRuleOperator.@in ||
                 op == ConditionRuleOperator.notIn)
             {
-
                 // Parsing the array
                 try
                 {
@@ -628,13 +618,10 @@ namespace JsonRuleEngine.Net
                 {
                     throw new JsonRuleEngineException(JsonRuleEngineExceptionCategory.InvalidValue, $"The provided value is not an array {value.ToString()} : {e.Message} ");
                 }
-
             }
-
 
             var property = inputProperty;
             bool isMethodCall = property is MethodCallExpression;
-
 
             // Specific case of TimeSpan Stored as "\00:22:00"\""
             if (value != null)
@@ -658,7 +645,7 @@ namespace JsonRuleEngine.Net
                     }
 
                     // Date format "yyyy-mm-dd"
-                    if (isDatePeriod  || (dateStr.Length == 10 && dateStr.IndexOf("-") == 4))
+                    if (isDatePeriod || (dateStr.Length == 10 && dateStr.IndexOf("-") == 4))
                     {
                         if (property.Type.IsNullable())
                         {
@@ -671,7 +658,6 @@ namespace JsonRuleEngine.Net
                     }
                 }
             }
-
 
             bool isNullable = property.Type.IsNullable();
             if (value != null && isNullable)
@@ -737,7 +723,6 @@ namespace JsonRuleEngine.Net
             }
             else if (op == ConditionRuleOperator.contains)
             {
-              
                 MethodInfo method = typeof(string).GetMethod("Contains", new[] { typeof(string) });
                 expression = Expression.Call(property, method, toCompare);
                 if (property.Type == typeof(string))
@@ -760,15 +745,13 @@ namespace JsonRuleEngine.Net
             return expression;
         }
 
-
-        private static DateTime ParseTimeSpan(string str)
+        private DateTime ParseTimeSpan(string str)
         {
             TimeSpan ts = JsonConvert.DeserializeObject<TimeSpan>(str);
             return DateTime.UtcNow.Add(ts);
         }
 
-
-        private static string[] ToArray(object obj)
+        private string[] ToArray(object obj)
         {
             return ((IEnumerable)obj).Cast<object>()
                               .Select(x => x.ToString())
@@ -780,7 +763,7 @@ namespace JsonRuleEngine.Net
         /// </summary>
         /// <param name="jsonRules"></param>
         /// <returns></returns>
-        private static ConditionRuleSet Parse(string jsonRules)
+        private ConditionRuleSet Parse(string jsonRules)
         {
             try
             {
@@ -792,7 +775,7 @@ namespace JsonRuleEngine.Net
             }
         }
 
-        private static ConditionRuleSet<TOut> Parse<TOut>(string jsonRules)
+        private ConditionRuleSet<TOut> Parse<TOut>(string jsonRules)
         {
             try
             {

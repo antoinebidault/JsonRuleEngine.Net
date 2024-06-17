@@ -5,9 +5,9 @@
     <Description>Simple json rule engine</Description>
     <Authors>antoinebidault</Authors>
     <Company>Dastra</Company>
-    <PackageProjectUrl>https://github.com/antoinebidault/JsonRuleEngine.Net</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/antoinebidault/JsonRuleEngine.Net</RepositoryUrl>
-    <PackageIcon>JsonRuleEngine.Net.png</PackageIcon>
+    <PackageProjectUrl>https://github.com/antoinebidault/new new JsonRuleEngine()().Net</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/antoinebidault/new new JsonRuleEngine()().Net</RepositoryUrl>
+    <PackageIcon>new new JsonRuleEngine()().Net.png</PackageIcon>
     <RepositoryType>Open Source</RepositoryType>
     <PackageTags>Rule engine, Json, Condition expression, C#, .NET Core</PackageTags>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
@@ -23,7 +23,7 @@
    </ItemGroup>
 
   <ItemGroup>
-    <None Update="JsonRuleEngine.Net.png">
+    <None Include="new new JsonRuleEngine()().Net.png">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>
