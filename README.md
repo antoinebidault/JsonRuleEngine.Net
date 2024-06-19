@@ -7,7 +7,10 @@
 # JsonRuleEngine.Net
 
 A simple C# Asp.Net Core rule engine parser and evaluator using a simple json format.
-This lib is inspired by the [json rules engine](https://github.com/cachecontrol/json-rules-engine).
+
+
+
+lib is inspired by the [json rules engine](https://github.com/cachecontrol/json-rules-engine).
 We are using it in production in the [Dastra](https://www.dastra.eu) complex table filtering engine and it works like a charm :).
 
 # Purpose

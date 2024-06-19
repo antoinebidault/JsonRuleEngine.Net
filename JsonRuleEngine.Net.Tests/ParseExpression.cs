@@ -11,7 +11,7 @@ namespace JsonRuleEngine.Net.Tests
         [Fact()]
         public void ParseExpressionTest()
         {
-            var expression = JsonRuleEngine.ParseExpression<Game>(new ConditionRuleSet() { Field = "Name", Operator = ConditionRuleOperator.equal, Value = "GTA" });
+            var expression = new JsonRuleEngine().ParseExpression<Game>(new ConditionRuleSet() { Field = "Name", Operator = ConditionRuleOperator.equal, Value = "GTA" });
             var gameToTest = new Game() { Name = "GTA" };
             Assert.True(expression.Compile().Invoke(gameToTest));
         }

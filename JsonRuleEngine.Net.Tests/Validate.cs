@@ -12,7 +12,7 @@ namespace JsonRuleEngine.Net.Tests
         public void ValidateExpression()
         {
             var data = File.ReadAllText(Path.Combine("TestJsons/", "complex.json"));
-            var items = FakeGameService.GetDatas();
+            var items = FakeGameService.GetData();
             var whiteList = new List<string>() {
                 "Category",
                 "Price",
@@ -20,7 +20,7 @@ namespace JsonRuleEngine.Net.Tests
                 "Editor.Name",
                 "Reviews.Id"
             };
-            var result = JsonRuleEngine.ValidateExpressionFields(data, whiteList);
+            var result = new JsonRuleEngine().ValidateExpressionFields(data, whiteList);
             Assert.True(result.Success);
         }
 
