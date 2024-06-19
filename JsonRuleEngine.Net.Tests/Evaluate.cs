@@ -120,8 +120,8 @@ namespace JsonRuleEngine.Net.Tests
                 }
             };
 
-            var expectedResult = FakeGameService.GetDatas().Count(m => m.DateCreation < date && m.Editor.Name == "Test" && m.Reviews.Count() > 0);
-            var result = FakeGameService.GetDatas()
+            var expectedResult = FakeGameService.GetData().Count(m => m.DateCreation < date && m.Editor.Name == "Test" && m.Reviews.Count() > 0);
+            var result = FakeGameService.GetData()
                  .Where(m => new JsonRuleEngine().Evaluate<Game>(m, conditions, evaluateOptions))
                  .ToList();
 
@@ -278,7 +278,7 @@ namespace JsonRuleEngine.Net.Tests
         public void SimpleReturn()
         {
             string rules = GetJsonTestFile("simpleReturn.json");
-            var data = FakeGameService.GetDatas().First(x => x.Name == "GTA V");
+            var data = FakeGameService.GetData().First(x => x.Name == "GTA V");
 
             var returnValue = new JsonRuleEngine().Evaluate<Game, string>(data, rules);
 
@@ -289,7 +289,7 @@ namespace JsonRuleEngine.Net.Tests
         public void TryEvaluateTest()
         {
             string rules = GetJsonTestFile("simpleReturn.json");
-            var data = FakeGameService.GetDatas().First(x => x.Name == "GTA V");
+            var data = FakeGameService.GetData().First(x => x.Name == "GTA V");
 
             var result = new JsonRuleEngine().TryEvaluate<Game, string>(data, rules, out var returnValue);
 
@@ -304,7 +304,7 @@ namespace JsonRuleEngine.Net.Tests
             // Get all games with at least one review with the text value "It's cool"
             string rules = GetJsonTestFile("listEqual.json");
             var expression = new JsonRuleEngine().ParseExpression<Game>(rules);
-            var datas = FakeGameService.GetDatas().Where(expression).ToList();
+            var datas = FakeGameService.GetData().Where(expression).ToList();
             Assert.True(datas.Count() == 1);
         }
 
@@ -316,7 +316,7 @@ namespace JsonRuleEngine.Net.Tests
             // Get all games with at least one review with the text value "It's cool"
             string rules = GetJsonTestFile("listStringEqual.json");
             var expression = new JsonRuleEngine().ParseExpression<Game>(rules);
-            var datas = FakeGameService.GetDatas().Where(expression).ToList();
+            var datas = FakeGameService.GetData().Where(expression).ToList();
             Assert.True(datas.Count() == 1);
         }
 
@@ -325,7 +325,7 @@ namespace JsonRuleEngine.Net.Tests
         {
             string rules = GetJsonTestFile("complexReturn.json");
             var expression = new JsonRuleEngine().ParseExpression<Game>(rules);
-            var datas = FakeGameService.GetDatas().Where(expression).ToList();
+            var datas = FakeGameService.GetData().Where(expression).ToList();
 
             foreach (var data in datas)
             {
@@ -349,7 +349,7 @@ namespace JsonRuleEngine.Net.Tests
         public void GreaterThan()
         {
             List<Game> list = Test("greaterThan.json");
-            int total = FakeGameService.GetDatas().Count();
+            int total = FakeGameService.GetData().Count();
 
             Assert.True(list.Count > 0 && list.Count < total);
         }
@@ -359,9 +359,16 @@ namespace JsonRuleEngine.Net.Tests
         public void Enum()
         {
             List<Game> list = Test("enum.json");
-            var expectedCount = FakeGameService.GetDatas()
+            var expectedCount = FakeGameService.GetData()
                 .Count(m => m.Type == GameType.CityBuilder || m.Type == GameType.RPG);
             Assert.True(list.Count == expectedCount, $"{list.Count}/{expectedCount}");
+        }
+
+        [Fact]
+        public void CombinedCollection()
+        {
+            List<Game> list = Test("combinedCollection.json");
+            Assert.True(list.Count == 0);
         }
 
 
@@ -411,7 +418,7 @@ namespace JsonRuleEngine.Net.Tests
             List<Game> list = Test("listIsEmpty.json");
 
             Assert.NotEmpty(list);
-            Assert.True(list.All(m => !m.Reviews.Any()));
+            Assert.True(list.All(m => m.Reviews == null || !m.Reviews.Any() ));
         }
 
         [Fact]
@@ -429,7 +436,7 @@ namespace JsonRuleEngine.Net.Tests
         {
             string rules = GetJsonTestFile("guid.json");
 
-            var items = FakeGameService.GetDatas();
+            var items = FakeGameService.GetData();
             bool result = new JsonRuleEngine().Evaluate(items.First(), rules);
             Assert.False(result);
         }
@@ -440,7 +447,7 @@ namespace JsonRuleEngine.Net.Tests
         {
             string rules = GetJsonTestFile("bool.json");
 
-            var items = FakeGameService.GetDatas();
+            var items = FakeGameService.GetData();
             bool result = new JsonRuleEngine().Evaluate(items.First(), rules);
             Assert.True(result);
         }
@@ -450,7 +457,7 @@ namespace JsonRuleEngine.Net.Tests
         {
             string rules = GetJsonTestFile("date.json");
 
-            var items = FakeGameService.GetDatas();
+            var items = FakeGameService.GetData();
             bool result = new JsonRuleEngine().Evaluate(items.First(), rules);
             Assert.True(result);
         }
@@ -460,29 +467,26 @@ namespace JsonRuleEngine.Net.Tests
         {
             string rules = GetJsonTestFile("dateComplex.json");
 
-            var items = FakeGameService.GetDatas();
+            var items = FakeGameService.GetData();
             bool result = new JsonRuleEngine().Evaluate(items.First(), rules);
             Assert.True(result);
         }
-
-
 
         [Fact]
         public void DeepProps()
         {
             string rules = GetJsonTestFile("deepProps.json");
-            var items = FakeGameService.GetDatas();
+            var items = FakeGameService.GetData();
             var result = new JsonRuleEngine().Evaluate(items.First(), rules);
             Assert.True(result);
         }
-
 
         [Fact]
         public void TimeSpan()
         {
             string rules = GetJsonTestFile("timespan.json");
 
-            var items = FakeGameService.GetDatas();
+            var items = FakeGameService.GetData();
             bool result = new JsonRuleEngine().Evaluate(new Game() { Date = DateTime.UtcNow }, rules);
             Assert.True(result);
         }
@@ -504,7 +508,7 @@ namespace JsonRuleEngine.Net.Tests
         {
             string rules = GetJsonTestFile("object.json");
 
-            var items = FakeGameService.GetDatas();
+            var items = FakeGameService.GetData();
             bool result = new JsonRuleEngine().Evaluate(items.Last(), rules);
             Assert.True(result);
         }
@@ -515,7 +519,7 @@ namespace JsonRuleEngine.Net.Tests
         {
             string rules = GetJsonTestFile("listContains.json");
 
-            var items = FakeGameService.GetDatas();
+            var items = FakeGameService.GetData();
             bool result = new JsonRuleEngine().Evaluate(items.First(), rules);
             Assert.True(result);
         }
@@ -525,7 +529,7 @@ namespace JsonRuleEngine.Net.Tests
         {
             string rules = GetJsonTestFile("listIn.json");
 
-            var items = FakeGameService.GetDatas();
+            var items = FakeGameService.GetData();
             bool result = new JsonRuleEngine().Evaluate(items.First(), rules);
             Assert.True(result);
         }
@@ -534,7 +538,7 @@ namespace JsonRuleEngine.Net.Tests
         {
             string rules = GetJsonTestFile("listNotIn.json");
 
-            var items = FakeGameService.GetDatas();
+            var items = FakeGameService.GetData();
             bool result = new JsonRuleEngine().Evaluate(items.First(), rules);
             Assert.False(result);
 
@@ -592,7 +596,7 @@ namespace JsonRuleEngine.Net.Tests
         {
             string rules = GetJsonTestFile("empty.json");
 
-            var items = FakeGameService.GetDatas();
+            var items = FakeGameService.GetData();
             bool result = new JsonRuleEngine().Evaluate(items.First(), rules);
             Assert.False(result);
         }
@@ -602,7 +606,7 @@ namespace JsonRuleEngine.Net.Tests
         {
             string rules = GetJsonTestFile("isNull.json");
 
-            var items = FakeGameService.GetDatas();
+            var items = FakeGameService.GetData();
             bool result = new JsonRuleEngine().Evaluate(new Game() { Category = null, Date = null }, rules);
             Assert.True(result);
         }
@@ -611,7 +615,7 @@ namespace JsonRuleEngine.Net.Tests
         public void IsNotNull()
         {
             string rules = GetJsonTestFile("isNotNull.json");
-            var items = FakeGameService.GetDatas();
+            var items = FakeGameService.GetData();
             bool result = new JsonRuleEngine().Evaluate(new Game() { Category = "Titi", Date = DateTime.UtcNow }, rules);
             Assert.True(result);
         }
@@ -637,7 +641,7 @@ namespace JsonRuleEngine.Net.Tests
         {
             string rules = GetJsonTestFile("complex.json");
 
-            var items = FakeGameService.GetDatas();
+            var items = FakeGameService.GetData();
             bool result = new JsonRuleEngine().Evaluate(items.First(), rules);
             Assert.True(result);
         }
@@ -647,7 +651,7 @@ namespace JsonRuleEngine.Net.Tests
         {
             string rules = GetJsonTestFile("complex.json");
 
-            var items = FakeGameService.GetDatas();
+            var items = FakeGameService.GetData();
             bool result = new JsonRuleEngine().Evaluate(items.First(), new ConditionRuleSet() { Field = "Name", Operator = ConditionRuleOperator.isNotNull });
             Assert.True(result);
         }
@@ -658,7 +662,7 @@ namespace JsonRuleEngine.Net.Tests
 
             var expression = new JsonRuleEngine().ParseExpression<Game>(rules);
 
-            var datas = FakeGameService.GetDatas();
+            var datas = FakeGameService.GetData();
             var list = datas.Where(expression).ToList();
             return list;
         }

@@ -8,7 +8,7 @@ namespace JsonRuleEngine.Net.Tests
 
     public static class FakeGameService
     {
-        public static IQueryable<Game> GetDatas()
+        public static IQueryable<Game> GetData()
         {
             return new List<Game>()
             {

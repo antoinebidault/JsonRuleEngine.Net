@@ -1,0 +1,21 @@
+﻿{
+  "separator": "And",
+  "rules": [
+    {
+      "field": "Stock",
+      "operator": "equal",
+      "value": 1
+    },
+    {
+      "field": "Reviews.Id",
+      "operator": "equal",
+      "value": 1
+    },
+    {
+      "field": "Reviews.Text",
+      "operator": "equal",
+      "value": "It's very cool"
+    }
+
+  ]
+}

@@ -4,6 +4,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -257,7 +258,7 @@ namespace JsonRuleEngine.Net
         ParameterExpression parm
         , EvaluateOptions<T> evaluateOptions)
         {
-            IEnumerable<ConditionRuleSet> rules = condition.Rules;
+            condition = RegroupFieldsByCollection(typeof(T), condition);
 
             Binder binder = condition.Separator == ConditionRuleSeparator.Or ? (Binder)Expression.Or : Expression.And;
 
@@ -279,6 +280,148 @@ namespace JsonRuleEngine.Net
             }
 
             return left;
+        }
+
+
+
+        /// <summary>
+        /// Take each condition and regroup them by filters on collection
+        /// { field: "Reviews.Id"}, {field: "Reviews.Type"} => { field: "Reviews", collectionRules: [ { field: "Id"}, {field: "Type"}] }
+        /// </summary>
+        /// <param name="condition"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        private static ConditionRuleSet RegroupFieldsByCollection(Type type, ConditionRuleSet condition)
+        {
+
+            var conditionRuleSet = new ConditionRuleSet()
+            {
+                Field = condition.Field,
+                Operator = condition.Operator,
+                CollectionRules = condition.CollectionRules,
+                Value = condition.Value,
+                Rules = condition.Rules,
+                Separator = condition.Separator
+            };
+
+            HashSet<string> collectionGroups = new HashSet<string>();
+
+            if (!string.IsNullOrEmpty(conditionRuleSet.Field))
+            {
+                var (field, currentType) = GetCollectionType(type, conditionRuleSet.Field);
+                if (!string.IsNullOrEmpty(field))
+                {
+
+                    string subField = "";
+
+                    if (conditionRuleSet.Field.Length > field.Length + 1)
+                    {
+                        subField = condition.Field.Substring(field.Length + 1, condition.Field.Length - field.Length - 1);
+                    }
+                    conditionRuleSet.Field = field;
+                    conditionRuleSet.Value = null;
+                    conditionRuleSet.Separator = condition.Separator;
+                    conditionRuleSet.Rules = null;
+                    conditionRuleSet.CollectionRules = new List<ConditionRuleSet>() {
+                      RegroupFieldsByCollection(currentType,  new ConditionRuleSet()
+                        {
+                            Field = subField,
+                            Operator = condition.Operator,
+                            Value = condition.Value
+                        })
+                     };
+                }
+            }
+
+            if (conditionRuleSet.Rules == null && conditionRuleSet.CollectionRules == null)
+            {
+                return conditionRuleSet;
+            }
+
+            var rules = conditionRuleSet.Rules ?? conditionRuleSet.CollectionRules;
+            var groups = rules.GroupBy(m => GetCollectionType(type, m.Field));
+
+            foreach (var group in groups)
+            {
+                if (group.Key.Item1 == string.Empty)
+                {
+                    for (var i = 0; i < group.Count(); i++)
+                    {
+                        var rule = group.ElementAt(i);
+                        rules = rules.Append(rule);
+                    }
+                }
+                else
+                {
+                    conditionRuleSet.Field = group.Key.Item1;
+
+                    for (var i = 0; i < group.Count(); i++)
+                    {
+                        var rule = group.ElementAt(i);
+                        if (rule.Field.Length > group.Key.Item1.Length + 1)
+                        {
+                            rule.Field = rule.Field.Substring(group.Key.Item1.Length + 1, rule.Field.Length - group.Key.Item1.Length - 1);
+                        }
+                        else
+                        {
+                            rule.Field = "";
+                        }
+                        var arrType = group.Key.Item2;
+                        if (arrType != null)
+                        {
+                            var regroupField = RegroupFieldsByCollection(arrType, new ConditionRuleSet()
+                            {
+                                Field = rule.Field,
+                                Operator = rule.Operator,
+                                Value = rule.Value
+                            });
+                            rule.CollectionRules = regroupField.CollectionRules;
+                            rule.Field = regroupField.Field;
+                            rule.Operator = regroupField.Operator;
+                            rule.Value = regroupField.Value;
+                        }
+                        rule.Separator = condition.Separator;
+                    }
+                    conditionRuleSet.Rules = null;
+                    conditionRuleSet.CollectionRules = group.ToList();
+                }
+            }
+
+            return conditionRuleSet;
+        }
+
+        private static (string, Type) GetCollectionType(Type type, string field)
+        {
+            var output = "";
+            var currentType = type;
+            var oldFields = new List<string>();
+
+            if (field == null)
+            {
+                return (output, currentType);
+            }
+
+            var remainingFields = field.Split('.').ToList();
+
+            while (remainingFields.Count > 0)
+            {
+                var prop = currentType.GetProperty(remainingFields[0]);
+                oldFields.Add(remainingFields[0]);
+                remainingFields.Remove(remainingFields[0]);
+
+                if (prop != null)
+                {
+                    currentType = prop.PropertyType;
+                }
+
+                if (currentType.IsArray())
+                {
+                    output = string.Join(".", oldFields);
+                    remainingFields.Clear();
+                }
+            }
+
+            return (output, currentType.GetGenericArguments().FirstOrDefault());
         }
 
         /// <summary>
@@ -333,7 +476,7 @@ namespace JsonRuleEngine.Net
                     var visitor = new ParameterReplaceVisitor(parm);
                     Expression newBody = visitor.Visit(transformer);
 
-                    expression = CompileExpression(newBody, new List<string> { field }, false, parm, rule.Operator, rule.Value, true);
+                    expression = CompileExpression(newBody, new List<string> { field }, false, parm, rule.Operator, rule.Value, true, rule);
                 }
                 else
                 {
@@ -342,7 +485,7 @@ namespace JsonRuleEngine.Net
 
                     while (fields.Count > 0)
                     {
-                        expression = CompileExpression(expression ?? parm, fields, isDict, parm, rule.Operator, rule.Value, false);
+                        expression = CompileExpression(expression ?? parm, fields, isDict, parm, rule.Operator, rule.Value, false, rule);
                     }
                 }
 
@@ -362,7 +505,7 @@ namespace JsonRuleEngine.Net
         /// <return>Expresssion</return>
         public Func<PropertyAccessorContext, Expression> CustomPropertyAccessor { get; set; }
 
-        private Expression CompileExpression(Expression expression, List<string> remainingFields, bool isDict, Expression inputParam, ConditionRuleOperator op, object value, bool isOverride)
+        private Expression CompileExpression(Expression expression, List<string> remainingFields, bool isDict, Expression inputParam, ConditionRuleOperator op, object value, bool isOverride, ConditionRuleSet rule)
         {
             string memberName = remainingFields.First();
 
@@ -396,6 +539,7 @@ namespace JsonRuleEngine.Net
                 Expression key = Expression.Constant(memberName);
                 var methodGetValue = (this.GetType()).GetMethod("GetValueOrDefault");
 
+
                 expression = Expression.Call(methodGetValue, inputParam, key);
             }
             else if (expression == null)
@@ -409,7 +553,21 @@ namespace JsonRuleEngine.Net
 
             if (expression.Type.IsArray())
             {
-                return HandleTableRule(expression, inputParam, op, value, remainingFields);
+                if (isDict)
+                    rule.CollectionRules = new List<ConditionRuleSet>()
+                    {
+                        new ConditionRuleSet()
+                        {
+                            Operator = op,
+                            Value = value,
+                             Field = memberName
+                        }
+                    };
+
+                if (rule.CollectionRules.Count() > 0)
+                {
+                    return HandleTableRule(expression, inputParam, op, value, remainingFields, isOverride, rule, isDict);
+                }
             }
 
             remainingFields.Remove(memberName);
@@ -421,9 +579,9 @@ namespace JsonRuleEngine.Net
             {
                 if (op == ConditionRuleOperator.isNull)
                 {
-                    return Expression.OrElse(Expression.Equal(expression, Expression.Constant(null)), CompileExpression(expression, remainingFields, isDict, inputParam, op, value, isOverride));
+                    return Expression.OrElse(Expression.Equal(expression, Expression.Constant(null)), CompileExpression(expression, remainingFields, isDict, inputParam, op, value, isOverride, rule));
                 }
-                return Expression.AndAlso(Expression.NotEqual(expression, Expression.Constant(null)), CompileExpression(expression, remainingFields, isDict, inputParam, op, value, isOverride));
+                return Expression.AndAlso(Expression.NotEqual(expression, Expression.Constant(null)), CompileExpression(expression, remainingFields, isDict, inputParam, op, value, isOverride, rule));
             }
         }
 
@@ -489,43 +647,112 @@ namespace JsonRuleEngine.Net
         /// <param name="array"></param>
         /// <param name="param"></param>
         /// <param name="op"></param>
+        /// <param name="isOverride"></param>
         /// <param name="value"></param>
         /// <param name="remainingFields"></param>
         /// <returns></returns>
         /// <exception cref="JsonRuleEngineException"></exception>
-        private Expression HandleTableRule(Expression array, Expression param, ConditionRuleOperator op, object value, List<string> remainingFields)
+        private Expression HandleTableRule(Expression array, Expression param, ConditionRuleOperator op, object value, List<string> remainingFields, bool isOverride, ConditionRuleSet rule, bool isDict)
         {
             var currentField = remainingFields.First();
-            var childType = array.Type == typeof(JArray) ? GetJArrayType((JArray)value) : array.Type.GetGenericArguments().First();
+            var childType = GetChildType(array, value);
 
-            // Contains methods
-            // Need a conversion to an array of string
-            if (op == ConditionRuleOperator.isNotEmpty ||
-                op == ConditionRuleOperator.isEmpty)
+            // Set it as the param of the any expression
+            var childParam = Expression.Parameter(childType);
+
+            var expressions = new List<Expression>();
+            var expressionsEmpty = new List<Expression>();
+
+            Expression exp = null;
+            MethodInfo anyMethod = null;
+            foreach (var collectionRule in rule.CollectionRules)
             {
-
-                // Parsing the array
-                try
+                // Contains methods
+                // Need a conversion to an array of string
+                if (collectionRule.Operator == ConditionRuleOperator.isNotEmpty ||
+                    collectionRule.Operator == ConditionRuleOperator.isEmpty)
                 {
-                    remainingFields.Clear();
 
-                    var MethodAny = typeof(Enumerable).GetMethods().Single(m => m.Name == "Any" && m.GetParameters().Length == 1);
-                    var method = MethodAny.MakeGenericMethod(childType);
-
-                    var expression = Expression.Call(method, array);
-
-                    if (op == ConditionRuleOperator.isEmpty)
+                    // Parsing the array
+                    try
                     {
-                        return Expression.AndAlso(Expression.NotEqual(array, Expression.Constant(null)), Expression.Not(expression));
-                    }
+                        remainingFields.Clear();
+                        var MethodAny = typeof(Enumerable).GetMethods().Single(m => m.Name == "Any" && m.GetParameters().Length == 1);
+                        var method = MethodAny.MakeGenericMethod(childType);
 
-                    return Expression.AndAlso(Expression.NotEqual(array, Expression.Constant(null)), expression);
+                        var expression = Expression.Call(method, array);
+
+                        if (collectionRule.Operator == ConditionRuleOperator.isEmpty)
+                        {
+                            return Expression.OrElse(Expression.Equal(array, Expression.Constant(null)), Expression.Not(expression));
+                        }
+
+                        return Expression.AndAlso(Expression.NotEqual(array, Expression.Constant(null)), expression);
+                    }
+                    catch (Exception e)
+                    {
+                        throw new JsonRuleEngineException(JsonRuleEngineExceptionCategory.InvalidValue, $"The provided value is invalid : {e.Message} ");
+                    }
                 }
-                catch (Exception e)
+
+                // True if it is a class
+                if (IsClass(childType))
                 {
-                    throw new JsonRuleEngineException(JsonRuleEngineExceptionCategory.InvalidValue, $"The provided value is invalid : {e.Message} ");
+                    var fields = collectionRule.Field.Split('.').ToList();
+                    while (fields.Count > 0)
+                    {
+                        exp = CompileExpression(childParam, fields, isDict, param, collectionRule.Operator, collectionRule.Value, false, collectionRule);
+                    }
+                }
+                else
+                {
+                    exp = CreateOperationExpression(childParam, collectionRule.Operator, collectionRule.Value);
+                }
+
+
+                // In case it's a different of notEqual operator, we would like to apply the .All
+                if (collectionRule.Operator == ConditionRuleOperator.notIn || collectionRule.Operator == ConditionRuleOperator.notEqual)
+                {
+                    anyMethod = typeof(Enumerable).GetMethods().Single(m => m.Name == "All" && m.GetParameters().Length == 2);
+                    anyMethod = anyMethod.MakeGenericMethod(childType);
+                    exp = Expression.Call(anyMethod, array, Expression.Lambda(exp, childParam));
+                }
+
+                expressions.Add(exp);
+            }
+
+            exp = expressions.First();
+            foreach (var expression in expressions.Skip(1))
+            {
+                if (rule.Separator == ConditionRuleSeparator.And)
+                {
+                    exp = Expression.AndAlso(exp, expression);
+                }
+                else
+                {
+                    exp = Expression.OrElse(exp, expression);
                 }
             }
+
+            var anyExpression = Expression.Lambda(exp, childParam);
+
+            remainingFields.Remove(currentField);
+
+            anyMethod = typeof(Enumerable).GetMethods().Single(m => m.Name == "Any" && m.GetParameters().Length == 2);
+            anyMethod = anyMethod.MakeGenericMethod(childType);
+
+            return Expression.AndAlso(Expression.NotEqual(array, Expression.Constant(null)), Expression.Call(anyMethod, array, anyExpression));
+        }
+
+        private Type GetChildType(Expression array, object value)
+        {
+            return array.Type == typeof(JArray) ? GetJArrayType((JArray)value) : array.Type.GetGenericArguments().First();
+        }
+
+        private Expression CreateTableCondition(Expression array, Expression param, object value, ConditionRuleOperator op, string currentField, List<string> remainingFields, ConditionRuleSet condition)
+        {
+            var childType = array.Type == typeof(JArray) ? GetJArrayType((JArray)value) : array.Type.GetGenericArguments().First();
+
 
             // Set it as the param of the any expression
             var childParam = Expression.Parameter(childType);
@@ -539,7 +766,7 @@ namespace JsonRuleEngine.Net
             {
                 while (remainingFields.Count > 0)
                 {
-                    exp = CompileExpression(exp ?? childParam, remainingFields, false, param, op, value, false);
+                    exp = CompileExpression(exp ?? childParam, remainingFields, false, param, op, value, false, condition);
                 }
                 anyExpression = Expression.Lambda(exp, childParam);
             }
