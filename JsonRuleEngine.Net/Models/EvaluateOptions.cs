@@ -12,7 +12,10 @@ namespace JsonRuleEngine.Net.Models
 
         private IDictionary<string, Expression> _transformers =
             new Dictionary<string, Expression>();
-
+        internal IDictionary<string, Expression> GetAllTransformers()
+        {
+            return _transformers;
+        }
         internal Expression GetTransformer<TInput>(string field, ParameterExpression parameter)
         {
 

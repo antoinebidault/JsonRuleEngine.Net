@@ -258,7 +258,7 @@ namespace JsonRuleEngine.Net
         ParameterExpression parm
         , EvaluateOptions<T> evaluateOptions)
         {
-            condition = RegroupFieldsByCollection(typeof(T), condition);
+            condition = RegroupFieldsByCollection(typeof(T), condition, evaluateOptions?.GetAllTransformers());
 
             Binder binder = condition.Separator == ConditionRuleSeparator.Or ? (Binder)Expression.Or : Expression.And;
 
@@ -290,8 +290,9 @@ namespace JsonRuleEngine.Net
         /// </summary>
         /// <param name="condition"></param>
         /// <param name="type"></param>
+        /// <param name="dictionary"></param>
         /// <returns></returns>
-        private static ConditionRuleSet RegroupFieldsByCollection(Type type, ConditionRuleSet condition)
+        private static ConditionRuleSet RegroupFieldsByCollection(Type type, ConditionRuleSet condition, IDictionary<string, Expression> dictionary = null)
         {
 
             var conditionRuleSet = new ConditionRuleSet()
@@ -304,11 +305,9 @@ namespace JsonRuleEngine.Net
                 Separator = condition.Separator
             };
 
-            HashSet<string> collectionGroups = new HashSet<string>();
-
             if (!string.IsNullOrEmpty(conditionRuleSet.Field))
             {
-                var (field, currentType) = GetCollectionType(type, conditionRuleSet.Field);
+                var (field, currentType) = GetCollectionType(type, conditionRuleSet.Field, dictionary);
                 if (!string.IsNullOrEmpty(field))
                 {
 
@@ -330,6 +329,8 @@ namespace JsonRuleEngine.Net
                             Value = condition.Value
                         })
                      };
+
+                    type = currentType;
                 }
             }
 
@@ -339,10 +340,11 @@ namespace JsonRuleEngine.Net
             }
 
             var rules = conditionRuleSet.Rules ?? conditionRuleSet.CollectionRules;
-            var groups = rules.GroupBy(m => GetCollectionType(type, m.Field));
+            var groups = rules.GroupBy(m => GetCollectionType(type, m.Field, dictionary));
 
             foreach (var group in groups)
             {
+  
                 if (group.Key.Item1 == string.Empty)
                 {
                     for (var i = 0; i < group.Count(); i++)
@@ -390,7 +392,7 @@ namespace JsonRuleEngine.Net
             return conditionRuleSet;
         }
 
-        private static (string, Type) GetCollectionType(Type type, string field)
+        private static (string, Type) GetCollectionType(Type type, string field, IDictionary<string, Expression> dictionary)
         {
             var output = "";
             var currentType = type;
@@ -401,12 +403,23 @@ namespace JsonRuleEngine.Net
                 return (output, currentType);
             }
 
+            if (IsDictionary(type))
+            {
+                return (output, currentType);
+            }
+
+
+            if (dictionary != null && dictionary.ContainsKey(field))
+            {
+                return (output, currentType);
+            }
+
             var remainingFields = field.Split('.').ToList();
 
             while (remainingFields.Count > 0)
             {
-                var prop = currentType.GetProperty(remainingFields[0]);
 
+                var prop = currentType.GetProperty(remainingFields[0]);
 
                 oldFields.Add(remainingFields[0]);
                 remainingFields.Remove(remainingFields[0]);
@@ -414,6 +427,10 @@ namespace JsonRuleEngine.Net
                 if (prop != null)
                 {
                     currentType = prop.PropertyType;
+                }
+                else if (!IsDictionary(currentType))
+                {
+                    throw new JsonRuleEngineException(JsonRuleEngineExceptionCategory.InvalidField, field);
                 }
 
                 if (currentType.IsArray())
@@ -483,7 +500,7 @@ namespace JsonRuleEngine.Net
                 else
                 {
                     var fields = field.Split('.').ToList();
-                    bool isDict = typeof(IDictionary).IsAssignableFrom(parm.Type);
+                    bool isDict = IsDictionary(parm.Type);
 
                     while (fields.Count > 0)
                     {
@@ -497,6 +514,11 @@ namespace JsonRuleEngine.Net
             {
                 throw new JsonRuleEngineException(JsonRuleEngineExceptionCategory.InvalidField, $"The provided field is invalid {rule.Field} : {e.Message} ");
             }
+        }
+
+        private static bool IsDictionary(Type type)
+        {
+            return typeof(IDictionary).IsAssignableFrom(type);
         }
 
         /// <summary>
@@ -667,7 +689,7 @@ namespace JsonRuleEngine.Net
 
             Expression exp = null;
             MethodInfo anyMethod = null;
-            foreach (var collectionRule in rule.CollectionRules.OrderBy(m=> IsEmptyOperator(m)))
+            foreach (var collectionRule in rule.CollectionRules.OrderBy(m => IsEmptyOperator(m)))
             {
                 // Contains methods
                 // Need a conversion to an array of string
