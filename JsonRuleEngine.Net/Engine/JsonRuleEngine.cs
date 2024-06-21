@@ -407,10 +407,6 @@ namespace JsonRuleEngine.Net
             {
                 var prop = currentType.GetProperty(remainingFields[0]);
 
-                if (prop == null)
-                {
-                    throw new JsonRuleEngineException(JsonRuleEngineExceptionCategory.InvalidField, $"The following field does not exists : {field}");
-                }
 
                 oldFields.Add(remainingFields[0]);
                 remainingFields.Remove(remainingFields[0]);
@@ -671,12 +667,11 @@ namespace JsonRuleEngine.Net
 
             Expression exp = null;
             MethodInfo anyMethod = null;
-            foreach (var collectionRule in rule.CollectionRules)
+            foreach (var collectionRule in rule.CollectionRules.OrderBy(m=> IsEmptyOperator(m)))
             {
                 // Contains methods
                 // Need a conversion to an array of string
-                if (collectionRule.Operator == ConditionRuleOperator.isNotEmpty ||
-                    collectionRule.Operator == ConditionRuleOperator.isEmpty)
+                if (IsEmptyOperator(collectionRule))
                 {
 
                     // Parsing the array
@@ -688,12 +683,21 @@ namespace JsonRuleEngine.Net
 
                         var expression = Expression.Call(method, array);
 
+
+                        // All other expressions are cancelled in that case
                         if (collectionRule.Operator == ConditionRuleOperator.isEmpty)
                         {
                             return Expression.OrElse(Expression.Equal(array, Expression.Constant(null)), Expression.Not(expression));
                         }
 
-                        return Expression.AndAlso(Expression.NotEqual(array, Expression.Constant(null)), expression);
+                        if (rule.CollectionRules.Count() == 1)
+                        {
+                            return Expression.AndAlso(Expression.NotEqual(array, Expression.Constant(null)), expression);
+                        }
+                        else
+                        {
+                            continue;
+                        }
                     }
                     catch (Exception e)
                     {
@@ -748,6 +752,12 @@ namespace JsonRuleEngine.Net
             anyMethod = anyMethod.MakeGenericMethod(childType);
 
             return Expression.AndAlso(Expression.NotEqual(array, Expression.Constant(null)), Expression.Call(anyMethod, array, anyExpression));
+        }
+
+        private static bool IsEmptyOperator(ConditionRuleSet collectionRule)
+        {
+            return collectionRule.Operator == ConditionRuleOperator.isNotEmpty ||
+                                collectionRule.Operator == ConditionRuleOperator.isEmpty;
         }
 
         private Type GetChildType(Expression array, object value)
