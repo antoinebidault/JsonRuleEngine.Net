@@ -406,6 +406,12 @@ namespace JsonRuleEngine.Net
             while (remainingFields.Count > 0)
             {
                 var prop = currentType.GetProperty(remainingFields[0]);
+
+                if (prop == null)
+                {
+                    throw new JsonRuleEngineException(JsonRuleEngineExceptionCategory.InvalidField, $"The following field does not exists : {field}");
+                }
+
                 oldFields.Add(remainingFields[0]);
                 remainingFields.Remove(remainingFields[0]);
 
