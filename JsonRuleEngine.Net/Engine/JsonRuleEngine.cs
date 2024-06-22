@@ -428,7 +428,7 @@ namespace JsonRuleEngine.Net
                 {
                     currentType = prop.PropertyType;
                 }
-                else if (!IsDictionary(currentType))
+                else if (currentType  == null || !IsDictionary(currentType))
                 {
                     throw new JsonRuleEngineException(JsonRuleEngineExceptionCategory.InvalidField, field);
                 }
