@@ -344,7 +344,7 @@ namespace JsonRuleEngine.Net
 
             foreach (var group in groups)
             {
-  
+
                 if (group.Key.Item1 == string.Empty)
                 {
                     for (var i = 0; i < group.Count(); i++)
@@ -428,7 +428,7 @@ namespace JsonRuleEngine.Net
                 {
                     currentType = prop.PropertyType;
                 }
-                else if (currentType  == null || !IsDictionary(currentType))
+                else if (currentType == null || !IsDictionary(currentType))
                 {
                     throw new JsonRuleEngineException(JsonRuleEngineExceptionCategory.InvalidField, field);
                 }
@@ -563,7 +563,6 @@ namespace JsonRuleEngine.Net
                 Expression key = Expression.Constant(memberName);
                 var methodGetValue = (this.GetType()).GetMethod("GetValueOrDefault");
 
-
                 expression = Expression.Call(methodGetValue, inputParam, key);
             }
             else if (expression == null)
@@ -686,6 +685,7 @@ namespace JsonRuleEngine.Net
 
             var expressions = new List<Expression>();
             var expressionsEmpty = new List<Expression>();
+            var expressionsAll = new List<Expression>();
 
             Expression exp = null;
             MethodInfo anyMethod = null;
@@ -748,32 +748,62 @@ namespace JsonRuleEngine.Net
                     anyMethod = typeof(Enumerable).GetMethods().Single(m => m.Name == "All" && m.GetParameters().Length == 2);
                     anyMethod = anyMethod.MakeGenericMethod(childType);
                     exp = Expression.Call(anyMethod, array, Expression.Lambda(exp, childParam));
-                }
-
-                expressions.Add(exp);
-            }
-
-            exp = expressions.First();
-            foreach (var expression in expressions.Skip(1))
-            {
-                if (rule.Separator == ConditionRuleSeparator.And)
-                {
-                    exp = Expression.AndAlso(exp, expression);
+                    expressionsAll.Add(exp);
                 }
                 else
                 {
-                    exp = Expression.OrElse(exp, expression);
+                    expressions.Add(exp);
                 }
             }
 
-            var anyExpression = Expression.Lambda(exp, childParam);
+            if (expressions.Any())
+            {
+                exp = expressions.First();
+                foreach (var expression in expressions.Skip(1))
+                {
+                    if (rule.Separator == ConditionRuleSeparator.And)
+                    {
+                        exp = Expression.AndAlso(exp, expression);
+                    }
+                    else
+                    {
+                        exp = Expression.OrElse(exp, expression);
+                    }
+                }
+
+                var anyExpression = Expression.Lambda(exp, childParam);
+
+
+                anyMethod = typeof(Enumerable).GetMethods().Single(m => m.Name == "Any" && m.GetParameters().Length == 2);
+                anyMethod = anyMethod.MakeGenericMethod(childType);
+
+                exp = Expression.AndAlso(Expression.NotEqual(array, Expression.Constant(null)), Expression.Call(anyMethod, array, anyExpression));
+            }
+
+            if (expressionsAll.Any())
+            {
+                foreach (var expression in expressionsAll)
+                {
+                    if (!expressions.Any())
+                    {
+                        exp = expression;
+                        continue;
+                    }
+                    if (rule.Separator == ConditionRuleSeparator.And)
+                    {
+                        exp = Expression.AndAlso(exp, expression);
+                    }
+                    else
+                    {
+                        exp = Expression.OrElse(exp, expression);
+                    }
+                }
+                exp = Expression.OrElse(Expression.Equal(array, Expression.Constant(null)), exp);
+            }
 
             remainingFields.Remove(currentField);
 
-            anyMethod = typeof(Enumerable).GetMethods().Single(m => m.Name == "Any" && m.GetParameters().Length == 2);
-            anyMethod = anyMethod.MakeGenericMethod(childType);
-
-            return Expression.AndAlso(Expression.NotEqual(array, Expression.Constant(null)), Expression.Call(anyMethod, array, anyExpression));
+            return exp;
         }
 
         private static bool IsEmptyOperator(ConditionRuleSet collectionRule)

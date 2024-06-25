@@ -587,7 +587,28 @@ namespace JsonRuleEngine.Net.Tests
                  }
             }, rules);
 
-            Assert.False(result);
+
+            var result2 = new JsonRuleEngine().Evaluate(new Game()
+            {
+                Name = "Toto",
+                Reviews = new[]
+            {
+                     new Review()
+                     {
+                         Id = 2
+                     }
+                 }
+            }, rules);
+
+            Assert.True(result2);
+
+            var result3 = new JsonRuleEngine().Evaluate(new Game()
+            {
+                Name = "Toto",
+                Reviews = null
+            }, rules);
+
+            Assert.True(result3);
         }
 
 
