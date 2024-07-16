@@ -689,17 +689,18 @@ namespace JsonRuleEngine.Net
 
             Expression exp = null;
             MethodInfo anyMethod = null;
+
             foreach (var collectionRule in rule.CollectionRules.OrderBy(m => IsEmptyOperator(m)))
             {
                 // Contains methods
                 // Need a conversion to an array of string
                 if (IsEmptyOperator(collectionRule))
                 {
-
                     // Parsing the array
                     try
                     {
                         remainingFields.Clear();
+
                         var MethodAny = typeof(Enumerable).GetMethods().Single(m => m.Name == "Any" && m.GetParameters().Length == 1);
                         var method = MethodAny.MakeGenericMethod(childType);
 
@@ -743,7 +744,7 @@ namespace JsonRuleEngine.Net
 
 
                 // In case it's a different of notEqual operator, we would like to apply the .All
-                if (collectionRule.Operator == ConditionRuleOperator.notIn )
+                if (collectionRule.Operator == ConditionRuleOperator.notIn || collectionRule.Operator == ConditionRuleOperator.notEqual)
                 {
                     anyMethod = typeof(Enumerable).GetMethods().Single(m => m.Name == "All" && m.GetParameters().Length == 2);
                     anyMethod = anyMethod.MakeGenericMethod(childType);
@@ -773,7 +774,6 @@ namespace JsonRuleEngine.Net
 
                 var anyExpression = Expression.Lambda(exp, childParam);
 
-
                 anyMethod = typeof(Enumerable).GetMethods().Single(m => m.Name == "Any" && m.GetParameters().Length == 2);
                 anyMethod = anyMethod.MakeGenericMethod(childType);
 
@@ -782,13 +782,13 @@ namespace JsonRuleEngine.Net
 
             if (expressionsAll.Any())
             {
-                foreach (var expression in expressionsAll)
+                if (!expressions.Any())
                 {
-                    if (!expressions.Any())
-                    {
-                        exp = expression;
-                        continue;
-                    }
+                    exp = expressionsAll.First();
+                }
+                foreach (var expression in expressionsAll.Skip(1))
+                {
+
                     if (rule.Separator == ConditionRuleSeparator.And)
                     {
                         exp = Expression.AndAlso(exp, expression);
@@ -798,7 +798,7 @@ namespace JsonRuleEngine.Net
                         exp = Expression.OrElse(exp, expression);
                     }
                 }
-                exp = Expression.OrElse(Expression.Equal(array, Expression.Constant(null)), exp);
+                exp = Expression.AndAlso(Expression.NotEqual(array, Expression.Constant(null)), exp);
             }
 
             remainingFields.Remove(currentField);

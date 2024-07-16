@@ -305,7 +305,7 @@ namespace JsonRuleEngine.Net.Tests
             string rules = GetJsonTestFile("listNotEqual.json");
             var expression = new JsonRuleEngine().ParseExpression<Game>(rules);
             var data = FakeGameService.GetData().Where(expression).ToList();
-            Assert.True(data.Count() == FakeGameService.GetData().Count(m=> m.Reviews != null && m.Reviews.Any(m=> m.Id != 1 && m.Id != 2)));
+            Assert.True(data.Count() == FakeGameService.GetData().Count(m=> m.Reviews != null && m.Reviews.All(m=> m.Id != 1 && m.Id != 2)));
         }
 
         [Fact]
