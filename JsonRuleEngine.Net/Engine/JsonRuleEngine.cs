@@ -743,7 +743,7 @@ namespace JsonRuleEngine.Net
 
 
                 // In case it's a different of notEqual operator, we would like to apply the .All
-                if (collectionRule.Operator == ConditionRuleOperator.notIn || collectionRule.Operator == ConditionRuleOperator.notEqual)
+                if (collectionRule.Operator == ConditionRuleOperator.notIn )
                 {
                     anyMethod = typeof(Enumerable).GetMethods().Single(m => m.Name == "All" && m.GetParameters().Length == 2);
                     anyMethod = anyMethod.MakeGenericMethod(childType);

@@ -1,0 +1,15 @@
+﻿{
+  "separator": "And",
+  "rules": [
+    {
+      "field": "Reviews.Id",
+      "operator": "notEqual",
+      "value": "2"
+    },
+    {
+      "field": "Reviews.Id",
+      "operator": "notEqual",
+      "value": "1"
+    }
+  ]
+}

@@ -299,6 +299,16 @@ namespace JsonRuleEngine.Net.Tests
 
 
         [Fact]
+        public void ListNotEqualReturn()
+        {
+            // Get all games with at least one review with the text value "It's cool"
+            string rules = GetJsonTestFile("listNotEqual.json");
+            var expression = new JsonRuleEngine().ParseExpression<Game>(rules);
+            var data = FakeGameService.GetData().Where(expression).ToList();
+            Assert.True(data.Count() == FakeGameService.GetData().Count(m=> m.Reviews != null && m.Reviews.Any(m=> m.Id != 1 && m.Id != 2)));
+        }
+
+        [Fact]
         public void ListEqualReturn()
         {
             // Get all games with at least one review with the text value "It's cool"
@@ -307,7 +317,6 @@ namespace JsonRuleEngine.Net.Tests
             var datas = FakeGameService.GetData().Where(expression).ToList();
             Assert.True(datas.Count() == 1);
         }
-
 
 
         [Fact]
@@ -608,7 +617,7 @@ namespace JsonRuleEngine.Net.Tests
                 Reviews = null
             }, rules);
 
-            Assert.True(result3);
+            Assert.False(result3);
         }
 
 
