@@ -341,7 +341,7 @@ namespace JsonRuleEngine.Net
 
             var rules = conditionRuleSet.Rules ?? conditionRuleSet.CollectionRules;
             var groups = rules.GroupBy(m => GetCollectionType(type, m.Field, dictionary));
-
+            var newRules = new List<ConditionRuleSet>();
             foreach (var group in groups)
             {
 
@@ -349,14 +349,16 @@ namespace JsonRuleEngine.Net
                 {
                     for (var i = 0; i < group.Count(); i++)
                     {
-                        var rule = group.ElementAt(i);
-                        rules = rules.Append(rule);
+                        newRules.Add(group.ElementAt(i));
                     }
                 }
                 else
                 {
-                    conditionRuleSet.Field = group.Key.Item1;
-
+                    var groupedConditionRule = new ConditionRuleSet()
+                    {
+                        Field = group.Key.Item1,
+                        Separator = conditionRuleSet.Separator
+                    };
                     for (var i = 0; i < group.Count(); i++)
                     {
                         var rule = group.ElementAt(i);
@@ -384,10 +386,13 @@ namespace JsonRuleEngine.Net
                         }
                         rule.Separator = condition.Separator;
                     }
-                    conditionRuleSet.Rules = null;
-                    conditionRuleSet.CollectionRules = group.ToList();
+
+                    groupedConditionRule.Rules = null;
+                    groupedConditionRule.CollectionRules = group.ToList();
+                    newRules.Add(groupedConditionRule);
                 }
             }
+            conditionRuleSet.Rules = newRules;
 
             return conditionRuleSet;
         }
