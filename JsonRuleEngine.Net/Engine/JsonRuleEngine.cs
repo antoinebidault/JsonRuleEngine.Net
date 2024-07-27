@@ -331,6 +331,8 @@ namespace JsonRuleEngine.Net
                      };
 
                     type = currentType;
+
+                    return conditionRuleSet;
                 }
             }
 

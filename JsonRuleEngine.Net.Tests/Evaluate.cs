@@ -305,9 +305,9 @@ namespace JsonRuleEngine.Net.Tests
             string rules = GetJsonTestFile("listNotEqual.json");
             var expression = new JsonRuleEngine().ParseExpression<Game>(rules);
             var data = FakeGameService.GetData().Where(expression).ToList();
-            Assert.True(data.Count() == FakeGameService.GetData().Count(m=> 
-            m.Reviews != null && 
-            m.Reviews.All(m=> m.Id != 1 && m.Id != 2)));
+            Assert.True(data.Count() == FakeGameService.GetData().Count(m =>
+            m.Reviews != null &&
+            m.Reviews.All(m => m.Id != 1 && m.Id != 2)));
         }
 
         [Fact]
@@ -315,6 +315,17 @@ namespace JsonRuleEngine.Net.Tests
         {
             // Get all games with at least one review with the text value "It's cool"
             string rules = GetJsonTestFile("listEqual.json");
+            var expression = new JsonRuleEngine().ParseExpression<Game>(rules);
+            var datas = FakeGameService.GetData().Where(expression).ToList();
+            Assert.True(datas.Count() == 1);
+
+        }
+
+        [Fact]
+        public void ListEqualSimpleReturn()
+        {
+            // Get all games with at least one review with the text value "It's cool"
+            var rules = GetJsonTestFile("listEqualSimple.json");
             var expression = new JsonRuleEngine().ParseExpression<Game>(rules);
             var datas = FakeGameService.GetData().Where(expression).ToList();
             Assert.True(datas.Count() == 1);
@@ -429,7 +440,7 @@ namespace JsonRuleEngine.Net.Tests
             List<Game> list = Test("listIsEmpty.json");
 
             Assert.NotEmpty(list);
-            Assert.True(list.All(m => m.Reviews == null || !m.Reviews.Any() ));
+            Assert.True(list.All(m => m.Reviews == null || !m.Reviews.Any()));
         }
 
         [Fact]
