@@ -1,0 +1,5 @@
+﻿{
+  "field": "Reviews.Id",
+  "operator": "equal",
+  "value": "1"
+}

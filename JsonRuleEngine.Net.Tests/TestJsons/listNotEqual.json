@@ -2,14 +2,14 @@
   "separator": "And",
   "rules": [
     {
-      "field": "Category",
-      "operator": "equal",
-      "value": "Adventure"
+      "field": "Reviews.Id",
+      "operator": "notEqual",
+      "value": "2"
     },
     {
       "field": "Reviews.Id",
       "operator": "notEqual",
-      "value": 1
+      "value": "1"
     }
   ]
 }
