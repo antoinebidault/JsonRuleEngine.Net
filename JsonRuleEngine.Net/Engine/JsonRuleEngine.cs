@@ -679,6 +679,7 @@ namespace JsonRuleEngine.Net
         {
             var currentField = remainingFields.First();
             var childType = GetChildType(array, value);
+            ConditionRuleOperator? originalOp = null;
 
             // Set it as the param of the any expression
             var childParam = Expression.Parameter(childType);
@@ -743,12 +744,15 @@ namespace JsonRuleEngine.Net
 
 
                 // In case it's a different of notEqual operator, we would like to apply the .All
-                if (collectionRule.Operator == ConditionRuleOperator.notIn || collectionRule.Operator == ConditionRuleOperator.notEqual)
+                if (collectionRule.Operator == ConditionRuleOperator.notIn || 
+                    collectionRule.Operator == ConditionRuleOperator.notEqual || 
+                    collectionRule.Operator == ConditionRuleOperator.includeAll)
                 {
                     anyMethod = typeof(Enumerable).GetMethods().Single(m => m.Name == "All" && m.GetParameters().Length == 2);
                     anyMethod = anyMethod.MakeGenericMethod(childType);
                     exp = Expression.Call(anyMethod, array, Expression.Lambda(exp, childParam));
                     expressionsAll.Add(exp);
+                    originalOp = collectionRule.Operator;
                 }
                 else
                 {
@@ -798,7 +802,14 @@ namespace JsonRuleEngine.Net
                         exp = Expression.OrElse(exp, expression);
                     }
                 }
-                exp = Expression.OrElse(Expression.Equal(array, Expression.Constant(null)), exp);
+                if (originalOp  == ConditionRuleOperator.includeAll)
+                {
+                    exp = Expression.AndAlso(Expression.NotEqual(array, Expression.Constant(null)), exp);
+                }
+                else
+                {
+                    exp = Expression.OrElse(Expression.Equal(array, Expression.Constant(null)), exp);
+                }
             }
 
             remainingFields.Remove(currentField);
@@ -817,6 +828,7 @@ namespace JsonRuleEngine.Net
             return array.Type == typeof(JArray) ? GetJArrayType((JArray)value) : array.Type.GetGenericArguments().First();
         }
 
+        /*
         private Expression CreateTableCondition(Expression array, Expression param, object value, ConditionRuleOperator op, string currentField, List<string> remainingFields, ConditionRuleSet condition)
         {
             var childType = array.Type == typeof(JArray) ? GetJArrayType((JArray)value) : array.Type.GetGenericArguments().First();
@@ -845,7 +857,7 @@ namespace JsonRuleEngine.Net
             }
 
             // In case it's a different of notEqual operator, we would like to apply the .All
-            if (op == ConditionRuleOperator.notIn || op == ConditionRuleOperator.notEqual)
+            if (op == ConditionRuleOperator.notIn || op == ConditionRuleOperator.notEqual || op == ConditionRuleOperator.includeAll)
             {
                 anyMethod = typeof(Enumerable).GetMethods().Single(m => m.Name == "All" && m.GetParameters().Length == 2);
                 anyMethod = anyMethod.MakeGenericMethod(childType);
@@ -856,7 +868,7 @@ namespace JsonRuleEngine.Net
             anyMethod = anyMethod.MakeGenericMethod(childType);
 
             return Expression.AndAlso(Expression.NotEqual(array, Expression.Constant(null)), Expression.Call(anyMethod, array, anyExpression));
-        }
+        }*/
 
         private bool IsClass(Type type)
         {
@@ -878,7 +890,8 @@ namespace JsonRuleEngine.Net
             // Contains methods
             // Need a conversion to an array of string
             if (op == ConditionRuleOperator.@in ||
-                op == ConditionRuleOperator.notIn)
+                op == ConditionRuleOperator.notIn ||
+                op == ConditionRuleOperator.includeAll)
             {
                 // Parsing the array
                 try
@@ -906,7 +919,6 @@ namespace JsonRuleEngine.Net
                     {
                         expression = Expression.Not(expression);
                     }
-
                     return expression;
                 }
                 catch (Exception e)

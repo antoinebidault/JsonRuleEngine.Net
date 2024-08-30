@@ -1,0 +1,10 @@
+﻿{
+  "separator": "And",
+  "rules": [
+    {
+      "field": "Reviews.Id",
+      "operator": "includeAll",
+      "value": [ "2", "1" ]
+    }
+  ]
+}

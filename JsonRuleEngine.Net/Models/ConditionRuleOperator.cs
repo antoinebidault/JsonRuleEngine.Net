@@ -59,6 +59,15 @@ namespace JsonRuleEngine.Net
         /// Is empty
         /// </summary>
         isEmpty,
-        isNotEmpty
+
+        /// <summary>
+        /// Is not empty
+        /// </summary>
+        isNotEmpty,
+
+        /// <summary>
+        /// Include all element of a collection
+        /// </summary>
+        includeAll
     }
 }

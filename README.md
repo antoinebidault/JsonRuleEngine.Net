@@ -224,7 +224,8 @@ Here is the list of supported operators :
 - doesNotContains,
 - isNull,
 - isNotNull,
-- isEmpty
+- isEmpty,
+- includeAll (new) : match all elements with the condition
 
 ## Support of dictionary objects (since 1.14.0)
 

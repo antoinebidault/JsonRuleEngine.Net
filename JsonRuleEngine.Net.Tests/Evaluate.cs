@@ -262,7 +262,6 @@ namespace JsonRuleEngine.Net.Tests
         public void DateEqual()
         {
             List<Game> list = Test("dateEqual.json");
-
             Assert.True(list.Count == 1);
         }
 
@@ -270,7 +269,6 @@ namespace JsonRuleEngine.Net.Tests
         public void Simple()
         {
             List<Game> list = Test("simple.json");
-
             Assert.True(list.Count == 1);
         }
 
@@ -279,7 +277,6 @@ namespace JsonRuleEngine.Net.Tests
         {
             string rules = GetJsonTestFile("simpleReturn.json");
             var data = FakeGameService.GetData().First(x => x.Name == "GTA V");
-
             var returnValue = new JsonRuleEngine().Evaluate<Game, string>(data, rules);
 
             Assert.True(returnValue == "ThisIsTheReturnValue");
@@ -297,7 +294,6 @@ namespace JsonRuleEngine.Net.Tests
             Assert.True(returnValue == "ThisIsTheReturnValue");
         }
 
-
         [Fact]
         public void ListEqualReturn()
         {
@@ -308,7 +304,18 @@ namespace JsonRuleEngine.Net.Tests
             Assert.True(datas.Count() == 1);
         }
 
-
+        [Fact]
+        public void ListEqualAltReturn()
+        {
+            // Get all games with at least one review with the text value "It's cool"
+            string rules = GetJsonTestFile("listEqualAlt.json");
+            var expression = new JsonRuleEngine().ParseExpression<Game>(rules);
+            var datas = FakeGameService.GetData()
+                .Where(expression)
+                .ToList();
+            var list = new[] { 1, 2 };
+            Assert.True(datas.Count() == datas.Count(m=> m.Reviews != null &&  m.Reviews.All(m=> list.Contains(m.Id))));
+        }
 
         [Fact]
         public void ListStringEqualReturn()
