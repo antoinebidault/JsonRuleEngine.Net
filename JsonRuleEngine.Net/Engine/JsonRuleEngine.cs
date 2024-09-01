@@ -484,36 +484,40 @@ namespace JsonRuleEngine.Net
 
             Expression expression = null;
 
+#if !DEBUG
             try
             {
-                string field = rule.Field;
+#endif
+            string field = rule.Field;
 
-                if (evaluateOptions != null && evaluateOptions.HasTransformer(field))
+            if (evaluateOptions != null && evaluateOptions.HasTransformer(field))
+            {
+                var transformer = evaluateOptions.GetTransformer<T>(field, parm);
+
+                var visitor = new ParameterReplaceVisitor(parm);
+                Expression newBody = visitor.Visit(transformer);
+
+                expression = CompileExpression(newBody, new List<string> { field }, false, parm, rule.Operator, rule.Value, true, rule, false);
+            }
+            else
+            {
+                var fields = field.Split('.').ToList();
+                bool isDict = IsDictionary(parm.Type);
+
+                while (fields.Count > 0)
                 {
-                    var transformer = evaluateOptions.GetTransformer<T>(field, parm);
-
-                    var visitor = new ParameterReplaceVisitor(parm);
-                    Expression newBody = visitor.Visit(transformer);
-
-                    expression = CompileExpression(newBody, new List<string> { field }, false, parm, rule.Operator, rule.Value, true, rule);
+                    expression = CompileExpression(expression ?? parm, fields, isDict, parm, rule.Operator, rule.Value, false, rule, false);
                 }
-                else
-                {
-                    var fields = field.Split('.').ToList();
-                    bool isDict = IsDictionary(parm.Type);
+            }
 
-                    while (fields.Count > 0)
-                    {
-                        expression = CompileExpression(expression ?? parm, fields, isDict, parm, rule.Operator, rule.Value, false, rule);
-                    }
-                }
-
-                return expression;
+            return expression;
+#if !DEBUG
             }
             catch (Exception e)
             {
                 throw new JsonRuleEngineException(JsonRuleEngineExceptionCategory.InvalidField, $"The provided field is invalid {rule.Field} : {e.Message} ");
             }
+#endif
         }
 
         private static bool IsDictionary(Type type)
@@ -529,7 +533,7 @@ namespace JsonRuleEngine.Net
         /// <return>Expresssion</return>
         public Func<PropertyAccessorContext, Expression> CustomPropertyAccessor { get; set; }
 
-        private Expression CompileExpression(Expression expression, List<string> remainingFields, bool isDict, Expression inputParam, ConditionRuleOperator op, object value, bool isOverride, ConditionRuleSet rule)
+        private Expression CompileExpression(Expression expression, List<string> remainingFields, bool isDict, Expression inputParam, ConditionRuleOperator op, object value, bool isOverride, ConditionRuleSet rule, bool isNavigation)
         {
             string memberName = remainingFields.First();
 
@@ -547,9 +551,17 @@ namespace JsonRuleEngine.Net
                 if (tmpExpression != null)
                 {
                     remainingFields.Remove(memberName);
-                    return CreateOperationExpression(tmpExpression, op, value);
+                    if (isNavigation)
+                    {
+                        return tmpExpression;
+                    }
+                    else
+                    {
+                        return CreateOperationExpression(tmpExpression, op, value);
+                    }
                 }
             }
+
 
             if (expression != null && typeof(Dictionary<string, object>).IsAssignableFrom(expression.Type))
             {
@@ -562,7 +574,6 @@ namespace JsonRuleEngine.Net
             {
                 Expression key = Expression.Constant(memberName);
                 var methodGetValue = (this.GetType()).GetMethod("GetValueOrDefault");
-
                 expression = Expression.Call(methodGetValue, inputParam, key);
             }
             else if (expression == null)
@@ -594,17 +605,25 @@ namespace JsonRuleEngine.Net
             }
 
             remainingFields.Remove(memberName);
+
             if (remainingFields.Count == 0)
             {
-                return CreateOperationExpression(expression, op, value);
+                if (isNavigation)
+                {
+                    return expression;
+                }
+                else
+                {
+                    return CreateOperationExpression(expression, op, value);
+                }
             }
             else
             {
                 if (op == ConditionRuleOperator.isNull)
                 {
-                    return Expression.OrElse(Expression.Equal(expression, Expression.Constant(null)), CompileExpression(expression, remainingFields, isDict, inputParam, op, value, isOverride, rule));
+                    return Expression.OrElse(Expression.Equal(expression, Expression.Constant(null)), CompileExpression(expression, remainingFields, isDict, inputParam, op, value, isOverride, rule, isNavigation));
                 }
-                return Expression.AndAlso(Expression.NotEqual(expression, Expression.Constant(null)), CompileExpression(expression, remainingFields, isDict, inputParam, op, value, isOverride, rule));
+                return Expression.AndAlso(Expression.NotEqual(expression, Expression.Constant(null)), CompileExpression(expression, remainingFields, isDict, inputParam, op, value, isOverride, rule, isNavigation));
             }
         }
 
@@ -729,13 +748,17 @@ namespace JsonRuleEngine.Net
                 }
 
                 // True if it is a class
-                if (IsClass(childType))
+                if (collectionRule.Operator == ConditionRuleOperator.includeAll)
                 {
-                    var fields = collectionRule.Field.Split('.').ToList();
-                    while (fields.Count > 0)
-                    {
-                        exp = CompileExpression(childParam, fields, isDict, param, collectionRule.Operator, collectionRule.Value, false, collectionRule);
-                    }
+
+                    exp = GetChildExpression(param, isDict, childParam, exp, collectionRule, true);
+                    exp = HandleIncludeAll(array, exp, childParam, collectionRule.Value);
+                    remainingFields.Remove(currentField);
+                    return exp;
+                }
+                else if (IsClass(childType))
+                {
+                    exp = GetChildExpression(param, isDict, childParam, exp, collectionRule, false);
                 }
                 else
                 {
@@ -744,9 +767,8 @@ namespace JsonRuleEngine.Net
 
 
                 // In case it's a different of notEqual operator, we would like to apply the .All
-                if (collectionRule.Operator == ConditionRuleOperator.notIn || 
-                    collectionRule.Operator == ConditionRuleOperator.notEqual || 
-                    collectionRule.Operator == ConditionRuleOperator.includeAll)
+                if (collectionRule.Operator == ConditionRuleOperator.notIn ||
+                    collectionRule.Operator == ConditionRuleOperator.notEqual)
                 {
                     anyMethod = typeof(Enumerable).GetMethods().Single(m => m.Name == "All" && m.GetParameters().Length == 2);
                     anyMethod = anyMethod.MakeGenericMethod(childType);
@@ -802,7 +824,7 @@ namespace JsonRuleEngine.Net
                         exp = Expression.OrElse(exp, expression);
                     }
                 }
-                if (originalOp  == ConditionRuleOperator.includeAll)
+                if (originalOp == ConditionRuleOperator.includeAll)
                 {
                     exp = Expression.AndAlso(Expression.NotEqual(array, Expression.Constant(null)), exp);
                 }
@@ -814,6 +836,88 @@ namespace JsonRuleEngine.Net
 
             remainingFields.Remove(currentField);
 
+            return exp;
+        }
+
+        private Expression GetChildExpression(Expression param, bool isDict, ParameterExpression childParam, Expression exp, ConditionRuleSet collectionRule, bool isNavigation = false)
+        {
+            var fields = collectionRule.Field.Split('.').ToList();
+            while (fields.Count > 0)
+            {
+                exp = CompileExpression(childParam, fields, isDict, param, collectionRule.Operator, collectionRule.Value, false, collectionRule, isNavigation);
+            }
+
+            return exp;
+        }
+        private Expression GetChild(Expression exp, ConditionRuleSet collectionRule)
+        {
+            var fields = collectionRule.Field.Split('.').ToList();
+            while (fields.Count > 0)
+            {
+                if (IsDictionary(exp.Type))
+                {
+                }
+                else
+                {
+                    exp = Expression.Property(exp, fields[0]);
+                }
+                fields.RemoveAt(0);
+            }
+
+            return exp;
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="visitedExpression">Example : Reviews.Id</param>
+        /// <param name="childParam">Reviews</param>
+        /// <param name="operator"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        /// <exception cref="JsonRuleEngineException"></exception>
+        private Expression HandleIncludeAll(Expression arrayExpression, Expression visitedExpression, ParameterExpression childParam, object value)
+        {
+            if (value == null)
+            {
+                throw new JsonRuleEngineException(JsonRuleEngineExceptionCategory.InvalidValue, "The provided value is not correct");
+            }
+
+            object array;
+            if (value is JArray)
+            {
+                var listType = typeof(IEnumerable<>).MakeGenericType(visitedExpression.Type);
+                array = ((JArray)value).ToObject(listType);
+            }
+            else
+            {
+                array = value;
+            }
+
+            var anyMethod = typeof(Enumerable).GetMethods().Single(m => m.Name == "Any" && m.GetParameters().Length == 2);
+            anyMethod = anyMethod.MakeGenericMethod(childParam.Type);
+
+            Expression exp = null;
+            foreach (var item in (IEnumerable)array)
+            {
+                var equal = CreateOperationExpression(visitedExpression, ConditionRuleOperator.equal, item);
+                var anyExp = Expression.Call(anyMethod, arrayExpression, Expression.Lambda(equal, childParam));
+
+                if (exp == null)
+                {
+                    exp = anyExp;
+                }
+                else
+                {
+                    exp = Expression.AndAlso(exp, anyExp);
+                }
+
+            }
+
+
+
+            exp = Expression.AndAlso(Expression.NotEqual(arrayExpression, Expression.Constant(null)), exp);
             return exp;
         }
 
@@ -890,8 +994,7 @@ namespace JsonRuleEngine.Net
             // Contains methods
             // Need a conversion to an array of string
             if (op == ConditionRuleOperator.@in ||
-                op == ConditionRuleOperator.notIn ||
-                op == ConditionRuleOperator.includeAll)
+                op == ConditionRuleOperator.notIn)
             {
                 // Parsing the array
                 try

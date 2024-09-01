@@ -313,8 +313,7 @@ namespace JsonRuleEngine.Net.Tests
             var datas = FakeGameService.GetData()
                 .Where(expression)
                 .ToList();
-            var list = new[] { 1, 2 };
-            Assert.True(datas.Count() == datas.Count(m=> m.Reviews != null &&  m.Reviews.All(m=> list.Contains(m.Id))));
+            Assert.True(datas.Count() == datas.Count(m=> m.Reviews != null &&  m.Reviews.Any(m=> m.Id == 1) && m.Reviews.Any(m => m.Id == 2) ));
         }
 
         [Fact]
