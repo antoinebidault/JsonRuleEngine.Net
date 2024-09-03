@@ -710,8 +710,10 @@ namespace JsonRuleEngine.Net
             Expression exp = null;
             Expression tempExpression = null;
             MethodInfo anyMethod = null;
+            bool isIncludeAllStatement = false;
             foreach (var collectionRule in rule.CollectionRules.OrderBy(m => IsEmptyOperator(m)))
             {
+                isIncludeAllStatement = collectionRule.Operator == ConditionRuleOperator.includeAll || collectionRule.Operator == ConditionRuleOperator.excludeAll;
                 // Contains methods
                 // Need a conversion to an array of string
                 if (IsEmptyOperator(collectionRule))
@@ -749,7 +751,7 @@ namespace JsonRuleEngine.Net
                 }
 
                 // True if it is a class
-                if (collectionRule.Operator == ConditionRuleOperator.includeAll || collectionRule.Operator == ConditionRuleOperator.excludeAll)
+                if (isIncludeAllStatement)
                 {
                     tempExpression = GetChildExpression(param, isDict, childParam, exp, collectionRule, true);
                     tempExpression = HandleIncludeAll(array, tempExpression, childParam, collectionRule.Value, collectionRule.Operator);
@@ -765,9 +767,10 @@ namespace JsonRuleEngine.Net
 
                     tempExpression = CreateOperationExpression(childParam, collectionRule.Operator, collectionRule.Value);
                 }
-
+                
 
                 // In case it's a different of notEqual operator, we would like to apply the .All
+               
                 if (collectionRule.Operator == ConditionRuleOperator.notIn ||
                     collectionRule.Operator == ConditionRuleOperator.notEqual)
                 {
@@ -775,7 +778,7 @@ namespace JsonRuleEngine.Net
                     anyMethod = anyMethod.MakeGenericMethod(childType);
                     expressionsAll.Add(Tuple.Create(collectionRule.Operator, (Expression)Expression.Call(anyMethod, array, Expression.Lambda(tempExpression, childParam))));
                 }
-                else
+                else if (!isIncludeAllStatement)
                 {
                     expressions.Add(tempExpression);
                 }
@@ -915,7 +918,6 @@ namespace JsonRuleEngine.Net
             }
 
 
-            exp = Expression.AndAlso(Expression.NotEqual(arrayExpression, Expression.Constant(null)), exp);
             return exp;
         }
 
