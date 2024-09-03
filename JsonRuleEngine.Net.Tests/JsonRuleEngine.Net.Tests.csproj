@@ -13,7 +13,8 @@
     <None Remove="TestJsons\deepProps.json" />
     <None Remove="TestJsons\enum.json" />
     <None Remove="TestJsons\listEqual.json" />
-    <None Remove="TestJsons\listEqualAlt.json" />
+    <None Remove="TestJsons\listExcludeAll.json" />
+    <None Remove="TestJsons\listIncludeAll.json" />
     <None Remove="TestJsons\listIsEmpty.json" />
     <None Remove="TestJsons\listIsNotEmpty.json" />
     <None Remove="TestJsons\listNotInAlt.json" />
@@ -30,7 +31,10 @@
     <Content Include="TestJsons\combinedCollection.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="TestJsons\listEqualAlt.json">
+    <Content Include="TestJsons\listExcludeAll.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestJsons\listIncludeAll.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="TestJsons\listStringEqual.json">

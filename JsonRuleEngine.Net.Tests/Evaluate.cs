@@ -305,16 +305,31 @@ namespace JsonRuleEngine.Net.Tests
         }
 
         [Fact]
-        public void ListEqualAltReturn()
+        public void ListIncludeAllReturn()
         {
             // Get all games with at least one review with the text value "It's cool"
-            string rules = GetJsonTestFile("listEqualAlt.json");
+            string rules = GetJsonTestFile("listIncludeAll.json");
             var expression = new JsonRuleEngine().ParseExpression<Game>(rules);
             var datas = FakeGameService.GetData()
                 .Where(expression)
                 .ToList();
             Assert.True(datas.Count() == datas.Count(m=> m.Reviews != null &&  m.Reviews.Any(m=> m.Id == 1) && m.Reviews.Any(m => m.Id == 2) ));
         }
+
+
+        [Fact]
+        public void ListExcludeAllReturn()
+        {
+            // Get all games with at least one review with the text value "It's cool"
+            string rules = GetJsonTestFile("listExcludeAll.json");
+            var expression = new JsonRuleEngine().ParseExpression<Game>(rules);
+            var datas = FakeGameService.GetData()
+                .Where(expression)
+                .ToList();
+
+            Assert.True(datas.Count() == datas.Count(m => m.Reviews != null && !m.Reviews.Any(m => m.Id == 1) && !m.Reviews.Any(m => m.Id == 2)));
+        }
+
 
         [Fact]
         public void ListStringEqualReturn()

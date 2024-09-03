@@ -748,11 +748,11 @@ namespace JsonRuleEngine.Net
                 }
 
                 // True if it is a class
-                if (collectionRule.Operator == ConditionRuleOperator.includeAll)
+                if (collectionRule.Operator == ConditionRuleOperator.includeAll || collectionRule.Operator == ConditionRuleOperator.excludeAll)
                 {
 
                     exp = GetChildExpression(param, isDict, childParam, exp, collectionRule, true);
-                    exp = HandleIncludeAll(array, exp, childParam, collectionRule.Value);
+                    exp = HandleIncludeAll(array, exp, childParam, collectionRule.Value, collectionRule.Operator);
                     remainingFields.Remove(currentField);
                     return exp;
                 }
@@ -877,7 +877,7 @@ namespace JsonRuleEngine.Net
         /// <param name="value"></param>
         /// <returns></returns>
         /// <exception cref="JsonRuleEngineException"></exception>
-        private Expression HandleIncludeAll(Expression arrayExpression, Expression visitedExpression, ParameterExpression childParam, object value)
+        private Expression HandleIncludeAll(Expression arrayExpression, Expression visitedExpression, ParameterExpression childParam, object value, ConditionRuleOperator @operator)
         {
             if (value == null)
             {
@@ -902,7 +902,12 @@ namespace JsonRuleEngine.Net
             foreach (var item in (IEnumerable)array)
             {
                 var equal = CreateOperationExpression(visitedExpression, ConditionRuleOperator.equal, item);
-                var anyExp = Expression.Call(anyMethod, arrayExpression, Expression.Lambda(equal, childParam));
+                Expression anyExp = Expression.Call(anyMethod, arrayExpression, Expression.Lambda(equal, childParam));
+
+                if (@operator == ConditionRuleOperator.excludeAll)
+                {
+                    anyExp = Expression.Not(anyExp);
+                }
 
                 if (exp == null)
                 {
@@ -915,8 +920,7 @@ namespace JsonRuleEngine.Net
 
             }
 
-
-
+           
             exp = Expression.AndAlso(Expression.NotEqual(arrayExpression, Expression.Constant(null)), exp);
             return exp;
         }

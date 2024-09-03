@@ -68,6 +68,7 @@ namespace JsonRuleEngine.Net
         /// <summary>
         /// Include all element of a collection
         /// </summary>
-        includeAll
+        includeAll,
+        excludeAll
     }
 }
