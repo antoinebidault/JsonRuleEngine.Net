@@ -705,9 +705,10 @@ namespace JsonRuleEngine.Net
 
             var expressions = new List<Expression>();
             var expressionsEmpty = new List<Expression>();
-            var expressionsAll = new List<Expression>();
+            var expressionsAll = new List<Tuple<ConditionRuleOperator, Expression>>();
 
             Expression exp = null;
+            Expression tempExpression = null;
             MethodInfo anyMethod = null;
             foreach (var collectionRule in rule.CollectionRules.OrderBy(m => IsEmptyOperator(m)))
             {
@@ -750,19 +751,19 @@ namespace JsonRuleEngine.Net
                 // True if it is a class
                 if (collectionRule.Operator == ConditionRuleOperator.includeAll || collectionRule.Operator == ConditionRuleOperator.excludeAll)
                 {
-
-                    exp = GetChildExpression(param, isDict, childParam, exp, collectionRule, true);
-                    exp = HandleIncludeAll(array, exp, childParam, collectionRule.Value, collectionRule.Operator);
+                    tempExpression = GetChildExpression(param, isDict, childParam, exp, collectionRule, true);
+                    tempExpression = HandleIncludeAll(array, tempExpression, childParam, collectionRule.Value, collectionRule.Operator);
+                    expressionsAll.Add(Tuple.Create(collectionRule.Operator, tempExpression));
                     remainingFields.Remove(currentField);
-                    return exp;
                 }
                 else if (IsClass(childType))
                 {
-                    exp = GetChildExpression(param, isDict, childParam, exp, collectionRule, false);
+                    tempExpression = GetChildExpression(param, isDict, childParam, exp, collectionRule, false);
                 }
                 else
                 {
-                    exp = CreateOperationExpression(childParam, collectionRule.Operator, collectionRule.Value);
+
+                    tempExpression = CreateOperationExpression(childParam, collectionRule.Operator, collectionRule.Value);
                 }
 
 
@@ -772,13 +773,11 @@ namespace JsonRuleEngine.Net
                 {
                     anyMethod = typeof(Enumerable).GetMethods().Single(m => m.Name == "All" && m.GetParameters().Length == 2);
                     anyMethod = anyMethod.MakeGenericMethod(childType);
-                    exp = Expression.Call(anyMethod, array, Expression.Lambda(exp, childParam));
-                    expressionsAll.Add(exp);
-                    originalOp = collectionRule.Operator;
+                    expressionsAll.Add(Tuple.Create(collectionRule.Operator, (Expression)Expression.Call(anyMethod, array, Expression.Lambda(tempExpression, childParam))));
                 }
                 else
                 {
-                    expressions.Add(exp);
+                    expressions.Add(tempExpression);
                 }
             }
 
@@ -810,28 +809,23 @@ namespace JsonRuleEngine.Net
             {
                 foreach (var expression in expressionsAll)
                 {
-                    if (!expressions.Any())
+                    if (exp == null)
                     {
-                        exp = expression;
-                        continue;
+                        exp = expression.Item2;
                     }
-                    if (rule.Separator == ConditionRuleSeparator.And)
+                    else if (rule.Separator == ConditionRuleSeparator.And)
                     {
-                        exp = Expression.AndAlso(exp, expression);
+                        exp = Expression.AndAlso(exp, expression.Item2);
                     }
                     else
                     {
-                        exp = Expression.OrElse(exp, expression);
+                        exp = Expression.OrElse(exp, expression.Item2);
                     }
                 }
-                if (originalOp == ConditionRuleOperator.includeAll)
-                {
-                    exp = Expression.AndAlso(Expression.NotEqual(array, Expression.Constant(null)), exp);
-                }
-                else
-                {
+                if (expressionsAll.All(m => m.Item1 != ConditionRuleOperator.includeAll && m.Item1 != ConditionRuleOperator.excludeAll))
                     exp = Expression.OrElse(Expression.Equal(array, Expression.Constant(null)), exp);
-                }
+                else
+                    exp = Expression.AndAlso(Expression.NotEqual(array, Expression.Constant(null)), exp);
             }
 
             remainingFields.Remove(currentField);
@@ -920,7 +914,7 @@ namespace JsonRuleEngine.Net
 
             }
 
-           
+
             exp = Expression.AndAlso(Expression.NotEqual(arrayExpression, Expression.Constant(null)), exp);
             return exp;
         }

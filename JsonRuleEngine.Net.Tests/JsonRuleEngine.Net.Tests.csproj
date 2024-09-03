@@ -19,6 +19,7 @@
     <None Remove="TestJsons\listIsNotEmpty.json" />
     <None Remove="TestJsons\listNotInAlt.json" />
     <None Remove="TestJsons\listStringEqual.json" />
+    <None Remove="TestJsons\notEqualAltList.json" />
     <None Remove="TestJsons\notEqualList.json" />
     <None Remove="TestJsons\nullProp.json" />
     <None Remove="TestJsons\nullPropIsEqual.json" />
@@ -41,6 +42,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="TestJsons\listEqual.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestJsons\notEqualAltList.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="TestJsons\nullPropIsEqual.json">

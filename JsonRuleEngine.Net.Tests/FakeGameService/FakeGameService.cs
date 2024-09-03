@@ -70,7 +70,7 @@ namespace JsonRuleEngine.Net.Tests
                        new Review()
                        {
                            Id = 3,
-                           Text ="It's very cool"
+                           Text ="It's very very cool"
                        }
                     }
                 },
@@ -82,7 +82,13 @@ namespace JsonRuleEngine.Net.Tests
                     Category = null,
                     Date =new DateTime(2021,1,12),
                     DateCreation =new DateTime(2021,1,22),
-                    Reviews = new List<Review>{}
+                    Reviews = new List<Review>{
+                       new Review()
+                       {
+                           Id = 1,
+                           Text ="It's very very cool"
+                       }
+                    }
                 },
                  new Game()
                 {

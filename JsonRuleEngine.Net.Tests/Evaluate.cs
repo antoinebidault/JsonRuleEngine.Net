@@ -634,6 +634,20 @@ namespace JsonRuleEngine.Net.Tests
 
 
         [Fact]
+        public void NotEqualAltList()
+        {
+
+            string rules = GetJsonTestFile("notEqualAltList.json");
+
+            var expression = new JsonRuleEngine().ParseExpression<Game>(rules);
+            var datas = FakeGameService.GetData().Where(expression).ToList();
+            var valueToCompare = FakeGameService.GetData().Count(m => m.Reviews == null || (m.Reviews.All(m => m.Text != "It's cool") && m.Reviews.All(m => m.Text != "It's very cool")));
+
+            Assert.True(datas.Count() == valueToCompare);
+        }
+
+
+        [Fact]
         public void Empty()
         {
             string rules = GetJsonTestFile("empty.json");
