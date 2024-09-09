@@ -294,7 +294,6 @@ namespace JsonRuleEngine.Net
         /// <returns></returns>
         private static ConditionRuleSet RegroupFieldsByCollection(Type type, ConditionRuleSet condition, IDictionary<string, Expression> dictionary = null)
         {
-
             var conditionRuleSet = new ConditionRuleSet()
             {
                 Field = condition.Field,
@@ -310,7 +309,6 @@ namespace JsonRuleEngine.Net
                 var (field, currentType) = GetCollectionType(type, conditionRuleSet.Field, dictionary);
                 if (!string.IsNullOrEmpty(field))
                 {
-
                     string subField = "";
 
                     if (conditionRuleSet.Field.Length > field.Length + 1)
@@ -342,6 +340,7 @@ namespace JsonRuleEngine.Net
             var rules = conditionRuleSet.Rules ?? conditionRuleSet.CollectionRules;
             var groups = rules.GroupBy(m => GetCollectionType(type, m.Field, dictionary));
 
+            var newRuleSet = new List<ConditionRuleSet>();
             foreach (var group in groups)
             {
 
@@ -350,16 +349,29 @@ namespace JsonRuleEngine.Net
                     for (var i = 0; i < group.Count(); i++)
                     {
                         var rule = group.ElementAt(i);
-                        rules = rules.Append(rule);
+                        newRuleSet.Add(rule);
                     }
                 }
                 else
                 {
-                    conditionRuleSet.Field = group.Key.Item1;
+                    var newConditionRuleSet = new ConditionRuleSet();
+
+                    newConditionRuleSet.Field = group.Key.Item1;
+                    newConditionRuleSet.CollectionRules = new List<ConditionRuleSet>();
 
                     for (var i = 0; i < group.Count(); i++)
                     {
-                        var rule = group.ElementAt(i);
+                        var sourceRule = group.ElementAt(i);
+                        var rule = new ConditionRuleSet()
+                        {
+                            CollectionRules = sourceRule.CollectionRules,
+                            Field = sourceRule.Field,
+                            Operator = sourceRule.Operator,
+                            Rules = sourceRule.Rules,
+                            Separator = sourceRule.Separator,
+                            Value = sourceRule.Value
+                        };
+
                         if (rule.Field.Length > group.Key.Item1.Length + 1)
                         {
                             rule.Field = rule.Field.Substring(group.Key.Item1.Length + 1, rule.Field.Length - group.Key.Item1.Length - 1);
@@ -371,25 +383,38 @@ namespace JsonRuleEngine.Net
                         var arrType = group.Key.Item2;
                         if (arrType != null)
                         {
-                            var regroupField = RegroupFieldsByCollection(arrType, new ConditionRuleSet()
+                            if (!IsClass(group.Key.Item2))
                             {
-                                Field = rule.Field,
-                                Operator = rule.Operator,
-                                Value = rule.Value
-                            });
-                            rule.CollectionRules = regroupField.CollectionRules;
-                            rule.Field = regroupField.Field;
-                            rule.Operator = regroupField.Operator;
-                            rule.Value = regroupField.Value;
+                                rule.Field = "";
+                                rule.CollectionRules = null;
+                            }
+                            else
+                            {
+                                var regroupField = RegroupFieldsByCollection(arrType, new ConditionRuleSet()
+                                {
+                                    Field = rule.Field,
+                                    Operator = rule.Operator,
+                                    Value = rule.Value
+                                });
+                                rule.Rules = null;
+                                rule.CollectionRules = regroupField.CollectionRules;
+                                rule.Field = regroupField.Field;
+                                rule.Operator = regroupField.Operator;
+                                rule.Value = regroupField.Value;
+                            }
+
                         }
                         rule.Separator = condition.Separator;
+                        newConditionRuleSet.Separator = condition.Separator;
+                        newConditionRuleSet.CollectionRules = newConditionRuleSet.CollectionRules.Append(rule);
                     }
-                    conditionRuleSet.Rules = null;
-                    conditionRuleSet.CollectionRules = group.ToList();
+                    newConditionRuleSet.Rules = null;
+                    newRuleSet.Add(newConditionRuleSet);
                 }
             }
-
+            conditionRuleSet.Rules = newRuleSet;
             return conditionRuleSet;
+
         }
 
         private static (string, Type) GetCollectionType(Type type, string field, IDictionary<string, Expression> dictionary)
@@ -418,7 +443,6 @@ namespace JsonRuleEngine.Net
 
             while (remainingFields.Count > 0)
             {
-
                 var prop = currentType.GetProperty(remainingFields[0]);
 
                 oldFields.Add(remainingFields[0]);
@@ -767,10 +791,10 @@ namespace JsonRuleEngine.Net
 
                     tempExpression = CreateOperationExpression(childParam, collectionRule.Operator, collectionRule.Value);
                 }
-                
+
 
                 // In case it's a different of notEqual operator, we would like to apply the .All
-               
+
                 if (collectionRule.Operator == ConditionRuleOperator.notIn ||
                     collectionRule.Operator == ConditionRuleOperator.notEqual)
                 {
@@ -974,7 +998,7 @@ namespace JsonRuleEngine.Net
             return Expression.AndAlso(Expression.NotEqual(array, Expression.Constant(null)), Expression.Call(anyMethod, array, anyExpression));
         }*/
 
-        private bool IsClass(Type type)
+        private static bool IsClass(Type type)
         {
             return type.IsClass && !type.IsArray && !type.IsAbstract && !type.IsEnum && type != typeof(string);
         }

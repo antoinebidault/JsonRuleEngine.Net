@@ -302,6 +302,53 @@ namespace JsonRuleEngine.Net.Tests
             var expression = new JsonRuleEngine().ParseExpression<Game>(rules);
             var datas = FakeGameService.GetData().Where(expression).ToList();
             Assert.True(datas.Count() == 1);
+
+
+        }
+
+
+        [Fact]
+        public void ListEqualListStringReturn()
+        {
+            var game = new Game()
+            {
+                Name = "GTA",
+                Tags = new[]
+                {
+                    "Value1",
+                    "Value2"
+                }
+            };
+
+            var rules = new ConditionRuleSet()
+            {
+                Separator = ConditionRuleSeparator.And,
+                Rules = new List<ConditionRuleSet>()
+               {
+                   new ConditionRuleSet()
+                   {
+                        Field = "Tags",
+                        Operator = ConditionRuleOperator.equal,
+                         Value = "Value1"
+                   },
+                   new ConditionRuleSet()
+                   {
+                        Field = "Name",
+                        Operator = ConditionRuleOperator.equal,
+                         Value = "GTA2"
+                   },
+               }
+            };
+
+            var result1 = new JsonRuleEngine().Evaluate(game, rules);
+
+            Assert.False(result1);
+
+            game.Name = "GTA2";
+
+            var result2 = new JsonRuleEngine().Evaluate(game, rules);
+            Assert.True(result2);
+
         }
 
         [Fact]
@@ -313,7 +360,7 @@ namespace JsonRuleEngine.Net.Tests
             var datas = FakeGameService.GetData()
                 .Where(expression)
                 .ToList();
-            Assert.True(datas.Count() == datas.Count(m=> m.Reviews != null &&  m.Reviews.Any(m=> m.Id == 1) && m.Reviews.Any(m => m.Id == 2) ));
+            Assert.True(datas.Count() == datas.Count(m => m.Reviews != null && m.Reviews.Any(m => m.Id == 1) && m.Reviews.Any(m => m.Id == 2)));
         }
 
 
@@ -389,7 +436,7 @@ namespace JsonRuleEngine.Net.Tests
         public void CombinedCollection()
         {
             List<Game> list = Test("combinedCollection.json");
-            Assert.True(list.Count == 0);
+            Assert.True(list.Count == 1);
         }
 
 
@@ -439,7 +486,7 @@ namespace JsonRuleEngine.Net.Tests
             List<Game> list = Test("listIsEmpty.json");
 
             Assert.NotEmpty(list);
-            Assert.True(list.All(m => m.Reviews == null || !m.Reviews.Any() ));
+            Assert.True(list.All(m => m.Reviews == null || !m.Reviews.Any()));
         }
 
         [Fact]
@@ -612,6 +659,7 @@ namespace JsonRuleEngine.Net.Tests
             var result2 = new JsonRuleEngine().Evaluate(new Game()
             {
                 Name = "Toto",
+                Category = "Adventure",
                 Reviews = new[]
             {
                      new Review()
@@ -626,6 +674,7 @@ namespace JsonRuleEngine.Net.Tests
             var result3 = new JsonRuleEngine().Evaluate(new Game()
             {
                 Name = "Toto",
+                Category = "Adventure",
                 Reviews = null
             }, rules);
 

@@ -2,6 +2,11 @@
   "separator": "And",
   "rules": [
     {
+      "field": "Name",
+      "operator": "equal",
+      "value": "Assassin's creed"
+    },
+    {
       "field": "Reviews.Text",
       "operator": "equal",
       "value": "It's cool"
