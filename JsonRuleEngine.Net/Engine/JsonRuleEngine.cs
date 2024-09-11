@@ -329,6 +329,7 @@ namespace JsonRuleEngine.Net
                      };
 
                     type = currentType;
+                    return conditionRuleSet;
                 }
             }
 
@@ -955,48 +956,6 @@ namespace JsonRuleEngine.Net
         {
             return array.Type == typeof(JArray) ? GetJArrayType((JArray)value) : array.Type.GetGenericArguments().First();
         }
-
-        /*
-        private Expression CreateTableCondition(Expression array, Expression param, object value, ConditionRuleOperator op, string currentField, List<string> remainingFields, ConditionRuleSet condition)
-        {
-            var childType = array.Type == typeof(JArray) ? GetJArrayType((JArray)value) : array.Type.GetGenericArguments().First();
-
-
-            // Set it as the param of the any expression
-            var childParam = Expression.Parameter(childType);
-            Expression exp = null;
-            MethodInfo anyMethod = null;
-            Expression anyExpression = null;
-            remainingFields.Remove(currentField);
-
-            // True if it is a class
-            if (IsClass(childType))
-            {
-                while (remainingFields.Count > 0)
-                {
-                    exp = CompileExpression(exp ?? childParam, remainingFields, false, param, op, value, false, condition);
-                }
-                anyExpression = Expression.Lambda(exp, childParam);
-            }
-            else
-            {
-                exp = CreateOperationExpression(exp ?? childParam, op, value);
-                anyExpression = Expression.Lambda(exp, childParam);
-            }
-
-            // In case it's a different of notEqual operator, we would like to apply the .All
-            if (op == ConditionRuleOperator.notIn || op == ConditionRuleOperator.notEqual || op == ConditionRuleOperator.includeAll)
-            {
-                anyMethod = typeof(Enumerable).GetMethods().Single(m => m.Name == "All" && m.GetParameters().Length == 2);
-                anyMethod = anyMethod.MakeGenericMethod(childType);
-                return Expression.Call(anyMethod, array, anyExpression);
-            }
-
-            anyMethod = typeof(Enumerable).GetMethods().Single(m => m.Name == "Any" && m.GetParameters().Length == 2);
-            anyMethod = anyMethod.MakeGenericMethod(childType);
-
-            return Expression.AndAlso(Expression.NotEqual(array, Expression.Constant(null)), Expression.Call(anyMethod, array, anyExpression));
-        }*/
 
         private static bool IsClass(Type type)
         {

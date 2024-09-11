@@ -1,5 +1,5 @@
 ﻿{
-  "field": "Reviews.Id",
+  "field": "Reviews.Text",
   "operator": "equal",
-  "value": "1"
+  "value": "It's very very cool"
 }

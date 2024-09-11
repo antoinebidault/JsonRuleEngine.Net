@@ -302,8 +302,18 @@ namespace JsonRuleEngine.Net.Tests
             var expression = new JsonRuleEngine().ParseExpression<Game>(rules);
             var datas = FakeGameService.GetData().Where(expression).ToList();
             Assert.True(datas.Count() == 1);
+        }
 
-
+        [Fact]
+        public void ListEqualSimpleReturn()
+        {
+            // Get all games with at least one review with the text value "It's cool"
+            string rules = GetJsonTestFile("listEqualSimple.json");
+            var expression = new JsonRuleEngine().ParseExpression<Game>(rules);
+            var data = FakeGameService.GetData().Where(expression).ToList();
+            var count = FakeGameService.GetData().Count(m => m.Reviews != null &&
+                                                             m.Reviews.Any(m => m.Text == "It's very very cool"));
+            Assert.True(data.Count() == count );
         }
 
 
