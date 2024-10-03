@@ -93,6 +93,26 @@ namespace JsonRuleEngine.Net.Tests
             // Assert.True(setDic);
         }
 
+
+        [Fact]
+        public void Dictionary_WrongTypes()
+        {
+            var game = new Game()
+            {
+                Id = System.Guid.NewGuid(),
+                CustomFields = new Dictionary<string, object>()
+                {
+                    {"testInt",(int)12 }
+                }
+            };
+
+
+
+            bool resultNotNull = new JsonRuleEngine().Evaluate(game, new ConditionRuleSet() { Field = "CustomFields.testInt", Operator = ConditionRuleOperator.greaterThan, Value = (long)1 });
+            Assert.True(resultNotNull);
+
+        }
+
         public static string GetValueOrDefault(Dictionary<string, object> dictionary, string key)
         {
             if (dictionary.ContainsKey(key))

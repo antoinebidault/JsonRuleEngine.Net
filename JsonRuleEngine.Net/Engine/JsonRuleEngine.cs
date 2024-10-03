@@ -180,6 +180,7 @@ namespace JsonRuleEngine.Net
         /// <typeparam name="TOut">Output type</typeparam>
         /// <param name="obj">The object to test</param>
         /// <param name="rules">The conditionRuleSet object</param>
+        /// <param name="returnValue">The conditionRuleSet object</param>
         /// <returns>True if the conditions are matched</returns>
         public bool TryEvaluate<T, TOut>(T obj, ConditionRuleSet<TOut> rules, out TOut returnValue)
         {
@@ -487,7 +488,21 @@ namespace JsonRuleEngine.Net
         {
             if (dictionary.ContainsKey(key))
             {
-                return (T)dictionary[key];
+                object value = dictionary[key];
+                if (value is T)
+                {
+                    return (T)value;
+                }
+                try
+                {
+                    return (T)Convert.ChangeType(value, typeof(T));
+                }
+                catch (InvalidCastException)
+                {
+                    // Handle the case where conversion fails
+                    return default(T);
+                }
+
             }
             return default(T);
         }
@@ -592,6 +607,7 @@ namespace JsonRuleEngine.Net
             {
                 Expression key = Expression.Constant(memberName);
                 var type = GetDictionaryType(value, op);
+
                 var methodGetValue = (this.GetType()).GetMethod(nameof(GetValueOrDefaultObject)).MakeGenericMethod(type);
                 expression = Expression.Call(methodGetValue, expression, key);
             }
