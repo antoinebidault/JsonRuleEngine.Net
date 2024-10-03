@@ -499,8 +499,9 @@ namespace JsonRuleEngine.Net
                 }
                 catch (InvalidCastException)
                 {
-                    // Handle the case where conversion fails
-                    return default(T);
+                    throw new JsonRuleEngineException(JsonRuleEngineExceptionCategory.InvalidValue, 
+                        $"The type provided in dictionary key {key} ({value.GetType().Name}) " +
+                        $"is not the same as the value provided in rule ({typeof(T).Name})");
                 }
 
             }
