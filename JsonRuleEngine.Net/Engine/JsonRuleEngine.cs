@@ -696,6 +696,11 @@ namespace JsonRuleEngine.Net
             if (value is JArray)
                 return typeof(IEnumerable<>).MakeGenericType(GetJArrayType((JArray)value));
 
+            if (value is string && ((value.ToString().StartsWith("\"") && value.ToString().Contains(":")) || value.ToString().IndexOf("-") == 5))
+            {
+                return typeof(DateTime?);
+            }
+
             return value.GetType();
         }
 
@@ -1115,7 +1120,7 @@ namespace JsonRuleEngine.Net
             {
                 expression = Expression.NotEqual(property, toCompare);
             }
-            else if (op == ConditionRuleOperator.greaterThan)
+            else if ( op == ConditionRuleOperator.greaterThan)
             {
                 expression = Expression.GreaterThan(property, toCompare);
             }

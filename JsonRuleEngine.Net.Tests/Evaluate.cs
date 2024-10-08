@@ -111,6 +111,24 @@ namespace JsonRuleEngine.Net.Tests
             bool resultNotNull = new JsonRuleEngine().Evaluate(game, new ConditionRuleSet() { Field = "CustomFields.testInt", Operator = ConditionRuleOperator.greaterThan, Value = (long)1 });
             Assert.True(resultNotNull);
 
+
+        }
+
+        [Fact]
+        public void Dictionary_DateCompare()
+        {
+            var game2 = new Game()
+            {
+                Id = System.Guid.NewGuid(),
+                CustomFields = new Dictionary<string, object>()
+                {
+                }
+            };
+
+
+            var ts = TimeSpan.FromHours(1);
+            bool resultFalse = new JsonRuleEngine().Evaluate(game2, new ConditionRuleSet() { Field = "CustomFields.testDate", Operator = ConditionRuleOperator.greaterThan, Value = $"\"{ts}\"" });
+            Assert.False(resultFalse);
         }
 
         public static string GetValueOrDefault(Dictionary<string, object> dictionary, string key)
@@ -580,7 +598,7 @@ namespace JsonRuleEngine.Net.Tests
         }
 
         [Fact]
-        public void TimeSpan()
+        public void TimeSpans()
         {
             string rules = GetJsonTestFile("timespan.json");
 
