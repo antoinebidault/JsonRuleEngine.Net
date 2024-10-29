@@ -29,16 +29,23 @@ namespace JsonRuleEngine.Net
         {
             if (value is string)
             {
-                if (double.TryParse(value.ToString(),NumberStyles.Number, CultureInfo.CreateSpecificCulture("en-US"), out double result))
+                if (double.TryParse(value.ToString(), NumberStyles.Number, CultureInfo.CreateSpecificCulture("en-US"), out double result))
                     return true;
             }
 
             return false;
         }
 
+
+
+        internal static bool IsNumeric(this object value)
+        {
+            return (value is int || value is double || value is long || value is decimal );
+        }
+
         internal static bool IsArray(this Type type)
         {
-            return( type != typeof(string) &&
+            return (type != typeof(string) &&
                     type.IsGenericType &&
                     !type.IsDictionary() &&
                     typeof(IEnumerable).IsAssignableFrom(type)) || type == typeof(JArray);

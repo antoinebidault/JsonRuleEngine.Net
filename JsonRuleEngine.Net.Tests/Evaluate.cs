@@ -58,10 +58,10 @@ namespace JsonRuleEngine.Net.Tests
                 return null;
             };*/
 
-            bool resultInt = new JsonRuleEngine().Evaluate(game, new ConditionRuleSet() { Field = "CustomFields.testInt", Operator = ConditionRuleOperator.greaterThan, Value = "3" });
+            bool resultInt = new JsonRuleEngine().Evaluate(game, new ConditionRuleSet() { Field = "CustomFields.testInt", Operator = ConditionRuleOperator.greaterThan, Value = 3 });
             Assert.True(resultInt);
 
-            bool resultDouble = new JsonRuleEngine().Evaluate(game, new ConditionRuleSet() { Field = "CustomFields.testDouble", Operator = ConditionRuleOperator.greaterThan, Value = "3.1" });
+            bool resultDouble = new JsonRuleEngine().Evaluate(game, new ConditionRuleSet() { Field = "CustomFields.testDouble", Operator = ConditionRuleOperator.greaterThan, Value = 3.1 });
             Assert.True(resultDouble);
 
             bool resultSuccess = new JsonRuleEngine().Evaluate(game, new ConditionRuleSet() { Field = "CustomFields.testSuccess", Operator = ConditionRuleOperator.equal, Value = "success" });
@@ -76,8 +76,6 @@ namespace JsonRuleEngine.Net.Tests
 
             bool resultTrue = new JsonRuleEngine().Evaluate(game, new ConditionRuleSet() { Field = "CustomFields.testBool", Operator = ConditionRuleOperator.equal, Value = true });
             Assert.True(resultTrue);
-
-
 
             bool resultFalse = new JsonRuleEngine().Evaluate(game, new ConditionRuleSet() { Field = "CustomFields.testBool", Operator = ConditionRuleOperator.equal, Value = false });
             Assert.False(resultFalse);
@@ -113,6 +111,52 @@ namespace JsonRuleEngine.Net.Tests
 
 
         }
+
+        [Fact]
+        public void Dictionary_EqualArray()
+        {
+            var game = new Game()
+            {
+                Id = System.Guid.NewGuid(),
+                CustomFields = new Dictionary<string, object>
+                {
+                    {"test", (new List<string>(){ "Test"})},
+                    {"test2", "test2" },
+                }
+            };
+
+
+            bool result = new JsonRuleEngine().Evaluate(game, new ConditionRuleSet() { Field = "CustomFields.test", Operator = ConditionRuleOperator.equal, Value = "Test" });
+            Assert.True(result);
+
+            result = new JsonRuleEngine().Evaluate(game, new ConditionRuleSet() { Field = "CustomFields.test", Operator = ConditionRuleOperator.equal, Value = "Test2" });
+            Assert.False(result);
+        }
+
+        [Fact]
+        public void Dictionary_NotEqualArray()
+        {
+            var game = new Game()
+            {
+                Id = System.Guid.NewGuid(),
+                CustomFields = new Dictionary<string, object>
+                {
+                    {"test", (new List<string>(){ "Test"})},
+                    {"test2", "test2" },
+                }
+            };
+
+
+            bool result = new JsonRuleEngine().Evaluate(game, new ConditionRuleSet() { Field = "CustomFields.test", Operator = ConditionRuleOperator.notEqual, Value = "Test2" });
+            Assert.True(result);
+
+
+             result = new JsonRuleEngine().Evaluate(game, new ConditionRuleSet() { Field = "CustomFields.test", Operator = ConditionRuleOperator.notEqual, Value = "Test" });
+            Assert.False(result);
+        }
+
+
+
 
         [Fact]
         public void Dictionary_DateCompare()
@@ -264,6 +308,18 @@ namespace JsonRuleEngine.Net.Tests
                 dict,
                 conditions
                 );
+            Assert.True(result); // Return true
+
+            conditions = JsonConvert.DeserializeObject<ConditionRuleSet>("{\"operator\":\"in\",\"field\":\"Test\"}");
+            conditions.Value = new List<string>()
+                {
+                    "0"
+                };
+            result = new JsonRuleEngine().Evaluate(
+               dict,
+               conditions
+               );
+            Assert.False(result); // Return true
 
             conditions = JsonConvert.DeserializeObject<ConditionRuleSet>("{\"operator\":\"in\",\"field\":\"Test\"}");
             conditions.Value = new JArray
@@ -294,6 +350,20 @@ namespace JsonRuleEngine.Net.Tests
             };
             bool result = new JsonRuleEngine().Evaluate(dict, new ConditionRuleSet<bool>() { Field = "1234", Operator = ConditionRuleOperator.isNotNull });
             Assert.False(result);
+
+
+        }
+
+        [Fact]
+        public void Dictionary_NoField_Date()
+        {
+
+            var dict = new Dictionary<string, object>()
+            {
+            };
+            bool result2 = new JsonRuleEngine().Evaluate(dict, new ConditionRuleSet<bool>() { Field = "1234", Operator = ConditionRuleOperator.greaterThan, Value = DateTime.UtcNow });
+            Assert.False(result2);
+
         }
 
         [Fact]
@@ -351,7 +421,7 @@ namespace JsonRuleEngine.Net.Tests
             var data = FakeGameService.GetData().Where(expression).ToList();
             var count = FakeGameService.GetData().Count(m => m.Reviews != null &&
                                                              m.Reviews.Any(m => m.Text == "It's very very cool"));
-            Assert.True(data.Count() == count );
+            Assert.True(data.Count() == count);
         }
 
 

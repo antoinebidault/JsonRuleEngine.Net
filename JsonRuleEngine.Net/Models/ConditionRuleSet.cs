@@ -37,5 +37,6 @@ namespace JsonRuleEngine.Net
         /// Collection rules 
         /// </summary>
         internal IEnumerable<ConditionRuleSet> CollectionRules { get; set; }
+        internal Type DictionaryInternalType { get; set; }
     }
 }
