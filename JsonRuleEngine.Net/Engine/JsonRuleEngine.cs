@@ -5,6 +5,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
+using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -493,13 +494,15 @@ namespace JsonRuleEngine.Net
                 {
                     return (T)value;
                 }
+
+
                 try
                 {
                     return (T)Convert.ChangeType(value, typeof(T));
                 }
                 catch (InvalidCastException)
                 {
-                    throw new JsonRuleEngineException(JsonRuleEngineExceptionCategory.InvalidValue, 
+                    throw new JsonRuleEngineException(JsonRuleEngineExceptionCategory.InvalidValue,
                         $"The type provided in dictionary key {key} ({value.GetType().Name}) " +
                         $"is not the same as the value provided in rule ({typeof(T).Name})");
                 }
@@ -606,17 +609,24 @@ namespace JsonRuleEngine.Net
 
             if (expression != null && typeof(Dictionary<string, object>).IsAssignableFrom(expression.Type))
             {
+
+                remainingFields.Remove(memberName);
+                return GetDictionaryOperation(expression, memberName, op, value);
+                /*
                 Expression key = Expression.Constant(memberName);
                 var type = GetDictionaryType(value, op);
-
                 var methodGetValue = (this.GetType()).GetMethod(nameof(GetValueOrDefaultObject)).MakeGenericMethod(type);
                 expression = Expression.Call(methodGetValue, expression, key);
+                */
+                //isDict = true;
             }
             else if (isDict)
             {
                 Expression key = Expression.Constant(memberName);
                 var methodGetValue = (this.GetType()).GetMethod("GetValueOrDefault");
                 expression = Expression.Call(methodGetValue, inputParam, key);
+
+
             }
             else if (expression == null)
             {
@@ -636,11 +646,11 @@ namespace JsonRuleEngine.Net
                         {
                             Operator = op,
                             Value = value,
-                             Field = memberName
+                            Field = memberName
                         }
                     };
 
-                if (rule.CollectionRules.Count() > 0)
+                if (rule.CollectionRules != null && rule.CollectionRules.Count() > 0)
                 {
                     return HandleTableRule(expression, inputParam, op, value, remainingFields, isOverride, rule, isDict);
                 }
@@ -656,6 +666,7 @@ namespace JsonRuleEngine.Net
                 }
                 else
                 {
+
                     return CreateOperationExpression(expression, op, value);
                 }
             }
@@ -667,6 +678,357 @@ namespace JsonRuleEngine.Net
                 }
                 return Expression.AndAlso(Expression.NotEqual(expression, Expression.Constant(null)), CompileExpression(expression, remainingFields, isDict, inputParam, op, value, isOverride, rule, isNavigation));
             }
+        }
+
+
+        /// <summary>
+        /// For handling dictionary specific case,
+        /// the operation handling needs to be a bit different
+        /// </summary>
+        /// <param name="expression"></param>
+        /// <param name="memberName"></param>
+        /// <param name="op"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException"></exception>
+        /// <exception cref="NotSupportedException"></exception>
+        private Expression GetDictionaryOperation(Expression expression, string memberName, ConditionRuleOperator op, object value)
+        {    // Access the ContainsKey method of the dictionary
+            var containsKeyMethod = typeof(IDictionary<string, object>).GetMethod("ContainsKey");
+
+            // Create a call to the ContainsKey method
+            var keyExpression = Expression.Constant(memberName);
+            var containsKeyExpression = Expression.Call(expression, containsKeyMethod, keyExpression);
+
+            // Get the IDictionary item by key (if it exists)
+            var dictionaryAccess = Expression.MakeIndex(
+                expression,
+                typeof(IDictionary<string, object>).GetProperty("Item"),
+                new[] { keyExpression });
+
+
+            // Add special case for the isNull and isNotNull operators
+            var comparison = GetDictionaryComparisonExpression(dictionaryAccess, value, op);
+
+
+            var valueIsNotACollection = Expression.Not(Expression.TypeIs(dictionaryAccess, typeof(object[])));
+
+
+            IEnumerable<object> valueCollection = new List<object>();
+
+            // Specific cas of collection
+            if (value != null)
+            {
+                if (!value.GetType().IsArray())
+                {
+                    valueCollection = valueCollection.Append(value);
+                }
+                else
+                {
+
+                    valueCollection = value is JArray ? ((JArray)value).ToObject<IEnumerable<object>>() : (IEnumerable<object>)value;
+                }
+
+
+                // Check if value is a collection and contains "cocoonut"
+                var containsMethod = typeof(Enumerable).GetMethods()
+                                                           .First(m => m.Name == "Contains" && m.GetParameters().Length == 2)
+                                                           .MakeGenericMethod(typeof(object));
+
+
+                var list = new List<Expression>().Any(m => m.CanReduce);
+                var valueAsCollection = Expression.Convert(dictionaryAccess, typeof(IEnumerable<object>));
+
+                Expression checkCollection = null;
+                foreach (var itemValue in valueCollection)
+                {
+                    Expression call = Expression.Call(null, containsMethod, valueAsCollection, Expression.Convert(Expression.Constant(itemValue), typeof(object)));
+
+                    if (op == ConditionRuleOperator.notIn || op == ConditionRuleOperator.excludeAll)
+                    {
+                        call = Expression.Not(call);
+                    }
+
+                    if (checkCollection == null)
+                    {
+                        checkCollection = call;
+                    }
+                    else
+                    {
+                        if (op == ConditionRuleOperator.@in || op == ConditionRuleOperator.includeAll)
+                        {
+                            checkCollection = Expression.Or(checkCollection, call);
+                        }
+                        else if (op == ConditionRuleOperator.notIn || op == ConditionRuleOperator.excludeAll)
+                        {
+                            checkCollection = Expression.AndAlso(checkCollection, call);
+                        }
+                    }
+                }
+
+
+
+                if (op == ConditionRuleOperator.doesNotContains || op == ConditionRuleOperator.notIn || op == ConditionRuleOperator.notEqual)
+                {
+                    checkCollection = Expression.Not(checkCollection);
+                }
+
+                var valueIsArray = Expression.TypeIs(dictionaryAccess, typeof(object[]));
+                var valueIsCollection = Expression.TypeIs(dictionaryAccess, typeof(IEnumerable<object>));
+                Expression isArrayOrCollection = Expression.OrElse(valueIsArray, valueIsCollection);
+                comparison = Expression.Condition(isArrayOrCollection, checkCollection, comparison);
+            }
+
+            // If the key is not present, return false or some default behavior
+            Expression defaultExpression = Expression.Constant(false);
+
+            // Combine the contains key check and the comparison
+            return Expression.Condition(containsKeyExpression, comparison, defaultExpression);
+
+
+
+            /*
+            // Define the parameter for the lambda expression (IDictionary<string, object> dict)
+            // var dictParam = Expression.Parameter(typeof(IDictionary<string, object>), "dict");
+
+            // Define the key we're searching for ("test")
+            var key = Expression.Constant(memberName, typeof(string));
+            var inputType = GetDictionaryType(value, op);
+            // Expression to retrieve the value from the dictionary: dict.TryGetValue("test", out object value)
+            var tryGetValueMethod = typeof(IDictionary<string, object>).GetMethod("TryGetValue");
+            var valueVar = Expression.Variable(typeof(object), "value");
+            var castedValue = Expression.Convert(valueVar, inputType);
+            var tryGetValueCall = Expression.Call(expression, tryGetValueMethod, key, valueVar);
+
+            var valueIsNotACollection = Expression.Not(Expression.TypeIs(valueVar, typeof(object[])));
+
+            Expression compareExpression = CreateOperationExpression(castedValue, op, value);
+
+
+            //  var isNotNull = Expression.Not(Expression.Equal(valueVar, Expression.Constant(null)));
+
+            // var valueCasted = GetValueCasted(valueVar);
+
+            // Expression compareExpression = Expression.Equal(valueCasted, Expression.Constant(value));
+
+
+            var checkString = Expression.AndAlso(valueIsNotACollection, compareExpression);
+
+
+            checkString = Expression.AndAlso(Expression.Not(Expression.Equal(castedValue, Expression.Default(inputType))), checkString);
+            
+            var valueIsNotACollection = Expression.Not(Expression.TypeIs(valueVar, typeof(object[])));
+            // Check if value is a collection and contains "cocoonut"
+            var containsMethod = typeof(Enumerable).GetMethods()
+                                                       .First(m => m.Name == "Contains" && m.GetParameters().Length == 2)
+                                                       .MakeGenericMethod(typeof(object));
+            var list = new List<Expression>().Any(m => m.CanReduce);
+            var valueAsCollection = Expression.Convert(valueVar, typeof(IEnumerable<object>));
+            var checkCollection = Expression.Call(null, containsMethod, valueAsCollection, Expression.Convert(Expression.Constant(value), typeof(object)));
+
+            var valueIsArray = Expression.TypeIs(valueVar, typeof(object[]));
+            //var valueIsCollection = Expression.TypeIs(valueVar, typeof(IEnumerable<object>));
+            //Expression isArrayOrCollection = Expression.OrElse(valueIsArray, valueIsCollection);
+
+            var check = Expression.OrElse(checkString, Expression.AndAlso(valueIsArray, checkCollection));
+
+
+            // Combine the TryGetValue and the value check: dict.TryGetValue && (check for string or collection)
+            var ifThenElseExpression = Expression.Condition(tryGetValueCall, check, Expression.Constant(false));
+
+            var body = Expression.AndAlso(tryGetValueCall, ifThenElseExpression);
+
+            var block = Expression.Block(new[] { valueVar }, body);
+
+            return block;*/
+        }
+
+        private Expression GetDictionaryComparisonExpression(Expression dictionaryAccess, object value, ConditionRuleOperator op)
+        {
+            Expression comparison;
+            switch (op)
+            {
+                case ConditionRuleOperator.isNull:
+                    // Check if the dictionary value is null
+                    comparison = Expression.Equal(dictionaryAccess, Expression.Constant(null, typeof(object)));
+                    break;
+
+                case ConditionRuleOperator.isNotNull:
+                    // Check if the dictionary value is NOT null
+                    comparison = Expression.NotEqual(dictionaryAccess, Expression.Constant(null, typeof(object)));
+                    break;
+                case ConditionRuleOperator.doesNotContains:
+                case ConditionRuleOperator.contains:
+                    if (value == null || value.GetType() != typeof(string))
+                    {
+                        throw new ArgumentException("The 'contains' operator requires a non-null string value.");
+                    }
+
+                    // Ensure the value in the dictionary is a string and call String.Contains
+                    var containsMethod = typeof(string).GetMethod("Contains", new[] { typeof(string) });
+                    comparison = Expression.AndAlso(
+                        Expression.TypeIs(dictionaryAccess, typeof(string)),
+                        Expression.Call(
+                            Expression.Convert(dictionaryAccess, typeof(string)),
+                            containsMethod,
+                            Expression.Constant((string)value)
+                        )
+                    );
+
+                    if (op == ConditionRuleOperator.doesNotContains)
+                    {
+                        comparison = Expression.Not(comparison);
+                    }
+
+                    break;
+
+                default:
+                    // Handle other operators (Equal, NotEqual, GreaterThan, etc.) including nulls
+                    if (value == null)
+                    {
+                        switch (op)
+                        {
+                            case ConditionRuleOperator.equal:
+                            case ConditionRuleOperator.@in:
+                            case ConditionRuleOperator.includeAll:
+                                comparison = Expression.Equal(dictionaryAccess, Expression.Constant(null, typeof(object)));
+                                break;
+                            case ConditionRuleOperator.notEqual:
+                            case ConditionRuleOperator.notIn:
+                            case ConditionRuleOperator.excludeAll:
+                                comparison = Expression.NotEqual(dictionaryAccess, Expression.Constant(null, typeof(object)));
+                                break;
+                            default:
+                                throw new NotSupportedException($"Unsupported operator for null comparison: {op}");
+                        }
+                    }
+                    else
+                    {
+                        var isNumeric = value.IsNumeric();
+                        var valueType = value.GetType();
+
+                        Expression convertedValue;
+                        if (isNumeric)
+                        {
+                            convertedValue = Expression.Constant(Convert.ChangeType(value, typeof(double)), typeof(double));
+                        }
+                        else
+                        {
+                            convertedValue = Expression.Convert(Expression.Constant(value), valueType);
+                        }
+
+                        // It's a date
+                        if (valueType == typeof(string))
+                        {
+                            bool isDatePeriod = false;
+                            var dateStr = value.ToString();
+                            if (valueType == typeof(string) && dateStr.StartsWith("\""))
+                            {
+                                value = ParseTimeSpan(dateStr);
+                                if (dateStr.EndsWith(".00:00:00\""))
+                                {
+                                    isDatePeriod = true;
+                                    value = ((DateTime)value).Date;
+                                }
+                                convertedValue = Expression.Constant(value, typeof(DateTime));
+                            }
+
+                            // Date format "yyyy-mm-dd"
+                            if (isDatePeriod || (dateStr.Length == 10 && dateStr.IndexOf("-") == 4))
+                            {
+                                if (DateTime.TryParseExact(dateStr, "DD-MM-YYYY", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime valueCasted))
+                                {
+                                    value = valueCasted;
+                                    convertedValue = Expression.Constant(valueCasted, typeof(DateTime));
+                                }
+                            }
+                        }
+
+
+                        switch (op)
+                        {
+                            case ConditionRuleOperator.@in:
+                            case ConditionRuleOperator.equal:
+                                comparison = Expression.Equal(GetDictionary(isNumeric, dictionaryAccess, value), convertedValue);
+                                break;
+
+                            case ConditionRuleOperator.notEqual:
+                            case ConditionRuleOperator.notIn:
+                                comparison = Expression.NotEqual(GetDictionary(isNumeric, dictionaryAccess, value), convertedValue);
+                                break;
+
+                            case ConditionRuleOperator.greaterThan:
+                                comparison = Expression.GreaterThan(GetDictionary(isNumeric, dictionaryAccess, value), convertedValue);
+                                break;
+
+                            case ConditionRuleOperator.greaterThanInclusive:
+                                comparison = Expression.GreaterThanOrEqual(GetDictionary(isNumeric, dictionaryAccess, value), convertedValue);
+                                break;
+
+                            case ConditionRuleOperator.lessThan:
+                                comparison = Expression.LessThan(GetDictionary(isNumeric, dictionaryAccess, value), convertedValue);
+                                break;
+
+                            case ConditionRuleOperator.lessThanInclusive:
+                                comparison = Expression.LessThanOrEqual(GetDictionary(isNumeric, dictionaryAccess, value), convertedValue);
+                                break;
+
+                            default:
+                                throw new NotSupportedException($"Unsupported operator: {op}");
+                        }
+                    }
+                    break;
+            }
+
+            return comparison;
+
+            UnaryExpression GetDictionary(bool isNumeric, Expression dicAccess, object objValue)
+            {
+
+                if (isNumeric)
+                {
+                    // Get the method info for Convert.ChangeType
+                    MethodInfo changeTypeMethod = typeof(Convert).GetMethod("ChangeType", new[] { typeof(object), typeof(Type) });
+
+                    // Create a method call expression for Convert.ChangeType(param, targetType)
+                    MethodCallExpression convertCall = Expression.Call(
+                        changeTypeMethod,
+                        dicAccess,
+                        Expression.Constant(typeof(double))
+                    );
+
+                    // Cast the result of Convert.ChangeType to the actual target type (double)
+                    return Expression.Convert(convertCall, typeof(double));
+
+                }
+
+                return Expression.Convert(dicAccess, objValue.GetType());
+            }
+        }
+
+        private Expression GetValueCasted(ParameterExpression valueVar)
+        {
+            var types = new List<Type>()
+            {
+                typeof(string),
+                typeof(DateTime),
+                typeof(Guid),
+                typeof(int?),
+                typeof(long?),
+                typeof(double?),
+                typeof(int),
+                typeof(long),
+                typeof(double),
+                typeof(bool)
+            };
+
+            Expression expression = Expression.Constant(null);
+            foreach (var type in types)
+            {
+                expression = Expression.Condition(Expression.TypeIs(valueVar, type), Expression.Convert(valueVar, type), expression);
+            }
+
+            return expression;
         }
 
         private Type GetDictionaryType(object value, ConditionRuleOperator op)
@@ -1120,7 +1482,7 @@ namespace JsonRuleEngine.Net
             {
                 expression = Expression.NotEqual(property, toCompare);
             }
-            else if ( op == ConditionRuleOperator.greaterThan)
+            else if (op == ConditionRuleOperator.greaterThan)
             {
                 expression = Expression.GreaterThan(property, toCompare);
             }
