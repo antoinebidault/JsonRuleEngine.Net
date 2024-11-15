@@ -1400,7 +1400,8 @@ namespace JsonRuleEngine.Net
             var property = inputProperty;
             bool isMethodCall = property is MethodCallExpression;
 
-            // Specific case of TimeSpan Stored as "\00:22:00"\""
+            bool isNullable = property.Type.IsNullable();
+
             if (value != null)
             {
                 var valueType = value.GetType();
@@ -1413,6 +1414,7 @@ namespace JsonRuleEngine.Net
                     // It's a date
                     if (valueType == typeof(string) && dateStr.StartsWith("\""))
                     {
+                        // Specific case of TimeSpan Stored as "\00:22:00"\""
                         value = ParseTimeSpan(dateStr);
                         if (dateStr.EndsWith(".00:00:00\""))
                         {
@@ -1432,19 +1434,32 @@ namespace JsonRuleEngine.Net
                         {
                             property = Expression.Property(property, "Date");
                         }
+                        try
+                        {
+                            value = DateTime.Parse(value.ToString());
+                        }
+                        catch (Exception)
+                        {
+                            throw new JsonRuleEngineException(JsonRuleEngineExceptionCategory.InvalidValue, $"Unable to cast value {value} to date, please provide the right format yyyy-mm-dd");
+                        }
                     }
                 }
-            }
+                // Case of a standard value nullable
+                else if (isNullable)
+                {
+                    value = Nullable.GetUnderlyingType(property.Type).GetValue(value);
+                }
+                else
+                {
+                    value = property.Type.GetValue(value);
+                }
 
-            bool isNullable = property.Type.IsNullable();
-            if (value != null && isNullable)
-            {
-                value = Nullable.GetUnderlyingType(property.Type).GetValue(value);
             }
             else
             {
-                value = property.Type.GetValue(value);
+               value = property.Type.GetValue(value);
             }
+
 
             Expression toCompare = Expression.Constant(value);
             if (toCompare.Type != property.Type)
@@ -1517,6 +1532,11 @@ namespace JsonRuleEngine.Net
                     var notExp = Expression.NotEqual(property, Expression.Default(property.Type));
                     expression = Expression.AndAlso(notExp, expression);
                 }
+            }
+
+            if (isNullable && op != ConditionRuleOperator.isNotNull && op != ConditionRuleOperator.isNull)
+            {
+                expression = Expression.AndAlso(Expression.Property(inputProperty, "HasValue"), expression);
             }
 
             return expression;

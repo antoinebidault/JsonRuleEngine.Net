@@ -1,0 +1,6 @@
+﻿{
+  "separator": "And",
+  "field": "Date",
+  "operator": "lessThan",
+  "value": "2018-01-01"
+}

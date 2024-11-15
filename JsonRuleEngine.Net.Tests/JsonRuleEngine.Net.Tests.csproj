@@ -10,6 +10,7 @@
     <None Remove="TestJsons\containsNull.json" />
     <None Remove="TestJsons\dateComplex.json" />
     <None Remove="TestJsons\dateEqual.json" />
+    <None Remove="TestJsons\dateNullableEqual.json" />
     <None Remove="TestJsons\deepProps.json" />
     <None Remove="TestJsons\enum.json" />
     <None Remove="TestJsons\listEqual.json" />
@@ -30,6 +31,9 @@
 
   <ItemGroup>
     <Content Include="TestJsons\combinedCollection.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="TestJsons\dateNullableEqual.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="TestJsons\listExcludeAll.json">

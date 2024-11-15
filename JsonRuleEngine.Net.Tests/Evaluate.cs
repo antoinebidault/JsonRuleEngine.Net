@@ -151,7 +151,7 @@ namespace JsonRuleEngine.Net.Tests
             Assert.True(result);
 
 
-             result = new JsonRuleEngine().Evaluate(game, new ConditionRuleSet() { Field = "CustomFields.test", Operator = ConditionRuleOperator.notEqual, Value = "Test" });
+            result = new JsonRuleEngine().Evaluate(game, new ConditionRuleSet() { Field = "CustomFields.test", Operator = ConditionRuleOperator.notEqual, Value = "Test" });
             Assert.False(result);
         }
 
@@ -371,6 +371,19 @@ namespace JsonRuleEngine.Net.Tests
         {
             List<Game> list = Test("dateEqual.json");
             Assert.True(list.Count == 1);
+        }
+        [Fact]
+        public void DateNullableEqual()
+        {
+            string rules = GetJsonTestFile("dateNullableEqual.json");
+            var evaluator = new JsonRuleEngine();
+            var expression = evaluator.ParseExpression<Game>(rules);
+            var testResult = new Game()
+            {
+                Date = null
+            };
+
+            Assert.False(evaluator.Evaluate(testResult, rules));
         }
 
         [Fact]
