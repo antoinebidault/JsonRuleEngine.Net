@@ -584,13 +584,17 @@ namespace JsonRuleEngine.Net
             // If a custom accessor is set
             if (this.CustomPropertyAccessor != null)
             {
-                var tmpExpression = this.CustomPropertyAccessor.Invoke(new PropertyAccessorContext()
+                var accessor = new PropertyAccessorContext()
                 {
                     ValueCompared = value,
                     MemberName = memberName,
                     Expression = expression,
                     InputParam = inputParam
-                });
+                };
+                var tmpExpression = this.CustomPropertyAccessor.Invoke(accessor);
+
+                // If value compared has been changed, reassign it
+                value = accessor.ValueCompared;
 
                 if (tmpExpression != null)
                 {
@@ -936,7 +940,8 @@ namespace JsonRuleEngine.Net
                             // Date format "yyyy-mm-dd"
                             if (isDatePeriod || (dateStr.Length == 10 && dateStr.IndexOf("-") == 4))
                             {
-                                if (DateTime.TryParseExact(dateStr, "DD-MM-YYYY", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime valueCasted))
+                                string[] formats = { "dd-MM-yyyy", "yyyy-MM-dd", "dd/MM/yyyy" };
+                                if (DateTime.TryParseExact(dateStr, formats, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime valueCasted))
                                 {
                                     value = valueCasted;
                                     convertedValue = Expression.Constant(valueCasted, typeof(DateTime));
@@ -1457,7 +1462,7 @@ namespace JsonRuleEngine.Net
             }
             else
             {
-               value = property.Type.GetValue(value);
+                value = property.Type.GetValue(value);
             }
 
 
