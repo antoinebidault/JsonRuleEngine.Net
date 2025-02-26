@@ -10,6 +10,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace JsonRuleEngine.Net
 {
@@ -198,7 +199,7 @@ namespace JsonRuleEngine.Net
         }
 
         /// <summary>
-        /// Evaluate a simple object (it will uses the inferred type)
+        /// Evaluate a simple object (it will use the inferred type)
         /// </summary>
         /// <param name="obj"></param>
         /// <param name="rules"></param>
@@ -209,8 +210,8 @@ namespace JsonRuleEngine.Net
                 .Single(m => m.Name == nameof(JsonRuleEngine.Evaluate) &&
                         m.GetParameters() != null &&
                         m.ContainsGenericParameters &&
-                      m.GetParameters().Length == 3 &&
-                     m.GetParameters().Select(c => c.ParameterType).Contains(typeof(ConditionRuleSet)));
+                        m.GetParameters().Length == 3 &&
+                        m.GetParameters().Select(c => c.ParameterType).Contains(typeof(ConditionRuleSet)));
 
             MethodInfo generic = method.MakeGenericMethod(obj.GetType());
             return (bool)generic.Invoke(this, parameters: new[] { obj, rules, null });
@@ -283,8 +284,6 @@ namespace JsonRuleEngine.Net
 
             return left;
         }
-
-
 
         /// <summary>
         /// Take each condition and regroup them by filters on collection
@@ -436,7 +435,6 @@ namespace JsonRuleEngine.Net
                 return (output, currentType);
             }
 
-
             if (dictionary != null && dictionary.ContainsKey(field))
             {
                 return (output, currentType);
@@ -494,7 +492,6 @@ namespace JsonRuleEngine.Net
                 {
                     return (T)value;
                 }
-
 
                 try
                 {
@@ -610,10 +607,8 @@ namespace JsonRuleEngine.Net
                 }
             }
 
-
             if (expression != null && typeof(Dictionary<string, object>).IsAssignableFrom(expression.Type))
             {
-
                 remainingFields.Remove(memberName);
                 return GetDictionaryOperation(expression, memberName, op, value);
                 /*
@@ -629,8 +624,6 @@ namespace JsonRuleEngine.Net
                 Expression key = Expression.Constant(memberName);
                 var methodGetValue = (this.GetType()).GetMethod("GetValueOrDefault");
                 expression = Expression.Call(methodGetValue, inputParam, key);
-
-
             }
             else if (expression == null)
             {
@@ -670,7 +663,6 @@ namespace JsonRuleEngine.Net
                 }
                 else
                 {
-
                     return CreateOperationExpression(expression, op, value);
                 }
             }
@@ -683,7 +675,6 @@ namespace JsonRuleEngine.Net
                 return Expression.AndAlso(Expression.NotEqual(expression, Expression.Constant(null)), CompileExpression(expression, remainingFields, isDict, inputParam, op, value, isOverride, rule, isNavigation));
             }
         }
-
 
         /// <summary>
         /// For handling dictionary specific case,
@@ -710,13 +701,10 @@ namespace JsonRuleEngine.Net
                 typeof(IDictionary<string, object>).GetProperty("Item"),
                 new[] { keyExpression });
 
-
             // Add special case for the isNull and isNotNull operators
             var comparison = GetDictionaryComparisonExpression(dictionaryAccess, value, op);
 
-
             var valueIsNotACollection = Expression.Not(Expression.TypeIs(dictionaryAccess, typeof(object[])));
-
 
             IEnumerable<object> valueCollection = new List<object>();
 
@@ -733,12 +721,10 @@ namespace JsonRuleEngine.Net
                     valueCollection = value is JArray ? ((JArray)value).ToObject<IEnumerable<object>>() : (IEnumerable<object>)value;
                 }
 
-
                 // Check if value is a collection and contains "cocoonut"
                 var containsMethod = typeof(Enumerable).GetMethods()
                                                            .First(m => m.Name == "Contains" && m.GetParameters().Length == 2)
                                                            .MakeGenericMethod(typeof(object));
-
 
                 var list = new List<Expression>().Any(m => m.CanReduce);
                 var valueAsCollection = Expression.Convert(dictionaryAccess, typeof(IEnumerable<object>));
@@ -770,8 +756,6 @@ namespace JsonRuleEngine.Net
                     }
                 }
 
-
-
                 if (op == ConditionRuleOperator.doesNotContains || op == ConditionRuleOperator.notIn || op == ConditionRuleOperator.notEqual)
                 {
                     checkCollection = Expression.Not(checkCollection);
@@ -788,8 +772,6 @@ namespace JsonRuleEngine.Net
 
             // Combine the contains key check and the comparison
             return Expression.Condition(containsKeyExpression, comparison, defaultExpression);
-
-
 
             /*
             // Define the parameter for the lambda expression (IDictionary<string, object> dict)
@@ -808,16 +790,13 @@ namespace JsonRuleEngine.Net
 
             Expression compareExpression = CreateOperationExpression(castedValue, op, value);
 
-
             //  var isNotNull = Expression.Not(Expression.Equal(valueVar, Expression.Constant(null)));
 
             // var valueCasted = GetValueCasted(valueVar);
 
             // Expression compareExpression = Expression.Equal(valueCasted, Expression.Constant(value));
 
-
             var checkString = Expression.AndAlso(valueIsNotACollection, compareExpression);
-
 
             checkString = Expression.AndAlso(Expression.Not(Expression.Equal(castedValue, Expression.Default(inputType))), checkString);
             
@@ -835,7 +814,6 @@ namespace JsonRuleEngine.Net
             //Expression isArrayOrCollection = Expression.OrElse(valueIsArray, valueIsCollection);
 
             var check = Expression.OrElse(checkString, Expression.AndAlso(valueIsArray, checkCollection));
-
 
             // Combine the TryGetValue and the value check: dict.TryGetValue && (check for string or collection)
             var ifThenElseExpression = Expression.Condition(tryGetValueCall, check, Expression.Constant(false));
@@ -861,6 +839,7 @@ namespace JsonRuleEngine.Net
                     // Check if the dictionary value is NOT null
                     comparison = Expression.NotEqual(dictionaryAccess, Expression.Constant(null, typeof(object)));
                     break;
+
                 case ConditionRuleOperator.doesNotContains:
                 case ConditionRuleOperator.contains:
                     if (value == null || value.GetType() != typeof(string))
@@ -884,6 +863,25 @@ namespace JsonRuleEngine.Net
                         comparison = Expression.Not(comparison);
                     }
 
+                    break;
+
+                case ConditionRuleOperator.regexMatch:
+                    if (value == null || value.GetType() != typeof(string))
+                    {
+                        throw new ArgumentException("The 'regexMatch' operator requires a non-null string value.");
+                    }
+
+                    // Ensure the value in the dictionary is a string and call Regex.IsMatch
+                    var regexMatchMethod = typeof(Regex).GetMethod("IsMatch", new[] { typeof(string), typeof(string) });
+                    comparison = Expression.AndAlso(
+                        Expression.TypeIs(dictionaryAccess, typeof(string)),
+                        Expression.Call(
+                            null,
+                            regexMatchMethod,
+                            Expression.Convert(dictionaryAccess, typeof(string)),
+                            Expression.Constant((string)value)
+                        )
+                    );
                     break;
 
                 default:
@@ -948,7 +946,6 @@ namespace JsonRuleEngine.Net
                                 }
                             }
                         }
-
 
                         switch (op)
                         {
@@ -1142,7 +1139,6 @@ namespace JsonRuleEngine.Net
 
                         var expression = Expression.Call(method, array);
 
-
                         // All other expressions are cancelled in that case
                         if (collectionRule.Operator == ConditionRuleOperator.isEmpty)
                         {
@@ -1178,10 +1174,8 @@ namespace JsonRuleEngine.Net
                 }
                 else
                 {
-
                     tempExpression = CreateOperationExpression(childParam, collectionRule.Operator, collectionRule.Value);
                 }
-
 
                 // In case it's a different of notEqual operator, we would like to apply the .All
 
@@ -1214,7 +1208,6 @@ namespace JsonRuleEngine.Net
                 }
 
                 var anyExpression = Expression.Lambda(exp, childParam);
-
 
                 anyMethod = typeof(Enumerable).GetMethods().Single(m => m.Name == "Any" && m.GetParameters().Length == 2);
                 anyMethod = anyMethod.MakeGenericMethod(childType);
@@ -1278,7 +1271,6 @@ namespace JsonRuleEngine.Net
             return exp;
         }
 
-
         /// <summary>
         /// 
         /// </summary>
@@ -1328,9 +1320,7 @@ namespace JsonRuleEngine.Net
                 {
                     exp = Expression.AndAlso(exp, anyExp);
                 }
-
             }
-
 
             return exp;
         }
@@ -1464,7 +1454,6 @@ namespace JsonRuleEngine.Net
             {
                 value = property.Type.GetValue(value);
             }
-
 
             Expression toCompare = Expression.Constant(value);
             if (toCompare.Type != property.Type)

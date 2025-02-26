@@ -73,6 +73,11 @@ namespace JsonRuleEngine.Net
         /// <summary>
         /// Exclude all element of a collection
         /// </summary>
-        excludeAll
+        excludeAll,
+
+        /// <summary>
+        /// Matches a given regular expression (provided in value)
+        /// </summary>
+        regexMatch
     }
 }
