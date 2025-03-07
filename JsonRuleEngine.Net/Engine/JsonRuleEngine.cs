@@ -18,6 +18,26 @@ namespace JsonRuleEngine.Net
     /// </summary>
     public class JsonRuleEngine
     {
+        public bool Logging { get; private set; }
+
+        /// <summary>
+        /// Create a JsonRuleEngine, with logging disabled
+        /// </summary>
+        /// <param name="logging">a <c>bool</c> that specifies whether log messages should be output on the console.</param>
+        public JsonRuleEngine()
+        {
+            this.Logging = false;
+        }
+
+        /// <summary>
+        /// Create a JsonRuleEngine, optionally with logging enabled
+        /// </summary>
+        /// <param name="logging">a <c>bool</c> that specifies whether log messages should be output on the console.</param>
+        public JsonRuleEngine(bool logging)
+        {
+            this.Logging = logging;
+        }
+
         /// <summary>
         /// Validate expression against a list of white listed field
         /// </summary>
@@ -100,7 +120,8 @@ namespace JsonRuleEngine.Net
                 conditions = conditions.ReduceAndCheck();
             }
 
-            Console.WriteLine(conditions.ToString());
+            if (Logging)
+                Console.WriteLine(conditions.ToString());
 
             var query = Expression.Lambda<Func<T, bool>>(conditions, itemExpression);
             return query;
