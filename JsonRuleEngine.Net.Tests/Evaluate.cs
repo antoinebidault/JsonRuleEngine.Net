@@ -40,23 +40,7 @@ namespace JsonRuleEngine.Net.Tests
                 }
             };
 
-            bool setDic = false;
-
-            /*
-            new JsonRuleEngine().CustomPropertyAccessor = (ctx) =>
-            {
-                var exp = ctx.Expression;
-                var fieldName = ctx.MemberName;
-                if (exp != null && exp.Type == typeof(Dictionary<string, object>))
-                {
-                    setDic = true;
-                    Expression key = Expression.Constant(fieldName);
-                    var methodGetValue = (typeof(BaseTests)).GetMethod("GetValueOrDefault");
-                    return Expression.Call(methodGetValue, exp, key);
-                }
-
-                return null;
-            };*/
+            // See CustomAccessor.cs for the CustomPropertyAccessor / CustomConditionRuleSetAccessor tests
 
             bool resultInt = new JsonRuleEngine().Evaluate(game, new ConditionRuleSet() { Field = "CustomFields.testInt", Operator = ConditionRuleOperator.greaterThan, Value = 3 });
             Assert.True(resultInt);
@@ -85,10 +69,6 @@ namespace JsonRuleEngine.Net.Tests
 
             bool resultNotNull = new JsonRuleEngine().Evaluate(game, new ConditionRuleSet() { Field = "CustomFields.testSuccess", Operator = ConditionRuleOperator.isNotNull });
             Assert.True(resultNotNull);
-
-            // new JsonRuleEngine().CustomPropertyAccessor = null;
-
-            // Assert.True(setDic);
         }
 
 

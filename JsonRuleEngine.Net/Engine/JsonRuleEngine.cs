@@ -16,7 +16,7 @@ namespace JsonRuleEngine.Net
     /// <summary>
     /// The JsonRuleEngine class that contains
     /// </summary>
-    public class JsonRuleEngine
+    public partial class JsonRuleEngine
     {
         /// <summary>
         /// Validate expression against a list of white listed field
@@ -100,8 +100,6 @@ namespace JsonRuleEngine.Net
                 conditions = conditions.ReduceAndCheck();
             }
 
-            Console.WriteLine(conditions.ToString());
-
             var query = Expression.Lambda<Func<T, bool>>(conditions, itemExpression);
             return query;
         }
@@ -116,8 +114,7 @@ namespace JsonRuleEngine.Net
         /// <returns>True if the conditions are matched</returns>
         public bool Evaluate<T>(T obj, string jsonRules, EvaluateOptions<T> evaluateOptions = null)
         {
-            var query = ParseExpression<T>(jsonRules, evaluateOptions);
-            return query.Compile().Invoke(obj);
+            return GetPredicate<T>(jsonRules, evaluateOptions).Invoke(obj);
         }
 
         /// <summary>
@@ -161,8 +158,7 @@ namespace JsonRuleEngine.Net
         /// <returns>True if the conditions are matched</returns>
         public TOut Evaluate<T, TOut>(T obj, ConditionRuleSet<TOut> rules, EvaluateOptions<T> evaluateOptions)
         {
-            var query = ParseExpression<T>(rules, evaluateOptions);
-            var result = query.Compile().Invoke(obj);
+            var result = GetPredicate(rules, evaluateOptions).Invoke(obj);
             if (result)
             {
                 var returnValue = (TOut)Convert.ChangeType(rules.ReturnValue.Value, rules.ReturnValue.Type);
@@ -186,8 +182,7 @@ namespace JsonRuleEngine.Net
         public bool TryEvaluate<T, TOut>(T obj, ConditionRuleSet<TOut> rules, out TOut returnValue)
         {
             returnValue = default;
-            var query = ParseExpression<T>(rules);
-            var success = query.Compile().Invoke(obj);
+            var success = GetPredicate(rules, (EvaluateOptions<T>)null).Invoke(obj);
 
             if (!success)
                 return success;
@@ -226,8 +221,7 @@ namespace JsonRuleEngine.Net
         /// <returns>True if the conditions are matched</returns>
         public bool Evaluate<T>(T obj, ConditionRuleSet rules, EvaluateOptions<T> evaluateOptions = null)
         {
-            var query = ParseExpression<T>(rules, evaluateOptions);
-            return query.Compile().Invoke(obj);
+            return GetPredicate(rules, evaluateOptions).Invoke(obj);
         }
 
         private readonly MethodInfo MethodContains = typeof(Enumerable).GetMethods(
@@ -235,66 +229,14 @@ namespace JsonRuleEngine.Net
                         .Single(m => m.Name == nameof(Enumerable.Contains)
                             && m.GetParameters().Length == 2);
 
-        private readonly MethodInfo MethodAny = typeof(Enumerable).GetMethods(
-                        BindingFlags.Static | BindingFlags.Public)
-                        .Single(m => m.Name == nameof(Enumerable.Any)
-                            && m.GetParameters().Length == 1);
-
-        private readonly MethodInfo MethodNotContains = typeof(Enumerable).GetMethods(
-                    BindingFlags.Static | BindingFlags.Public)
-                    .Single(m => m.Name == nameof(Enumerable.Except)
-                        && m.GetParameters().Length == 2);
-
-        private delegate Expression Binder(Expression left, Expression right);
-
-        /// <summary>
-        /// Parse the expression tree
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="condition"></param>
-        /// <param name="parm"></param>
-        /// <param name="evaluateOptions"></param>
-        /// <returns></returns>
-        private Expression ParseTree<T>(
-        ConditionRuleSet condition,
-        ParameterExpression parm
-        , EvaluateOptions<T> evaluateOptions)
-        {
-            condition = RegroupFieldsByCollection(typeof(T), condition, evaluateOptions?.GetAllTransformers());
-
-            Binder binder = condition.Separator == ConditionRuleSeparator.Or ? (Binder)Expression.Or : Expression.And;
-
-            Expression bind(Expression lef, Expression right) => lef == null ? right : binder(lef, right);
-
-            Expression left = null;
-
-            // If multiple rules inner
-            if (condition.Rules != null && condition.Rules.Any())
-            {
-                foreach (var rule in condition.Rules)
-                {
-                    left = bind(left, CreateRuleExpression<T>(rule, parm, evaluateOptions));
-                }
-            }
-            else
-            {
-                left = bind(left, CreateRuleExpression<T>(condition, parm, evaluateOptions));
-            }
-
-            return left;
-        }
-
-
-
         /// <summary>
         /// Take each condition and regroup them by filters on collection
         /// { field: "Reviews.Id"}, {field: "Reviews.Type"} => { field: "Reviews", collectionRules: [ { field: "Id"}, {field: "Type"}] }
         /// </summary>
         /// <param name="condition"></param>
         /// <param name="type"></param>
-        /// <param name="dictionary"></param>
         /// <returns></returns>
-        private static ConditionRuleSet RegroupFieldsByCollection(Type type, ConditionRuleSet condition, IDictionary<string, Expression> dictionary = null)
+        private static ConditionRuleSet RegroupFieldsByCollection(Type type, ConditionRuleSet condition)
         {
             var conditionRuleSet = new ConditionRuleSet()
             {
@@ -308,7 +250,7 @@ namespace JsonRuleEngine.Net
 
             if (!string.IsNullOrEmpty(conditionRuleSet.Field))
             {
-                var (field, currentType) = GetCollectionType(type, conditionRuleSet.Field, dictionary);
+                var (field, currentType) = GetCollectionType(type, conditionRuleSet.Field);
                 if (!string.IsNullOrEmpty(field))
                 {
                     string subField = "";
@@ -341,7 +283,7 @@ namespace JsonRuleEngine.Net
             }
 
             var rules = conditionRuleSet.Rules ?? conditionRuleSet.CollectionRules;
-            var groups = rules.GroupBy(m => GetCollectionType(type, m.Field, dictionary));
+            var groups = rules.GroupBy(m => GetCollectionType(type, m.Field));
 
             var newRuleSet = new List<ConditionRuleSet>();
             foreach (var group in groups)
@@ -420,7 +362,7 @@ namespace JsonRuleEngine.Net
 
         }
 
-        private static (string, Type) GetCollectionType(Type type, string field, IDictionary<string, Expression> dictionary)
+        private static (string, Type) GetCollectionType(Type type, string field)
         {
             var output = "";
             var currentType = type;
@@ -432,12 +374,6 @@ namespace JsonRuleEngine.Net
             }
 
             if (IsDictionary(type))
-            {
-                return (output, currentType);
-            }
-
-
-            if (dictionary != null && dictionary.ContainsKey(field))
             {
                 return (output, currentType);
             }
@@ -511,59 +447,6 @@ namespace JsonRuleEngine.Net
             return default(T);
         }
 
-        private Expression CreateRuleExpression<T>(ConditionRuleSet rule, ParameterExpression parm, EvaluateOptions<T> evaluateOptions)
-        {
-            Expression right = null;
-            if (rule.Separator.HasValue && rule.Rules != null && rule.Rules.Any())
-            {
-                right = ParseTree<T>(rule, parm, evaluateOptions);
-                return right;
-            }
-
-            // If the field is empty, then return true
-            if (string.IsNullOrEmpty(rule.Field))
-            {
-                return right;
-            }
-
-            Expression expression = null;
-
-#if !DEBUG
-            try
-            {
-#endif
-            string field = rule.Field;
-
-            if (evaluateOptions != null && evaluateOptions.HasTransformer(field))
-            {
-                var transformer = evaluateOptions.GetTransformer<T>(field, parm);
-
-                var visitor = new ParameterReplaceVisitor(parm);
-                Expression newBody = visitor.Visit(transformer);
-
-                expression = CompileExpression(newBody, new List<string> { field }, false, parm, rule.Operator, rule.Value, true, rule, false);
-            }
-            else
-            {
-                var fields = field.Split('.').ToList();
-                bool isDict = IsDictionary(parm.Type);
-
-                while (fields.Count > 0)
-                {
-                    expression = CompileExpression(expression ?? parm, fields, isDict, parm, rule.Operator, rule.Value, false, rule, false);
-                }
-            }
-
-            return expression;
-#if !DEBUG
-            }
-            catch (Exception e)
-            {
-                throw new JsonRuleEngineException(JsonRuleEngineExceptionCategory.InvalidField, $"The provided field is invalid {rule.Field} : {e.Message} ");
-            }
-#endif
-        }
-
         private static bool IsDictionary(Type type)
         {
             return typeof(IDictionary).IsAssignableFrom(type);
@@ -576,6 +459,81 @@ namespace JsonRuleEngine.Net
         /// </summary>
         /// <return>Expresssion</return>
         public Func<PropertyAccessorContext, Expression> CustomPropertyAccessor { get; set; }
+
+        /// <summary>
+        /// Low level accessor, called once for each leaf ConditionRuleSet with the complete
+        /// rule (full dotted field, operator and value) instead of one call per field segment
+        /// like <see cref="CustomPropertyAccessor"/>.
+        ///
+        /// Return null to let the engine handle the rule as usual.
+        /// Return a boolean expression to use it as the predicate of the rule as is.
+        /// Return any other expression (ex : a member access) and the engine applies the
+        /// operator and the value of the rule on it, exactly as it would have done itself.
+        /// You can also call ctx.ApplyOperator(...) explicitly.
+        ///
+        /// A claimed field does not need to exist on T : claimed fields bypass the field
+        /// validation and the collection regrouping, so a rule like
+        /// { field: "Extra.InternetTLD" } can be transpiled to a single
+        /// EF.Functions.JsonValue(w.ExtraInformation, "$.InternetTLD") call.
+        ///
+        /// The accessor is probed once per leaf rule and must not have side effects.
+        ///
+        /// Groups (rules with a Separator and inner Rules) are never passed to this accessor,
+        /// they are always built by the engine.
+        /// </summary>
+        /// <return>Expresssion</return>
+        public Func<ConditionRuleSetAccessorContext, Expression> CustomConditionRuleSetAccessor { get; set; }
+
+        /// <summary>
+        /// Invoke the custom condition rule set accessor on a leaf rule
+        /// </summary>
+        /// <param name="rule">The leaf rule</param>
+        /// <param name="inputParam">Parameter the expression must be built on</param>
+        /// <param name="isCollectionItem">True when the rule is a collection sub rule</param>
+        /// <param name="rawResult">True when the caller expects a raw member access instead of a predicate</param>
+        /// <returns>The custom expression, or null if the rule is not handled</returns>
+        private Expression InvokeConditionRuleSetAccessor(ConditionRuleSet rule, ParameterExpression inputParam, bool isCollectionItem, bool rawResult)
+        {
+            if (this.CustomConditionRuleSetAccessor == null)
+            {
+                return null;
+            }
+
+            var context = new ConditionRuleSetAccessorContext()
+            {
+                Rule = rule,
+                Value = rule.Value,
+                InputParam = inputParam,
+                IsCollectionItem = isCollectionItem,
+                OperatorFactory = (expression, value) => CreateOperationExpression(expression, rule.Operator, value)
+            };
+
+            var custom = this.CustomConditionRuleSetAccessor.Invoke(context);
+
+            // Not handled, let the engine do its job
+            if (custom == null)
+            {
+                return null;
+            }
+
+            // The caller needs the raw member access (navigation / includeAll)
+            if (rawResult)
+            {
+                return custom;
+            }
+
+            if (custom.Type == typeof(bool))
+            {
+                return custom;
+            }
+
+            if (custom.Type == typeof(bool?))
+            {
+                return Expression.Equal(custom, Expression.Constant(true, typeof(bool?)));
+            }
+
+            return CreateOperationExpression(custom, rule.Operator, context.Value);
+        }
 
         private Expression CompileExpression(Expression expression, List<string> remainingFields, bool isDict, Expression inputParam, ConditionRuleOperator op, object value, bool isOverride, ConditionRuleSet rule, bool isNavigation)
         {
@@ -1253,6 +1211,13 @@ namespace JsonRuleEngine.Net
 
         private Expression GetChildExpression(Expression param, bool isDict, ParameterExpression childParam, Expression exp, ConditionRuleSet collectionRule, bool isNavigation = false)
         {
+            // Collection sub rule : the custom accessor can transpile it, based on the collection item parameter
+            var customRuleExpression = InvokeConditionRuleSetAccessor(collectionRule, childParam, true, isNavigation);
+            if (customRuleExpression != null)
+            {
+                return customRuleExpression;
+            }
+
             var fields = collectionRule.Field.Split('.').ToList();
             while (fields.Count > 0)
             {
