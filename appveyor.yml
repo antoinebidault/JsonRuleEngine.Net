@@ -1,5 +1,5 @@
 image: Visual Studio 2026
-version: 1.2.{build}
+version: 2.0.{build}
 build: off
 
 before_build:
