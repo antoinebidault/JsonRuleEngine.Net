@@ -12,7 +12,7 @@ namespace JsonRuleEngine.Net
     public class ConditionRuleSetAccessorContext
     {
         /// <summary>
-        /// The context is instanciated by the engine before each accessor call
+        /// The context is instanciated by the engine before each accessor call to get the necessary data
         /// </summary>
         public ConditionRuleSetAccessorContext()
         {
