@@ -448,6 +448,66 @@ namespace JsonRuleEngine.Net
             return default(T);
         }
 
+        /// <summary>
+        /// Do not delete : bound by the expression trees built for the in / notIn
+        /// operators on dictionary values.
+        /// True if the stored value equals one of the rule values.
+        /// Numbers are compared as double, whatever their exact type (int stored vs long rule value...)
+        /// </summary>
+        /// <param name="storedValue">The value read from the dictionary</param>
+        /// <param name="ruleValues">The values of the rule</param>
+        /// <returns></returns>
+        public static bool DictionaryValueIn(object storedValue, object[] ruleValues)
+        {
+            foreach (var ruleValue in ruleValues)
+            {
+                if (ruleValue == null)
+                {
+                    if (storedValue == null)
+                    {
+                        return true;
+                    }
+
+                    continue;
+                }
+
+                if (storedValue == null)
+                {
+                    continue;
+                }
+
+                if (IsNumericValue(ruleValue) && IsNumericValue(storedValue))
+                {
+                    if (Convert.ToDouble(ruleValue, CultureInfo.InvariantCulture) == Convert.ToDouble(storedValue, CultureInfo.InvariantCulture))
+                    {
+                        return true;
+                    }
+
+                    continue;
+                }
+
+                if (ruleValue.Equals(storedValue))
+                {
+                    return true;
+                }
+
+                // Different runtime types (ex : a Guid stored against a string rule value)
+                if (string.Equals(ruleValue.ToString(), storedValue.ToString(), StringComparison.Ordinal))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private static bool IsNumericValue(object value)
+        {
+            return value is sbyte || value is byte || value is short || value is ushort
+                || value is int || value is uint || value is long || value is ulong
+                || value is float || value is double || value is decimal;
+        }
+
         private static bool IsDictionary(Type type)
         {
             return typeof(IDictionary).IsAssignableFrom(type);
@@ -854,6 +914,29 @@ namespace JsonRuleEngine.Net
                     break;
 
                 default:
+                    // in / notIn with an array value on a scalar stored value :
+                    // true when the stored value equals one of the rule values.
+                    // (a stored value that is itself a collection is handled by the caller)
+                    if (value != null && value.GetType().IsArray()
+                        && (op == ConditionRuleOperator.@in || op == ConditionRuleOperator.notIn))
+                    {
+                        var ruleValues = value is JArray valueArray
+                            ? valueArray.ToObject<object[]>()
+                            : ((IEnumerable)value).Cast<object>().ToArray();
+
+                        comparison = Expression.Call(
+                            typeof(JsonRuleEngine).GetMethod(nameof(DictionaryValueIn)),
+                            dictionaryAccess,
+                            Expression.Constant(ruleValues, typeof(object[])));
+
+                        if (op == ConditionRuleOperator.notIn)
+                        {
+                            comparison = Expression.Not(comparison);
+                        }
+
+                        break;
+                    }
+
                     // Handle other operators (Equal, NotEqual, GreaterThan, etc.) including nulls
                     if (value == null)
                     {

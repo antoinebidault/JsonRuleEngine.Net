@@ -292,6 +292,16 @@ namespace JsonRuleEngine.Net.Tests
                 g => g.CustomFields != null && g.CustomFields.ContainsKey("s") && g.CustomFields["s"] != null);
             Add("dictProp_missingKey_false", L("CustomFields.doesNotExist", ConditionRuleOperator.equal, "x"),
                 g => false);
+            // in / notIn on a scalar dictionary value : numbers compare as double whatever their type
+            Add("dictProp_in_scalarNumber", L("CustomFields.n", ConditionRuleOperator.@in, JArray.FromObject(new[] { 5, 12 })),
+                g => g.CustomFields != null && g.CustomFields.ContainsKey("n")
+                     && g.CustomFields["n"] != null && new[] { 5d, 12d }.Contains(Convert.ToDouble(g.CustomFields["n"])));
+            Add("dictProp_notIn_scalarNumber", L("CustomFields.n", ConditionRuleOperator.notIn, JArray.FromObject(new[] { 5, 99 })),
+                g => g.CustomFields != null && g.CustomFields.ContainsKey("n")
+                     && !(g.CustomFields["n"] != null && new[] { 5d, 99d }.Contains(Convert.ToDouble(g.CustomFields["n"]))));
+            Add("dictProp_in_scalarString", L("CustomFields.s", ConditionRuleOperator.@in, JArray.FromObject(new[] { "hello world", "other" })),
+                g => g.CustomFields != null && g.CustomFields.ContainsKey("s")
+                     && g.CustomFields["s"] != null && new[] { "hello world", "other" }.Contains(g.CustomFields["s"] as string));
             Add("dictProp_equal_onListValue", L("CustomFields.list", ConditionRuleOperator.equal, "a"),
                 g => g.CustomFields != null && g.CustomFields.ContainsKey("list") &&
                      g.CustomFields["list"] is IEnumerable<object> e && e.Contains("a"));
@@ -328,6 +338,10 @@ namespace JsonRuleEngine.Net.Tests
                 d => d.ContainsKey("num") && Convert.ToDouble(d["num"]) > 10d);
             Add("dictRoot_in_onListValue", L("list", ConditionRuleOperator.@in, new List<string>() { "1" }),
                 d => d.ContainsKey("list") && d["list"] is IEnumerable<object> e && e.Cast<object>().Contains("1"));
+            Add("dictRoot_in_scalarNumber", L("num", ConditionRuleOperator.@in, JArray.FromObject(new[] { 125, 12 })),
+                d => d.ContainsKey("num") && d["num"] != null && new[] { 125d, 12d }.Contains(Convert.ToDouble(d["num"])));
+            Add("dictRoot_notIn_scalarString", L("key", ConditionRuleOperator.notIn, JArray.FromObject(new[] { "nope", "other" })),
+                d => d.ContainsKey("key") && !new[] { "nope", "other" }.Contains(d["key"] as string));
             Add("dictRoot_group",
                 G(ConditionRuleSeparator.And,
                     L("key", ConditionRuleOperator.equal, "ok"),
