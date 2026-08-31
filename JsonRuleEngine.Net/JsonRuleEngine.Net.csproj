@@ -30,4 +30,15 @@
     </None>
   </ItemGroup>
 
+  <!--
+    AppVeyor builds this project from its UI configuration and ignores
+    appveyor.yml, so the yml's `artifacts:` section never runs. Push the
+    package from the build itself instead. No-op outside AppVeyor.
+  -->
+  <Target Name="PushPackageToAppVeyor" AfterTargets="Pack" Condition="'$(APPVEYOR)' != ''">
+    <Exec Command="appveyor PushArtifact &quot;%(NuGetPackOutput.FullPath)&quot; -DeploymentName &quot;NuGet package&quot;"
+          Condition="'%(NuGetPackOutput.Extension)' == '.nupkg'"
+          ContinueOnError="true" />
+  </Target>
+
 </Project>
