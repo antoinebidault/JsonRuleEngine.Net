@@ -7,12 +7,12 @@ before_build:
 
 build_script:
   - dotnet restore -v quiet
-  - ps: dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
+  - dotnet test -p:CollectCoverage=true -p:CoverletOutputFormat=opencover
   - ps: codecov -f "JsonRuleEngine.Net.Tests/coverage.opencover.xml" -t $($env:CODECOV_TOKEN)
-  - ps: dotnet build /p:configuration=Release /p:Version=$($env:appveyor_build_version)
+  - ps: dotnet build JsonRuleEngine.Net\JsonRuleEngine.Net.csproj -c Release -p:Version=$env:APPVEYOR_BUILD_VERSION
 
 test: off
 
 artifacts:
-  - path: JsonRuleEngine.Net\**\bin\release\*.nupkg
+  - path: JsonRuleEngine.Net\bin\Release\*.nupkg
     name: NuGet package
