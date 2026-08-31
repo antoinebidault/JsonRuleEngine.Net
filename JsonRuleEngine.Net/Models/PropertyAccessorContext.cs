@@ -23,5 +23,10 @@ namespace JsonRuleEngine.Net
         /// </summary>
         public Expression Expression { get; set; }
         public Expression InputParam { get; internal set; }
+
+        /// <summary>
+        /// Operator of the current operation
+        /// </summary>
+        public ConditionRuleOperator Operator { get; internal set; }
     }
 }

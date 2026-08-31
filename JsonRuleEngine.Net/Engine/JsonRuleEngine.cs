@@ -588,6 +588,7 @@ namespace JsonRuleEngine.Net
                 {
                     ValueCompared = value,
                     MemberName = memberName,
+                    Operator = op,
                     Expression = expression,
                     InputParam = inputParam
                 };
