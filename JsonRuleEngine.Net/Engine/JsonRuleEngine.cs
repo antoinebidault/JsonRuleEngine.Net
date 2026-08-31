@@ -846,6 +846,13 @@ namespace JsonRuleEngine.Net
 
                     break;
 
+                case ConditionRuleOperator.regex:
+                    // Only string values of the dictionary can match
+                    comparison = Expression.AndAlso(
+                        Expression.TypeIs(dictionaryAccess, typeof(string)),
+                        CreateRegexExpression(Expression.Convert(dictionaryAccess, typeof(string)), value));
+                    break;
+
                 default:
                     // Handle other operators (Equal, NotEqual, GreaterThan, etc.) including nulls
                     if (value == null)

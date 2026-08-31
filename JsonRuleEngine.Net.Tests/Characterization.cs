@@ -114,6 +114,15 @@ namespace JsonRuleEngine.Net.Tests
                 g => g.Name != null && g.Name.Contains("GTA"));
             Add("doesNotContains_string", L("Name", ConditionRuleOperator.doesNotContains, "GTA"),
                 g => g.Name != null && !g.Name.Contains("GTA"));
+            Add("regex_string", L("Name", ConditionRuleOperator.regex, "^GTA [IV]+$"),
+                g => g.Name != null && System.Text.RegularExpressions.Regex.IsMatch(g.Name, "^GTA [IV]+$"));
+            Add("regex_collection", L("Reviews.Text", ConditionRuleOperator.regex, "(very ){2,}"),
+                g => g.Reviews != null && g.Reviews.Any(r => r.Text != null && System.Text.RegularExpressions.Regex.IsMatch(r.Text, "(very ){2,}")));
+            Add("regex_primitiveCollection", L("Tags", ConditionRuleOperator.regex, "^Surv"),
+                g => g.Tags != null && g.Tags.Any(t => t != null && System.Text.RegularExpressions.Regex.IsMatch(t, "^Surv")));
+            Add("regex_dictProp", L("CustomFields.s", ConditionRuleOperator.regex, "wor.d$"),
+                g => g.CustomFields != null && g.CustomFields.ContainsKey("s") && g.CustomFields["s"] is string s
+                     && System.Text.RegularExpressions.Regex.IsMatch(s, "wor.d$"));
             Add("in_jarray_string", L("Name", ConditionRuleOperator.@in, JArray.FromObject(new[] { "Destiny", "Sim City" })),
                 g => new[] { "Destiny", "Sim City" }.Contains(g.Name));
             Add("notIn_jarray_string", L("Name", ConditionRuleOperator.notIn, JArray.FromObject(new[] { "Destiny", "Sim City" })),

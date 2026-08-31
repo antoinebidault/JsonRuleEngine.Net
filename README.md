@@ -204,7 +204,7 @@ var list = _db.Games.Where(expression).ToList();
 | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
 | separator  | enum (Or, And) **optional**                                                                                                                                   | The type of condition rules                                                                                                                 |
 | field      | string **optional**                                                                                                                                           | The name of the field used for filtering (Camel sensitive). If the rules properties contains no element **this field must be set**          |
-| operator   | enum (equal,notEqual, lessThan, lessThanInclusive,greaterThan, greaterThanInclusive,in,notIn, contains, doesNotContains, isNull, isNotNull) **default:equal** | The type of method used for comparing values                                                                                                |
+| operator   | enum (equal,notEqual, lessThan, lessThanInclusive,greaterThan, greaterThanInclusive,in,notIn, contains, doesNotContains, isNull, isNotNull, isEmpty, isNotEmpty, includeAll, excludeAll, regex) **default:equal** | The type of method used for comparing values                                                                                                |
 | value      | object **optional, default:null**                                                                                                                             | The string value, the number or the object used for egality comparison. In case, the in operator is used, this **must be a list of string** |
 | rules      | List of ConditionRuleSet **optional, default: null**                                                                                                          | The nested rules contained in the group                                                                                                     |
 
@@ -227,6 +227,23 @@ Here is the list of supported operators :
 - isEmpty,
 - includeAll (new) : match all elements with the condition
 - excludeAll (new) : does not match all elements within the condition
+- regex (new) : regular expression match, see below
+
+### The regex operator
+
+```json
+{ "field": "Name", "operator": "regex", "value": "^GTA [IV]+$" }
+```
+
+- applies to **string fields only** (including navigation properties, collections and dictionary values),
+  any other field type is rejected at parse time with an `InvalidValue` error,
+- the value is the .NET regex pattern, validated at parse time. Matching is case sensitive,
+  use an inline flag like `(?i)` for case insensitivity,
+- a null field value never matches,
+- matching is evaluated with a 1 second timeout, so a hostile pattern coming from client
+  provided rules cannot hang the evaluation (ReDoS),
+- it is evaluated in memory : most EF providers cannot translate `Regex.IsMatch` to SQL,
+  so use it with `Evaluate` rather than inside an EF Core query.
 
 
 ## Support of dictionary objects (since 1.14.0)
