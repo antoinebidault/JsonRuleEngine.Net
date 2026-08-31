@@ -10,6 +10,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace JsonRuleEngine.Net
 {
@@ -1325,6 +1326,64 @@ namespace JsonRuleEngine.Net
         /// <param name="value"></param>
         /// <returns></returns>
         /// <exception cref="JsonRuleEngineException"></exception>
+        /// <summary>
+        /// Matches are bounded by this timeout, so a hostile pattern coming from
+        /// client provided rules cannot hang the evaluation (ReDoS)
+        /// </summary>
+        private static readonly TimeSpan RegexMatchTimeout = TimeSpan.FromSeconds(1);
+
+        private static readonly MethodInfo MethodRegexIsMatch = typeof(Regex).GetMethod(
+            nameof(Regex.IsMatch),
+            new[] { typeof(string), typeof(string), typeof(RegexOptions), typeof(TimeSpan) });
+
+        /// <summary>
+        /// Build a Regex.IsMatch(field, pattern) expression.
+        /// String fields only, the pattern is validated at compile time,
+        /// and a null field value never matches
+        /// </summary>
+        /// <param name="inputProperty"></param>
+        /// <param name="value">The regex pattern</param>
+        /// <returns></returns>
+        /// <exception cref="JsonRuleEngineException"></exception>
+        private static Expression CreateRegexExpression(Expression inputProperty, object value)
+        {
+            var pattern = value as string;
+            if (string.IsNullOrEmpty(pattern))
+            {
+                throw new JsonRuleEngineException(JsonRuleEngineExceptionCategory.InvalidValue,
+                    "The regex operator requires a non empty string pattern as value");
+            }
+
+            if (inputProperty.Type != typeof(string))
+            {
+                throw new JsonRuleEngineException(JsonRuleEngineExceptionCategory.InvalidValue,
+                    $"The regex operator can only be applied to string fields (field type : {inputProperty.Type.Name})");
+            }
+
+            // Validate the pattern now, so an invalid rule fails at parse time with a clear error
+            try
+            {
+                new Regex(pattern);
+            }
+            catch (ArgumentException e)
+            {
+                throw new JsonRuleEngineException(JsonRuleEngineExceptionCategory.InvalidValue,
+                    $"The provided regex pattern is invalid {pattern} : {e.Message}");
+            }
+
+            var isMatch = Expression.Call(
+                MethodRegexIsMatch,
+                inputProperty,
+                Expression.Constant(pattern),
+                Expression.Constant(RegexOptions.None),
+                Expression.Constant(RegexMatchTimeout));
+
+            // IsMatch throws on null input : a null field value never matches
+            return Expression.AndAlso(
+                Expression.NotEqual(inputProperty, Expression.Default(typeof(string))),
+                isMatch);
+        }
+
         private Expression CreateOperationExpression(Expression inputProperty, ConditionRuleOperator op, object value)
         {
             Expression expression = null;
@@ -1366,6 +1425,12 @@ namespace JsonRuleEngine.Net
                 {
                     throw new JsonRuleEngineException(JsonRuleEngineExceptionCategory.InvalidValue, $"The provided value is not an array {value.ToString()} : {e.Message} ");
                 }
+            }
+
+            // Regex matching : handled before the value coercion, the value is a pattern
+            if (op == ConditionRuleOperator.regex)
+            {
+                return CreateRegexExpression(inputProperty, value);
             }
 
             var property = inputProperty;

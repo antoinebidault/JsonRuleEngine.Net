@@ -73,6 +73,12 @@ namespace JsonRuleEngine.Net
         /// <summary>
         /// Exclude all element of a collection
         /// </summary>
-        excludeAll
+        excludeAll,
+
+        /// <summary>
+        /// Regular expression match (string fields only, value is the pattern).
+        /// Evaluated in memory : most EF providers cannot translate it to SQL
+        /// </summary>
+        regex
     }
 }
