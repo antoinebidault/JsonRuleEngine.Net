@@ -16,6 +16,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.md = README.md
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JsonRuleEngine.Net.Benchmarks", "JsonRuleEngine.Net.Benchmarks\JsonRuleEngine.Net.Benchmarks.csproj", "{BEB56E4A-908A-4545-B5AA-C02F61AF2C64}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -50,6 +52,18 @@ Global
 		{B6A9E3A3-5931-4F27-87A7-5FACB9AB89AC}.Release|x64.Build.0 = Release|Any CPU
 		{B6A9E3A3-5931-4F27-87A7-5FACB9AB89AC}.Release|x86.ActiveCfg = Release|Any CPU
 		{B6A9E3A3-5931-4F27-87A7-5FACB9AB89AC}.Release|x86.Build.0 = Release|Any CPU
+		{BEB56E4A-908A-4545-B5AA-C02F61AF2C64}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BEB56E4A-908A-4545-B5AA-C02F61AF2C64}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BEB56E4A-908A-4545-B5AA-C02F61AF2C64}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{BEB56E4A-908A-4545-B5AA-C02F61AF2C64}.Debug|x64.Build.0 = Debug|Any CPU
+		{BEB56E4A-908A-4545-B5AA-C02F61AF2C64}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{BEB56E4A-908A-4545-B5AA-C02F61AF2C64}.Debug|x86.Build.0 = Debug|Any CPU
+		{BEB56E4A-908A-4545-B5AA-C02F61AF2C64}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BEB56E4A-908A-4545-B5AA-C02F61AF2C64}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BEB56E4A-908A-4545-B5AA-C02F61AF2C64}.Release|x64.ActiveCfg = Release|Any CPU
+		{BEB56E4A-908A-4545-B5AA-C02F61AF2C64}.Release|x64.Build.0 = Release|Any CPU
+		{BEB56E4A-908A-4545-B5AA-C02F61AF2C64}.Release|x86.ActiveCfg = Release|Any CPU
+		{BEB56E4A-908A-4545-B5AA-C02F61AF2C64}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
